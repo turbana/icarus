@@ -3,16 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GravitySource : MonoBehaviour {
-    public float RotationSpeed = 0.0f;
-    public float Radius = 50.0f;
+    public float RotationRate = 0.44f; // in radians
+    public Vector3 RotationAxis = Vector3.forward;
     
     public Vector3 ForceVector(Vector3 location) {
+        Vector3 offset = this.PositionVector(location);
+        Vector3 down = -offset.normalized;
+        // centripetal force: a = rw^2
+        float force = offset.magnitude * this.RotationRate * this.RotationRate;
+        return down * force;
+    }
+
+    public Vector3 PositionVector(Vector3 location) {
         Vector3 origin = new Vector3(this.transform.position.x,
                                      this.transform.position.y,
                                      location.z);
-        Vector3 down = -(origin - location).normalized;
-        // TODO change force to account for distance / velocity
-        float force = 9.81f;
-        return down * force;
+        return origin - location;
     }
 }
