@@ -101,12 +101,23 @@ public class PlayerMovement : MonoBehaviour {
         this.rb.AddRelativeForce(velocity, ForceMode.VelocityChange);
     }
 
+    void DisplayGravity() {
+        Vector3 g = this.gravity.ForceVector(this.transform.position);
+        float force = g.magnitude;
+        float gs = force / 9.81f;
+        Debug.LogFormat("g={0} rot={1}", gs, this.gravity.RotationRate);
+    }
+
     void CheckInputs() {
         if (Input.GetKeyDown("1")) {
-            Debug.Log("key one");
+            // Debug.Log("key one");
+            this.gravity.RotationRate -= 0.05f;
+            DisplayGravity();
         }
         if (Input.GetKeyDown("2")) {
-            Debug.Log("key two");
+            // Debug.Log("key two");
+            this.gravity.RotationRate += 0.05f;
+            DisplayGravity();
         }
     }
 
