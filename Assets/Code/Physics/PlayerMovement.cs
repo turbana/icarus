@@ -124,6 +124,10 @@ public class PlayerMovement : MonoBehaviour {
     void OnCollisionEnter(Collision collision) {
         this.isGrounded = true;
     }
+
+    void OnCollisionStay(Collision collision) {
+        this.isGrounded = true;
+    }
     
     void OnCollisionExit(Collision collision) {
         this.isGrounded = false;
