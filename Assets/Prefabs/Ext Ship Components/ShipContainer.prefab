@@ -61,7 +61,7 @@ MonoBehaviour:
       m_Rotation: 0
       m_Anchor: 9
     m_Material: {fileID: 0}
-    m_SubmeshIndex: 0
+    m_SubmeshIndex: 2
     m_ManualUV: 1
     elementGroup: -1
     m_TextureGroup: -1
@@ -95,7 +95,7 @@ MonoBehaviour:
       m_Rotation: 0
       m_Anchor: 9
     m_Material: {fileID: 0}
-    m_SubmeshIndex: 0
+    m_SubmeshIndex: 2
     m_ManualUV: 1
     elementGroup: -1
     m_TextureGroup: -1
@@ -511,6 +511,7 @@ MeshRenderer:
   m_Materials:
   - {fileID: 2100000, guid: 428a952ccea316f488f657d3cf3af6b6, type: 2}
   - {fileID: 2100000, guid: 998818487aa1fa14a887379f4f33623f, type: 2}
+  - {fileID: 2100000, guid: f5c0471ddd4335c4383c93566313f43c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

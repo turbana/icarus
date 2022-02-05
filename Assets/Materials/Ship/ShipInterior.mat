@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: H_FloorTrim
+  m_Name: ShipInterior
   m_Shader: {fileID: -6465566751694194690, guid: d262e90f92b5bef49abddf23e4e1c2ac, type: 3}
   m_ShaderKeywords: _DISABLE_SSR_TRANSPARENT
   m_LightmapFlags: 4
@@ -118,8 +118,9 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - Vector1_494586723ad24814ac164198887208cf: 0.2
-    - Vector1_a2bdbf6029184b22bef880a9664e7cea: 0.66
+    - Vector1_494586723ad24814ac164198887208cf: 0.5
+    - Vector1_4cfeb066ea3046cd9a8b280b14e6179f: -2.72
+    - Vector1_a2bdbf6029184b22bef880a9664e7cea: 0.338
     - _AORemapMax: 1
     - _AORemapMin: 0
     - _ATDistance: 1
@@ -175,7 +176,7 @@ Material:
     - _IridescenceThickness: 1
     - _LinkDetailsWithBase: 1
     - _MaterialID: 1
-    - _Metallic: 0.726
+    - _Metallic: 0
     - _MetallicRemapMax: 1
     - _MetallicRemapMin: 0
     - _NormalMapSpace: 0
@@ -192,7 +193,7 @@ Material:
     - _RefractionModel: 0
     - _RenderQueueType: 1
     - _RequireSplitLighting: 0
-    - _Smoothness: 0.186
+    - _Smoothness: 0.051
     - _SmoothnessRemapMax: 1
     - _SmoothnessRemapMin: 0
     - _SpecularAAScreenSpaceVariance: 0.1
@@ -233,10 +234,10 @@ Material:
     - _ZTestTransparent: 4
     - _ZWrite: 1
     m_Colors:
-    - Color_69c4d1ae401047cdb5c7925f88ccb324: {r: 0.7529412, g: 0.7372549, b: 0.6431373, a: 1}
-    - _BaseColor: {r: 0.754717, g: 0.73681104, b: 0.64435744, a: 1}
+    - Color_69c4d1ae401047cdb5c7925f88ccb324: {r: 0.5754717, g: 0.5754717, b: 0.5754717, a: 0}
+    - _BaseColor: {r: 0.10095044, g: 0.6226415, b: 0.07929868, a: 1}
     - _BaseColorMap_MipInfo: {r: 0, g: 0, b: 0, a: 0}
-    - _Color: {r: 0.75471693, g: 0.73681104, b: 0.64435744, a: 1}
+    - _Color: {r: 0.10095041, g: 0.62264144, b: 0.07929865, a: 1}
     - _DiffusionProfileAsset: {r: 0, g: 0, b: 0, a: 0}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
@@ -251,7 +252,7 @@ Material:
     - _UVMappingMask: {r: 1, g: 0, b: 0, a: 0}
     - _UVMappingMaskEmissive: {r: 1, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
---- !u!114 &1940040714198848921
+--- !u!114 &4698626832498543249
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
