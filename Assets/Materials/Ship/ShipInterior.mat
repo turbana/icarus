@@ -120,7 +120,7 @@ Material:
     m_Floats:
     - Vector1_494586723ad24814ac164198887208cf: 0.5
     - Vector1_4cfeb066ea3046cd9a8b280b14e6179f: -2.72
-    - Vector1_a2bdbf6029184b22bef880a9664e7cea: 0.338
+    - Vector1_a2bdbf6029184b22bef880a9664e7cea: 0
     - _AORemapMax: 1
     - _AORemapMin: 0
     - _ATDistance: 1
@@ -234,6 +234,7 @@ Material:
     - _ZTestTransparent: 4
     - _ZWrite: 1
     m_Colors:
+    - Color_1b5fb08d7cbb4ea9bedf6428f5527488: {r: 0, g: 0, b: 0, a: 0}
     - Color_69c4d1ae401047cdb5c7925f88ccb324: {r: 0.5754717, g: 0.5754717, b: 0.5754717, a: 0}
     - _BaseColor: {r: 0.10095044, g: 0.6226415, b: 0.07929868, a: 1}
     - _BaseColorMap_MipInfo: {r: 0, g: 0, b: 0, a: 0}
