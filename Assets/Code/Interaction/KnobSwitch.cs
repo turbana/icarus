@@ -8,11 +8,11 @@ public class KnobSwitch : MultiWaySwitch {
 
     private float step;
 
-    void Start() {
-        step = ((360f - leftStop) + rightStop) / this.count;
-        SetState(0);
+    public override void Start() {
+        this.step = ((360f - leftStop) + rightStop) / this.count;
+        base.Start();
     }
-    
+
     protected override void SetState(int next) {
         base.SetState(next);
         float degrees = (leftStop + (this.state * step)) % 360f;

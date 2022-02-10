@@ -2,14 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MultiWaySwitch : MonoBehaviour {
+public class MultiWaySwitch : BaseGameObject {
     public int count = 2;
+    public int initialState = 0;
 
     protected int state;
-    public int State { get { return state; }}
+    public int State { get => state; }
 
-    void Start() {
-        SetState(0);
+    public virtual void Start() {
+        SetState(initialState);
     }
 
     public bool CanIncrementState() {
@@ -33,6 +34,7 @@ public class MultiWaySwitch : MonoBehaviour {
     }
 
     protected virtual void SetState(int next) {
-        state = next;
+        this.state = next;
+        FireChangeEvent();
     }
 }

@@ -1053,7 +1053,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b32cd9899ba568f4e8abc3b8e46d0b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  count: 5
+  count: 4
+  initialState: 0
   leftStop: 270
   rightStop: 90
 --- !u!1 &996262059653944390
