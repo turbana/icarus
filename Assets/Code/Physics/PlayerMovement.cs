@@ -70,8 +70,9 @@ public class PlayerMovement : MonoBehaviour {
         Vector3 forward = this.rb.rotation
             * Quaternion.AngleAxis(mouseX, Vector3.up)
             * Vector3.forward;
-        this.rb.rotation = Quaternion.LookRotation(realUp, -forward)
-            * Quaternion.AngleAxis(90f, Vector3.right);
+        // this.rb.rotation = Quaternion.LookRotation(realUp, -forward)
+        //     * Quaternion.AngleAxis(90f, Vector3.right);
+        this.rb.rotation = Quaternion.LookRotation(forward, Vector3.up);
         
         DebugRay(0.5f, 0.5f, this.rb.rotation * Vector3.up, Color.red, true);
         DebugRay(0.5f, 0.5f, realUp, Color.blue, true);
