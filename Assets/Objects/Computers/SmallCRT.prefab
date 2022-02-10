@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8653952242564572905}
   - component: {fileID: 3045218352054193547}
   - component: {fileID: 925083655571190026}
+  - component: {fileID: 6570944663974701471}
   m_Layer: 0
   m_Name: SmallCRT
   m_TagString: Untagged
@@ -1322,6 +1323,23 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.75, y: 0.75, z: 0.9711392}
   m_Center: {x: 0.375, y: 0.375, z: -0.514439}
+--- !u!114 &6570944663974701471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4267474967009498045}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a1faed2f01c7824cbc4626214f5eec0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  source: {fileID: 1731857490696945532}
+  meshMaterialIndex: 1
+  materials:
+  - {fileID: 2100000, guid: 7ccba6797822b494bac60d39be491b3c, type: 2}
+  - {fileID: 2100000, guid: b7f3d3a9b69f2c949b1bcd59b13fdf51, type: 2}
 --- !u!1001 &2886294991885523857
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1396,3 +1414,14 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6563993588011888831, guid: f5e11446d010ec948bf03725a1f58040, type: 3}
   m_PrefabInstance: {fileID: 2886294991885523857}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1731857490696945532 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3460705387978974445, guid: f5e11446d010ec948bf03725a1f58040, type: 3}
+  m_PrefabInstance: {fileID: 2886294991885523857}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 370d83c488c23a8458ef47eecb92cbcb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
