@@ -423,11 +423,11 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: {x: 0, y: 2.51, z: 56.45}
   spaceEmissionTexture:
-    m_OverrideState: 0
-    m_Value: {fileID: 8900000, guid: a0f7b662ddf80064a9f52c1e9b80456e, type: 3}
+    m_OverrideState: 1
+    m_Value: {fileID: 8900000, guid: e9499ec6c711d6740a4122d686e32528, type: 3}
   spaceEmissionMultiplier:
-    m_OverrideState: 0
-    m_Value: 100
+    m_OverrideState: 1
+    m_Value: 10
     min: 0
   spaceRotation:
     m_OverrideState: 0
