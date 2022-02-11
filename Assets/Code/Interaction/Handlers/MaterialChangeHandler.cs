@@ -7,7 +7,7 @@ public class MaterialChangeHandler : BaseGameObject {
     public int meshMaterialIndex;
     public Material[] materials;
     
-    void Start() {
+    void Awake() {
         source.AddListener(this);
     }
 

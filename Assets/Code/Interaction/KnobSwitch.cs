@@ -8,9 +8,8 @@ public class KnobSwitch : MultiWaySwitch {
 
     private float step;
 
-    public override void Start() {
+    public void Awake() {
         this.step = ((360f - leftStop) + rightStop) / this.count;
-        base.Start();
     }
 
     protected override void SetState(int next) {

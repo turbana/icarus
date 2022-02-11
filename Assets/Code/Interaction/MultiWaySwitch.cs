@@ -11,6 +11,13 @@ public class MultiWaySwitch : BaseGameObject {
 
     public virtual void Start() {
         SetState(initialState);
+        StartCoroutine(StartLate());
+    }
+
+    IEnumerator StartLate() {
+        yield return new WaitForEndOfFrame();
+        FireChangeEvent();
+        yield return null;
     }
 
     public bool CanIncrementState() {
