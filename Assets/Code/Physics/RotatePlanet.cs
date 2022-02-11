@@ -33,7 +33,7 @@ public class RotatePlanet : MonoBehaviour {
 
     void OnDestroy() {
         // restore the initial position, otherwise we risk modifying editor values
-        if (this.initialSkyPos != null) {
+        if (this.initialSkyPos != null && this.sky != null) {
             this.sky.planetCenterPosition.value = this.initialSkyPos;
         }
     }
