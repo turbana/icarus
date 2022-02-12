@@ -8,7 +8,9 @@ public class MaterialChangeHandler : BaseGameObject {
     public Material[] materials;
     
     void Awake() {
-        source.AddListener(this);
+        if (source != null) {
+            source.AddListener(this);
+        }
     }
 
     protected override void OnChangeEvent(BaseGameObject obj) {

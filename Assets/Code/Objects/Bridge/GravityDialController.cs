@@ -24,5 +24,6 @@ public class GravityDialController : BaseGameObject {
     protected override void OnChangeEvent(BaseGameObject _) {
         float percent = dial.State / (float)dial.count;
         gravity.RotationRate = high * percent;
+        this.FireChangeEvent();
     }
 }

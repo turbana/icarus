@@ -14,6 +14,7 @@ public class BridgeMonitorTest : BaseGameObject {
         foreach (MultiWaySwitch sw in this.switches) {
             sw.AddListener(this);
         }
+        gravDial.AddListener(this);
     }
 
     string OnOff(MultiWaySwitch sw) {
