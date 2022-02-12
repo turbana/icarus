@@ -12,7 +12,7 @@ public class KnobSwitch : MultiWaySwitch {
         this.step = ((360f - leftStop) + rightStop) / this.count;
     }
 
-    protected override void SetState(int next) {
+    public override void SetState(int next) {
         base.SetState(next);
         float degrees = (leftStop + (this.state * step)) % 360f;
         this.transform.localRotation = Quaternion.Euler(0f, degrees, 0f);

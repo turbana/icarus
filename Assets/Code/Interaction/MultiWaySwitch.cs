@@ -40,7 +40,7 @@ public class MultiWaySwitch : BaseGameObject {
         }
     }
 
-    protected virtual void SetState(int next) {
+    public virtual void SetState(int next) {
         this.state = next;
         FireChangeEvent();
     }
