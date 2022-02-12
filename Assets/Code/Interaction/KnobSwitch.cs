@@ -9,7 +9,7 @@ public class KnobSwitch : MultiWaySwitch {
     private float step;
 
     public void Awake() {
-        this.step = ((360f - leftStop) + rightStop) / this.count;
+        this.step = ((360f - leftStop) + rightStop) / (this.count - 1);
     }
 
     public override void SetState(int next) {
