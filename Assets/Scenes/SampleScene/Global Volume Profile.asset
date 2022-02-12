@@ -253,7 +253,7 @@ MonoBehaviour:
     m_Value: {x: 0.5, y: 0.5}
   proceduralRadii:
     m_OverrideState: 1
-    m_Value: {x: 0.3, y: 0.3}
+    m_Value: {x: 0.5, y: 0.3}
   maskMinIntensity:
     m_OverrideState: 0
     m_Value: -30

@@ -1,3 +1,4 @@
+// taken from: https://forum.unity.com/threads/rigidbody-fps-controller.257353/
     using UnityEngine;
     using System.Collections;
     using System.Collections.Generic;
@@ -269,7 +270,7 @@
         void DoFallDamage(float fallSpeed) // fallSpeed will be positive
         {
             // do your fall logic here using fallSpeed to determine how hard we hit the ground
-            Debug.Log("Hit the ground at " + fallSpeed.ToString() + " units per second");
+            // Debug.Log("Hit the ground at " + fallSpeed.ToString() + " units per second");
         }
      
         void OnCollisionEnter(Collision collision)

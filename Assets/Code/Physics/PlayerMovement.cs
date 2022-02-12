@@ -27,13 +27,13 @@ public class PlayerMovement : MonoBehaviour {
         if (!Application.isFocused) return;
         CheckInputs();
         MouseLook();
-        PerformMovement();
-        DebugWidgets();
+        // PerformMovement();
+        // DebugWidgets();
     }
 
-    void FixedUpdate() {
-        this.rb.drag = this.isGrounded ? this.groundDrag : this.airDrag;
-    }
+    // void FixedUpdate() {
+    //     this.rb.drag = this.isGrounded ? this.groundDrag : this.airDrag;
+    // }
 
     void DebugWidgets() {
         float length = 0.1f;
@@ -110,16 +110,16 @@ public class PlayerMovement : MonoBehaviour {
     }
 
     void CheckInputs() {
-        if (Input.GetKeyDown("1")) {
-            // Debug.Log("key one");
-            this.gravity.RotationRate -= 0.05f;
-            DisplayGravity();
-        }
-        if (Input.GetKeyDown("2")) {
-            // Debug.Log("key two");
-            this.gravity.RotationRate += 0.05f;
-            DisplayGravity();
-        }
+        // if (Input.GetKeyDown("1")) {
+        //     // Debug.Log("key one");
+        //     this.gravity.RotationRate -= 0.05f;
+        //     DisplayGravity();
+        // }
+        // if (Input.GetKeyDown("2")) {
+        //     // Debug.Log("key two");
+        //     this.gravity.RotationRate += 0.05f;
+        //     DisplayGravity();
+        // }
     }
 
     void OnCollisionEnter(Collision collision) {
