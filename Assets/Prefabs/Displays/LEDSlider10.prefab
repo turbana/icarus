@@ -2068,7 +2068,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f7e8b0fecdf14f4ba3ceb9de77edefd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  count: 2
+  count: 10
   initialState: 0
   leds:
   - {fileID: 6627036264935869041}
@@ -2088,8 +2088,8 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 387e9900d730cdb4e9ff09ae16e59fea, type: 2}
   - {fileID: 2100000, guid: 4db9be3075eb67949919f40c19a664f3, type: 2}
   - {fileID: 2100000, guid: 4db9be3075eb67949919f40c19a664f3, type: 2}
-  - {fileID: 2100000, guid: 1084fda2d36819147964026993f48c65, type: 2}
-  - {fileID: 2100000, guid: 1084fda2d36819147964026993f48c65, type: 2}
+  - {fileID: 2100000, guid: 8ff00750f053c3f4cba3175c389842f5, type: 2}
+  - {fileID: 2100000, guid: 8ff00750f053c3f4cba3175c389842f5, type: 2}
   - {fileID: 2100000, guid: bc4145f1c2363be4da2a07c35b070fe5, type: 2}
   - {fileID: 2100000, guid: bc4145f1c2363be4da2a07c35b070fe5, type: 2}
   offMaterial: {fileID: 2100000, guid: f4b2be9ddb010df479e11013747da28d, type: 2}
