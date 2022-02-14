@@ -7,7 +7,9 @@ public class LightSwitchHandler : BaseGameObject {
     public GameObject[] lights;
     
     void Start() {
-        source.AddListener(this);
+        if (source != null) {
+            source.AddListener(this);
+        }
     }
 
     protected override void OnChangeEvent(BaseGameObject obj) {
