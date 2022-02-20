@@ -1,0 +1,45 @@
+* Rooms
+** Bridge
+- controls
+- communications
+- jump computer
+** Engineering
+- reactor
+- fuel
+- gravity gen
+** Life Support
+- oxygen
+- filtering
+- water
+- plants?
+** Crew Quarters
+- bunks
+- kitchen
+- head
+** Engine Room
+- engine
+** Machine Shop
+- repair machines
+** Airlock
+- suits
+- oxy tanks
+* Every room needs
+- fire alarm
+- intercom
+- life support panel
+- electrical panel
+* Reactor Steps
+- switch chamber pumps to dump
+- turn on chamber pumps
+- wait for vacuum
+- switch chamber pumps to loopback
+- ensure power loop (water) is set to dump (cool)
+- turn on power loop
+- power on magnets (toroidal, inner/outer poloidal)
+- turn on fuel injection (deuterium, lithium)
+- ignition
+- turn on aux heating
+- heat up (150-300 million C)
+- turn off aux heating
+- switch power loop to generate
+- enable generators
