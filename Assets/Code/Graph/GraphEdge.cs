@@ -10,4 +10,8 @@ public class GraphEdge : MonoBehaviour {
     void Start() {
         Debug.Log($"{name}: {(v1 == null ? "null" : v1.name)} -> {(v2 == null ? "null" : v2.name)}");
     }
+
+    public void GenerateObjects() {
+        this.data.GenerateObjects(this);
+    }
 }

@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 
@@ -23,5 +24,25 @@ public class GraphEdgeEditor : Editor {
             }
         }
         return false;
+    }
+
+    public override void OnInspectorGUI() {
+        DrawDefaultInspector();
+        if (GUILayout.Button("Generate Geometry")) {
+            foreach (GameObject go in Selection.gameObjects) {
+                go.GetComponent<GraphEdge>().GenerateObjects();
+            }
+        }
+    }
+
+    [MenuItem("Tools/Generate All Graph Objects")]
+    private static void GenerateAllObjects() {
+        Debug.Log("generate all");
+        GameObject[] roots = SceneManager.GetActiveScene().GetRootGameObjects();
+        foreach (GameObject root in roots) {
+            foreach (GraphEdge edge in root.GetComponentsInChildren(typeof(GraphEdge))) {
+                edge.GenerateObjects();
+            }
+        }
     }
 }
