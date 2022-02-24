@@ -4,4 +4,5 @@ using UnityEngine;
 
 public class GraphData : MonoBehaviour {
     public virtual void GenerateObjects(GraphEdge edge) {}
+    public virtual void Tick(GraphEdge edge) {}
 }

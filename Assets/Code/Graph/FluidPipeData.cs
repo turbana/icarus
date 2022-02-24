@@ -41,4 +41,7 @@ public class FluidPipeData : GraphData {
         mesh.transform.localPosition = Vector3.zero;
         mesh.transform.rotation = Quaternion.FromToRotation(mesh.transform.up, mid - v1);
     }
+
+    public override void Tick(GraphEdge edge) {
+    }
 }
