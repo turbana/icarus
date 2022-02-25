@@ -5,7 +5,7 @@ using UnityEngine.ProBuilder;
 
 public class FluidPipeData : GraphData {
     public Material material;
-    public float radius = 0.1f;
+    public float radius = 0.01f;
     public int sides = 6;
     public bool smooth = false;
 

@@ -6,25 +6,8 @@ using System.Collections;
 [CustomEditor(typeof(GraphVertex))]
 [CanEditMultipleObjects]
 public class GraphVertexEditor : Editor {
-    private const float GIZMO_SIZE = 0.025f;
-
-    [DrawGizmo(GizmoType.Selected | GizmoType.NonSelected)]
-    static void DrawGizmosSelected(GraphVertex vert, GizmoType gizmoType) {
-        if (ShouldDrawGizmo(vert)) {
-            bool selected = (gizmoType & GizmoType.Selected) == GizmoType.Selected;
-            Gizmos.color = selected ? Color.blue : Color.red;
-            Gizmos.DrawSphere(vert.transform.position, GIZMO_SIZE);
-        }
-    }
-
-    static bool ShouldDrawGizmo(GraphVertex vert) {
-        foreach (GameObject o in Selection.gameObjects) {
-            if (o.layer == vert.gameObject.layer) {
-                return true;
-            }
-        }
-        return false;
-    }
+    private string[] edgeClassChoices = new[] {"FluidGraphEdge"};
+    private int edgeClassChoice = 0;
 
     public override void OnInspectorGUI() {
         if (Selection.objects.Length == 1) {
@@ -41,6 +24,7 @@ public class GraphVertexEditor : Editor {
                     Object.DestroyImmediate(edge.gameObject);
                 }
             } else {
+                edgeClassChoice = EditorGUILayout.Popup(edgeClassChoice, edgeClassChoices);
                 if (GUILayout.Button("Create Connection")) {
                     string layer = LayerMask.LayerToName(v1.gameObject.layer);
                     GameObject parent = GameObject.Find(layer);
@@ -53,7 +37,9 @@ public class GraphVertexEditor : Editor {
                     go.transform.parent = parent.transform;
                     go.layer = v1.gameObject.layer;
                     go.name = GlobalObjectId.GetGlobalObjectIdSlow(go).ToString();
-                    edge = go.AddComponent<GraphEdge>() as GraphEdge;
+                    if (edgeClassChoice == 0) {
+                        edge = go.AddComponent<FluidPipeEdge>() as GraphEdge;
+                    }
                     edge.v1 = v1;
                     edge.v2 = v2;
                     v1.edges.Add(edge);
@@ -64,18 +50,4 @@ public class GraphVertexEditor : Editor {
             GUILayout.Label("Cannot connect more than two GraphVertexs.");
         }
     }
-    
-    // protected virtual void OnSceneGUI() {
-    //     GraphVertex vert = target as GraphVertex;
-    //     if (Event.current.type == EventType.Repaint || true) {
-    //         Handles.color = Color.grey;
-    //         Handles.SphereHandleCap(
-    //             0,
-    //             vert.transform.position,
-    //             vert.transform.rotation,
-    //             GIZMO_SIZE,
-    //             EventType.Repaint
-    //         );
-    //     }
-    // }
 }
