@@ -26,6 +26,7 @@ public class FluidPipeData : GraphData {
         float length = Vector3.Distance(edge.v1.transform.position, edge.v2.transform.position);
         ProBuilderMesh mesh = ShapeGenerator.GenerateCylinder(PivotLocation.Center, sides, radius, length, 0, smooth ? 1 : -1);
         GameObject go = mesh.transform.gameObject;
+        go.name = "GraphEdgeGeometry";
         go.AddComponent<BoxCollider>();
         go.GetComponent<BoxCollider>().center = Vector3.zero;
         mesh.GetComponent<Renderer>().sharedMaterial = material;
