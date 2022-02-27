@@ -54,13 +54,16 @@ public class GraphEdgeEditor : Editor {
                 "This will DELETE and/or RESET all graph objects (fluid pipes, electrical grid, etc). Are you SURE?",
                 "Yes", "Oh gawd, no"))
         {
+            Undo.IncrementCurrentGroup();
+            Undo.SetCurrentGroupName("Reset all graph script objects");
             Debug.Log("Reseting all GraphVertexs...");
             foreach (GraphVertex vert in FindAll(typeof(GraphVertex))) {
-                vert.edges.Clear();
+                Undo.RecordObject(vert, "Remove graph edges from vertex");
+                vert.edges = new GraphEdge[0];
             }
             Debug.Log("Deleting all GraphEdges...");
             foreach (GraphEdge edge in FindAll(typeof(GraphEdge))) {
-                Object.DestroyImmediate(edge.gameObject);
+                Undo.DestroyObjectImmediate(edge.gameObject);
             }
         }
         

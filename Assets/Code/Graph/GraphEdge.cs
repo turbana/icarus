@@ -10,7 +10,7 @@ public class GraphEdge : MonoBehaviour {
     
     protected TextMeshPro debug;
 
-    void Start() {
+    protected void Awake() {
         // Debug.Log($"{name}: {(v1 == null ? "null" : v1.name)} -> {(v2 == null ? "null" : v2.name)}");
         GameObject go = DebugText.CreateTextObject(this.transform);
         debug = go.GetComponent<TextMeshPro>();
