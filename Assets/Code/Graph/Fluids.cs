@@ -14,6 +14,10 @@ public enum FluidType {
 }
 
 
+public static class Fluids {
+    public const float IDEAL_GAS_CONSTANT = 0.0821f;
+}
+
 public static class FluidTypeExtensions {
     /* density in g/cm3 at STP */
     public static float[] FluidDensity = new float[] {

@@ -8,6 +8,8 @@ public class FluidPipeData : GraphData {
     public float radius = 0.01f;
     public int sides = 6;
     public bool smooth = false;
+    public float fullPressure = 300f;
+    public float burstPressure = 400f;
 
     public override void GenerateObjects(GraphEdge edge) {
         // Debug.Log($"generate objects: {name}");

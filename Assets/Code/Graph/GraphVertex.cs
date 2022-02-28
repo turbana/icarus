@@ -69,4 +69,23 @@ public class GraphVertex : MonoBehaviour {
         }
         return false;
     }
+
+    protected void FixedUpdate() {
+        if (edges.Length > 1) {
+            for (int i = 0; i < edges.Length - 1; i++) {
+                TryEqualize(edges[i], edges[i + 1]);
+            }
+            if (edges.Length > 2) {
+                TryEqualize(edges[0], edges[edges.Length - 1]);
+            }
+        }
+    }
+
+    private void TryEqualize(GraphEdge e1, GraphEdge e2) {
+        FluidPipeEdge fpe1 = e1 as FluidPipeEdge;
+        FluidPipeEdge fpe2 = e2 as FluidPipeEdge;
+        if (fpe1 != null && fpe2 != null) {
+            fpe1.container.Equalize(fpe2.container);
+        }
+    }
 }
