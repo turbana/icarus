@@ -11,7 +11,7 @@ public struct StarData {
     public float mag;
     public float temp;
 
-    public override string ToString() => $"<{name} ({ra}ra {dec}dec) {mag}mag {temp}K>";
+    public override string ToString() => $"{name} ({ra}ra {dec}dec) {mag}mag {temp}K";
 }
 
 [CustomEditor(typeof(StarField))]
@@ -53,24 +53,21 @@ public class StarFieldEditor : Editor {
             go.transform.Translate(rot * (Vector3.forward * config.starDistance));
             // face origin
             go.transform.LookAt(config.transform);
-            // magnitude
-            // change scale from -2.0 <-> ~8.0 into 3.0 <-> 0.15
-            float mscale = (star.mag + 2f) / 10f;
-            // float mag = Mathf.Lerp(4f,  0.1f, mscale);
-            float mag = Mathf.Exp(Mathf.Lerp(2f, 0f, mscale));
-            mag /= 2f;
-            // set scale
+            // scale magnitude
+            float mag = Mathf.Pow(1.2f, -(star.mag - 7f));
+            // set object scale (relative to 100 units distance)
             float scale = config.starDistance / 100f * mag;
             go.transform.localScale = Vector3.one * scale;
-            // create material
-            Material mat = new Material(config.material);
-            float rtemp = 6000f * (Random.value - 0.5f);
-            Color temp = Mathf.CorrelatedColorTemperatureToRGB(star.temp + rtemp);
-            mat.color = new Color(temp.r, temp.g, temp.b, 1f - mscale);
+            // scale the temperature half closer to "white"
+            float temp = star.temp + (6500f - star.temp) / 2f;
+            Color color = Mathf.CorrelatedColorTemperatureToRGB(temp);
+            // scale alpha
+            color.a = Mathf.Min(1f, Mathf.Pow(2.512f, -(star.mag - 2f)));
             // add sprite renderer
             SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
             sr.sprite = config.sprite;
-            sr.materials = new Material[1]{ mat };
+            sr.materials = new Material[1]{ config.material };
+            sr.color = color;
         }
     }
 
@@ -99,7 +96,12 @@ public class StarFieldEditor : Editor {
             // magnitude
             star.mag = float.Parse(line.Substring(102, 5));
             // color temperature
-            star.temp = 6500f;
+            float bv;
+            float.TryParse(line.Substring(109, 5), out bv);
+            // bv is now either set or 0
+            // https://en.wikipedia.org/wiki/Color_index
+            star.temp = 4600f * ((1 / (0.92f * bv + 1.7f)) +
+                                 (1 / (0.92f * bv + 0.62f)));
             yield return star;
         }
     }
