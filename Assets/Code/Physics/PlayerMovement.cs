@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour {
     public Transform mainCamera;
-    public GravitySource gravity;
+    // public GravitySource gravity;
 
     public float speed = 3f;
     public float jumpHeight = 3f;
@@ -59,7 +59,7 @@ public class PlayerMovement : MonoBehaviour {
     void MouseLook() {
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
-        Vector3 realUp = -this.gravity.ForceVector(this.transform.position).normalized;
+        // Vector3 realUp = -this.gravity.ForceVector(this.transform.position).normalized;
         
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
@@ -75,7 +75,7 @@ public class PlayerMovement : MonoBehaviour {
         this.rb.rotation = Quaternion.LookRotation(forward, Vector3.up);
         
         DebugRay(0.5f, 0.5f, this.rb.rotation * Vector3.up, Color.red, true);
-        DebugRay(0.5f, 0.5f, realUp, Color.blue, true);
+        // DebugRay(0.5f, 0.5f, realUp, Color.blue, true);
         // Debug.Log(Vector3.Dot(this.rb.rotation * Vector3.up, realUp));
     }
 
@@ -94,7 +94,8 @@ public class PlayerMovement : MonoBehaviour {
 
         if (Input.GetButtonDown("Jump") && this.isGrounded) {
             // Debug.Log("jump");
-            float g = this.gravity.ForceVector(this.transform.position).magnitude;
+            // float g = this.gravity.ForceVector(this.transform.position).magnitude;
+            float g = -6.675f;
             // jump v = sqrt(h * -2g)
             velocity += Vector3.up * Mathf.Sqrt(jumpHeight * 2f * g);
         }
@@ -102,12 +103,12 @@ public class PlayerMovement : MonoBehaviour {
         this.rb.AddRelativeForce(velocity, ForceMode.VelocityChange);
     }
 
-    void DisplayGravity() {
-        Vector3 g = this.gravity.ForceVector(this.transform.position);
-        float force = g.magnitude;
-        float gs = force / 9.81f;
-        Debug.LogFormat("g={0} rot={1}", gs, this.gravity.RotationRate);
-    }
+    // void DisplayGravity() {
+    //     Vector3 g = this.gravity.ForceVector(this.transform.position);
+    //     float force = g.magnitude;
+    //     float gs = force / 9.81f;
+    //     Debug.LogFormat("g={0} rot={1}", gs, this.gravity.RotationRate);
+    // }
 
     void CheckInputs() {
         // if (Input.GetKeyDown("1")) {
