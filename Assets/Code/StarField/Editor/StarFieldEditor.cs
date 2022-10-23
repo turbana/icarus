@@ -62,7 +62,7 @@ public class StarFieldEditor : Editor {
             float temp = star.temp + (6500f - star.temp) / 2f;
             Color color = Mathf.CorrelatedColorTemperatureToRGB(temp);
             // scale alpha
-            color.a = Mathf.Min(1f, Mathf.Pow(2.512f, -(star.mag - 2f)));
+            color.a = Mathf.Min(1f, Mathf.Pow(2.512f, -(star.mag - 3f)));
             // add sprite renderer
             SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
             sr.sprite = config.sprite;
