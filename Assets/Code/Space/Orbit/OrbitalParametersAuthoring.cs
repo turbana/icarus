@@ -3,31 +3,44 @@ using Unity.Mathematics;
 using Unity.Entities;
 
 namespace Icarus.Orbit {
-    struct OrbitalParameters : IComponentData {
-        public float DeltaTheta;
+    internal struct OrbitalParameters : IComponentData {
+        public float Period;
+        public float Eccentricity;
+        public float SemiMajorAxis;
+
+        public float Inclination;
+        public float AscendingNode;
+        
+        public float TimeSincePerhelion;
         public float Theta;
+        public float ParentDistance;
     }
 
     [AddComponentMenu("Icarus/Orbits/Orbital Parameters")]
     public class OrbitalParametersAuthoring : MonoBehaviour {
-        public float DeltaTheta;
-        public float InitialTheta = 0f;
+        public float Period;
+        public float Eccentricity;
+        public float SemiMajorAxis;
+
+        public float Inclination;
+        public float AscendingNode;
         
+        public float TimeSincePerhelion;
+        public float Theta;
+
         public class Baker : Unity.Entities.Baker<OrbitalParametersAuthoring> {
             public override void Bake(OrbitalParametersAuthoring parms) {
-                // Debug.Log("baking");
                 AddComponent(new OrbitalParameters {
-                        DeltaTheta = math.radians(parms.DeltaTheta),
-                        Theta = math.radians(parms.InitialTheta)
+                        Period = parms.Period,
+                        Eccentricity = parms.Eccentricity,
+                        SemiMajorAxis = parms.SemiMajorAxis,
+                        Inclination = parms.Inclination,
+                        AscendingNode = parms.AscendingNode,
+                        TimeSincePerhelion = parms.TimeSincePerhelion,
+                        Theta = parms.Theta,
+                        ParentDistance = 0f
                     });
             }
         }
     }
-
-    // [WorldSystemFilter(WorldSystemFilterFlags.BakingSystem)]
-    // public partial class TestBakingSystem : SystemBase {
-    //     protected override void OnUpdate() {
-    //         Debug.Log("baking system");
-    //     }
-    // }
 }
