@@ -3,7 +3,7 @@ using Unity.Mathematics;
 using Unity.Entities;
 
 namespace Icarus.Orbit {
-    internal struct OrbitalParameters : IComponentData {
+    public struct OrbitalParameters : IComponentData {
         public float Period;
         public float Eccentricity;
         public float SemiMajorAxis;

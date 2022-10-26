@@ -4,7 +4,8 @@ using Unity.Transforms;
 
 namespace Icarus.Orbit {
     [RequireMatchingQueriesForUpdate]
-    public partial class UpdateOrbitalRotationSystem : SystemBase {
+    [UpdateInGroup(typeof(UpdateOrbitSystemGroup))]
+    public partial class UpdateRotationSystem : SystemBase {
         protected override void OnUpdate() {
             float dt = SystemAPI.Time.DeltaTime * 1000000f;
 

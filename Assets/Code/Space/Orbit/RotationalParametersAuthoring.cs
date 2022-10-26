@@ -3,7 +3,7 @@ using Unity.Mathematics;
 using Unity.Entities;
 
 namespace Icarus.Orbit {
-    internal struct RotationalParameters : IComponentData {
+    public struct RotationalParameters : IComponentData {
         public float AxialTilt;
         public float NorthPoleRA;
         public float SiderealRotationPeriod;

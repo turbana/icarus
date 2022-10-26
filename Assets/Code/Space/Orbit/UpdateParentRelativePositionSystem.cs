@@ -1,12 +1,12 @@
-using UnityEngine;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 
 namespace Icarus.Orbit {
     [RequireMatchingQueriesForUpdate]
+    [UpdateInGroup(typeof(UpdateOrbitSystemGroup))]
     [UpdateAfter(typeof(UpdateOrbitalPositionSystem))]
-    public partial class UpdateOrbitalGamePositionSystem : SystemBase {
+    public partial class UpdateParentRelativePositionSystem : SystemBase {
         protected override void OnUpdate() {
             Entities
                 .ForEach(
