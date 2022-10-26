@@ -5,12 +5,12 @@ namespace Icarus.Orbit {
     [RequireMatchingQueriesForUpdate]
     public partial class UpdateOrbitalPositionSystem : SystemBase {
         protected override void OnUpdate() {
-            float dt = SystemAPI.Time.DeltaTime;
+            float dt = SystemAPI.Time.DeltaTime * 1000000f;
 
             Entities
                 .ForEach(
                     (ref OrbitalParameters parms) => {
-                        parms.TimeSincePerhelion = (parms.TimeSincePerhelion + dt * 100000f) % parms.Period;
+                        parms.TimeSincePerhelion = (parms.TimeSincePerhelion + dt) % parms.Period;
                         UpdatePosition(ref parms);
                     })
                 .ScheduleParallel();
