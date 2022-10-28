@@ -6,7 +6,8 @@ namespace Icarus.Orbit {
     [UpdateInGroup(typeof(UpdateOrbitSystemGroup))]
     public partial class UpdateOrbitalPositionSystem : SystemBase {
         protected override void OnUpdate() {
-            float dt = SystemAPI.Time.DeltaTime * 1000000f;
+            OrbitalOptions opts = SystemAPI.GetSingleton<OrbitalOptions>();
+            float dt = SystemAPI.Time.DeltaTime * opts.TimeScale;
 
             Entities
                 .ForEach(

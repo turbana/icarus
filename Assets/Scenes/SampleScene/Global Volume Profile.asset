@@ -80,7 +80,7 @@ MonoBehaviour:
   active: 1
   indirectDiffuseLightingMultiplier:
     m_OverrideState: 1
-    m_Value: 9.1
+    m_Value: 1
   indirectDiffuseLightingLayers:
     m_OverrideState: 0
     m_Value: 255
@@ -362,28 +362,28 @@ MonoBehaviour:
   active: 0
   mode:
     m_OverrideState: 1
-    m_Value: 3
+    m_Value: 2
   useFullACES:
     m_OverrideState: 0
     m_Value: 0
   toeStrength:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: 0.252
   toeLength:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: 0.5
   shoulderStrength:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: 0.5
   shoulderLength:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: 1.51
   shoulderAngle:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: 0.413
   gamma:
     m_OverrideState: 1
-    m_Value: 1.05
+    m_Value: 1.09
   lutTexture:
     m_OverrideState: 0
     m_Value: {fileID: 0}
