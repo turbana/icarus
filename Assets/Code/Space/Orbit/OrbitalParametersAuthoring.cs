@@ -14,6 +14,7 @@ namespace Icarus.Orbit {
         public float TimeSincePerhelion;
         public float Theta;
         public float ParentDistance;
+        public float3 ParentPosition;
         public float3 SolarPosition;
     }
 
@@ -76,6 +77,7 @@ namespace Icarus.Orbit {
                         TimeSincePerhelion = parms.TimeSincePerhelion,
                         Theta = parms.Theta,
                         ParentDistance = 0f,
+                        ParentPosition = float3.zero,
                         SolarPosition = float3.zero
                     });
                 // we need a fixup component on non-ships (objects with

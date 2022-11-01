@@ -17,7 +17,8 @@ namespace Icarus.Orbit {
                         quaternion rot =
                             math.mul(orbit, quaternion.RotateY(-parms.Theta));
                         float3 pos = math.forward() * parms.ParentDistance;
-                        parms.SolarPosition = math.mul(rot, pos);
+                        parms.ParentPosition = math.mul(rot, pos);
+                        parms.SolarPosition = parms.ParentPosition;
                     })
                 .ScheduleParallel(this.Dependency);
             

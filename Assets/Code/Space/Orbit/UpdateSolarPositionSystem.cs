@@ -11,7 +11,7 @@ namespace Icarus.Orbit {
             var moons = Entities
                 .WithAll<MoonTag>()
                 .ForEach(
-                    (ref OrbitalParameters parms, in Parent parent) => {
+                    (ref OrbitalParameters parms, in OrbitalParent parent) => {
                         FixupSolarPosition fixup = GetComponent<FixupSolarPosition>(parent.Value);
                         parms.SolarPosition = fixup.SolarPosition + parms.SolarPosition;
                     })
@@ -20,7 +20,7 @@ namespace Icarus.Orbit {
             var ships = Entities
                 .WithAll<ShipTag>()
                 .ForEach(
-                    (ref OrbitalParameters parms, in Parent parent) => {
+                    (ref OrbitalParameters parms, in OrbitalParent parent) => {
                         FixupSolarPosition fixup = GetComponent<FixupSolarPosition>(parent.Value);
                         parms.SolarPosition = fixup.SolarPosition + parms.SolarPosition;
                     })
