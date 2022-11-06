@@ -54,15 +54,17 @@ public class StarFieldEditor : Editor {
             // face origin
             go.transform.LookAt(config.transform);
             // scale magnitude
-            float mag = Mathf.Pow(1.2f, -(star.mag - 7f));
-            // set object scale (relative to 100 units distance)
-            float scale = config.starDistance / 100f * mag;
+            float mag = Mathf.Pow(2.512f / 2.0f, -(star.mag - 1f));
+            // set object scale (relative to 50 units distance)
+            float scale = config.starDistance / 50f * mag;
             go.transform.localScale = Vector3.one * scale;
             // scale the temperature half closer to "white"
-            float temp = star.temp + (6500f - star.temp) / 2f;
+            float temp = star.temp + (5800f - star.temp) / 2f;
+            // float temp = star.temp;
             Color color = Mathf.CorrelatedColorTemperatureToRGB(temp);
             // scale alpha
-            color.a = Mathf.Min(1f, Mathf.Pow(2.512f, -(star.mag - 2f)));
+            // color.a = Mathf.Min(1f, Mathf.Pow(2.512f / 1.65f, -(star.mag - 1f)));
+            color.a = Mathf.Min(1f, mag);
             // add sprite renderer
             SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
             sr.sprite = config.sprite;
