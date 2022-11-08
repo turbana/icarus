@@ -119,6 +119,12 @@
             // get player input
             inputX = Input.GetAxis("Horizontal");
             inputY = Input.GetAxis("Vertical");
+
+            // ignore movement commands when in "testing" mode
+            if (Input.GetKey(Icarus.Test.TestControlsSystem.MAIN_KEY)) {
+                inputX = 0f;
+                inputY = 0f;
+            }
      
             // limit the length to 1.0f
             float length = Mathf.Sqrt(inputX * inputX + inputY * inputY);

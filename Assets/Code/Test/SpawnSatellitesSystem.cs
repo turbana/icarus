@@ -4,7 +4,7 @@ using Unity.Mathematics;
 
 using Icarus.Orbit;
 
-namespace Icarus.Debug {
+namespace Icarus.Test {
     [RequireMatchingQueriesForUpdate]
     [UpdateInGroup(typeof(UpdateOrbitSystemGroup))]
     [UpdateBefore(typeof(UpdateOrbitalPositionSystem))]
