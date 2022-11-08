@@ -47,18 +47,23 @@ namespace Icarus.Orbit {
                         pos = pos - playerPos;
                         float sdist = dist - scale.Radius;
                         float desired = 1000f + math.sqrt(sdist / X) * 100f;
-                        float dscale = desired / sdist;
-                        rscale = (scale.Radius) * (desired / sdist) * 1f;
+                        // float dscale = desired / sdist;
+                        // rscale = (scale.Radius) * (desired / sdist) * 1f;
+                        // float a = math.atan(scale.Radius / dist);
+                        // float A = math.tan(a);
+                        float A = scale.Radius / dist;
+                        float S = -((A * desired) / (A - 1f));
+                        rscale = S * 2f;
                         float3 newpos = math.normalize(pos) * (desired + rscale / 2f);
-                        UnityEngine.Debug.Log(
-                            $"0 id={entityInQueryIndex} pos={pos} dist={dist} r={scale.Radius} sdist={sdist} desired={desired} dscale={dscale} rscale={rscale} newpos={newpos}");
-                        UnityEngine.Debug.Log(
-                            $"1 id={entityInQueryIndex} theta={parms.Theta} dist={parms.ParentDistance} ptheta={pparms.Theta} pdist={pparms.ParentDistance}");
-                        UnityEngine.Debug.Log(
-                            $"2 id={entityInQueryIndex} Pos={parms.ParentPosition} pPos={pparms.ParentPosition}");
-                        float newdist = math.distance(float3.zero, newpos);
-                        UnityEngine.Debug.Log(
-                            $"3 id={entityInQueryIndex} newdist={newdist}");
+                        // UnityEngine.Debug.Log(
+                        //     $"0 id={entityInQueryIndex} pos={pos} dist={dist} r={scale.Radius} sdist={sdist} desired={desired} rscale={rscale} newpos={newpos}");
+                        // UnityEngine.Debug.Log(
+                        //     $"1 id={entityInQueryIndex} theta={parms.Theta} dist={parms.ParentDistance} ptheta={pparms.Theta} pdist={pparms.ParentDistance}");
+                        // UnityEngine.Debug.Log(
+                        //     $"2 id={entityInQueryIndex} Pos={parms.ParentPosition} pPos={pparms.ParentPosition}");
+                        // float newdist = math.distance(float3.zero, newpos);
+                        // UnityEngine.Debug.Log(
+                        //     $"3 id={entityInQueryIndex} newdist={newdist}");
                         if (dist < 1000f) {
                             newpos = pos;
                             rscale = 1f;

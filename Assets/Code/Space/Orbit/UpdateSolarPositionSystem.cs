@@ -13,7 +13,7 @@ namespace Icarus.Orbit {
                 .ForEach(
                     (ref OrbitalParameters parms, in OrbitalParent parent) => {
                         FixupSolarPosition fixup = GetComponent<FixupSolarPosition>(parent.Value);
-                        parms.SolarPosition = fixup.SolarPosition + parms.SolarPosition;
+                        parms.SolarPosition = fixup.SolarPosition + parms.ParentPosition;
                     })
                 .ScheduleParallel(this.Dependency);
             
@@ -22,7 +22,7 @@ namespace Icarus.Orbit {
                 .ForEach(
                     (ref OrbitalParameters parms, in OrbitalParent parent) => {
                         FixupSolarPosition fixup = GetComponent<FixupSolarPosition>(parent.Value);
-                        parms.SolarPosition = fixup.SolarPosition + parms.SolarPosition;
+                        parms.SolarPosition = fixup.SolarPosition + parms.ParentPosition;
                     })
                 .ScheduleParallel(moons);
 
