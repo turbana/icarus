@@ -6,7 +6,7 @@ namespace Icarus.Orbit {
     public struct RotationalParameters : IComponentData {
         public float AxialTilt;
         public float NorthPoleRA;
-        public float SiderealRotationPeriod;
+        public float Period;
         public float ElapsedTime;
         public quaternion Tilt;
     }
@@ -26,7 +26,7 @@ namespace Icarus.Orbit {
                 AddComponent(new RotationalParameters {
                         AxialTilt = parms.AxialTilt,
                         NorthPoleRA = parms.NorthPoleRA,
-                        SiderealRotationPeriod = parms.SiderealRotationPeriod,
+                        Period = parms.SiderealRotationPeriod,
                         Tilt = tilt,
                         ElapsedTime = parms.ElapsedTime
                     });

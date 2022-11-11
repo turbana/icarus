@@ -11,6 +11,7 @@ namespace Icarus.Orbit {
 
         public float Inclination;
         public float AscendingNode;
+        public quaternion OrbitRotation;
     }
 
     public struct OrbitalPosition : IComponentData {
@@ -21,10 +22,6 @@ namespace Icarus.Orbit {
         public UniformScaleTransform LocalToParent;
     }
 
-    // public struct FixupSolarPosition : IComponentData {
-    //     public float3 SolarPosition;
-    // }
-    
     public struct PlayerOrbitTag : IComponentData {}
     public struct PlanetTag : IComponentData {}
     public struct MoonTag : IComponentData {}
@@ -58,8 +55,6 @@ namespace Icarus.Orbit {
                 if (parms.IsPlayer) {
                     AddComponent(new PlayerOrbitTag());
                 }
-                // IComponentData tag = OrbitTypeTag(parms.OrbitType);
-                // AddComponent(OrbitTypeTag(parms.OrbitType));
                 switch(parms.OrbitType) {
                     case OrbitTypeEnum.Planet:
                         AddComponent(new PlanetTag());
@@ -76,22 +71,11 @@ namespace Icarus.Orbit {
                         Eccentricity = parms.Eccentricity,
                         SemiMajorAxis = parms.SemiMajorAxis,
                         Inclination = parms.Inclination,
-                        AscendingNode = parms.AscendingNode
-                        // ,
-                        // TimeSincePerhelion = parms.TimeSincePerhelion,
-                        // Theta = parms.Theta,
-                        // ParentDistance = 0f,
-                        // ParentPosition = float3.zero,
-                        // SolarPosition = float3.zero
+                        AscendingNode = parms.AscendingNode,
+                        OrbitRotation = quaternion.EulerYXZ(math.radians(parms.Inclination),
+                                                            math.radians(parms.AscendingNode),
+                                                            0f)
                     });
-                // we need a fixup component on non-ships (objects with
-                // potential children)
-                // XXX why?
-                // if (parms.OrbitType != OrbitTypeEnum.Ship) {
-                //     AddComponent(new FixupSolarPosition {
-                //             SolarPosition = float3.zero
-                //         });
-                // }
                 AddComponent(new OrbitalPosition());
             }
         }
