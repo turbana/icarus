@@ -11,25 +11,22 @@ namespace Icarus.Orbit {
 
             Entities
                 .ForEach(
-                    (ref OrbitalParameters parms) => {
+                    (ref OrbitalPosition pos, in OrbitalParameters parms) => {
                         // update elapsed time
-                        parms.TimeSincePerhelion = (parms.TimeSincePerhelion + dt) % parms.Period;
+                        pos.ElapsedTime = (pos.ElapsedTime + dt) % parms.Period;
                         // mean motion
                         float n = (2f * math.PI) / parms.Period;
                         // mean anomaly
-                        float M = n * parms.TimeSincePerhelion;
+                        float M = n * pos.ElapsedTime;
                         // eccentric anomaly
                         float e = parms.Eccentricity;
                         float E = EccentricAnomaly(M, e);
                         // true anomaly
                         // https://en.wikipedia.org/wiki/True_anomaly#From_the_eccentric_anomaly
                         float beta = e / (1f + math.sqrt(1 - math.pow(e, 2f)));
-                        float v = E + 2f * math.atan((beta * math.sin(E)) / (1f - beta * math.cos(E)));
+                        pos.Theta = E + 2f * math.atan((beta * math.sin(E)) / (1f - beta * math.cos(E)));
                         // parent distance
-                        float r = parms.SemiMajorAxis * (1f - e * math.cos(E));
-                        // update parms
-                        parms.Theta = v;
-                        parms.ParentDistance = r;
+                        pos.Altitude = parms.SemiMajorAxis * (1f - e * math.cos(E));
                     })
                 .ScheduleParallel();
         }

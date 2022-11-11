@@ -13,6 +13,7 @@ namespace Icarus.Test {
             if (!UnityEngine.Input.GetKeyDown("q")) return;
             Entity player = GetSingletonEntity<PlayerOrbitTag>();
             OrbitalParameters parms = GetComponent<OrbitalParameters>(player);
+            OrbitalPosition pos = GetComponent<OrbitalPosition>(player);
             OrbitalParent parent = GetComponent<OrbitalParent>(player);
             SpawnSatellitesComponent spawn =
                 GetComponent<SpawnSatellitesComponent>(
@@ -30,19 +31,21 @@ namespace Icarus.Test {
             ecb.AddComponent<ShipTag>(entities);
             for (int i=0; i<spawn.Count; i++) {
                 float period = parms.Period + rand.NextFloat(-30f, 30f);
-                float elapsed = parms.TimeSincePerhelion + rand.NextFloat(-30f, 30f);
+                float elapsed = pos.ElapsedTime + rand.NextFloat(-30f, 30f);
                 if (elapsed < 0f) elapsed += period;
                 ecb.AddComponent<OrbitalParameters>(entities[i], new OrbitalParameters {
                         Eccentricity = parms.Eccentricity + rand.NextFloat(-0.01f, 0.01f),
                         SemiMajorAxis = parms.SemiMajorAxis + rand.NextFloat(-100f, 100f),
                         Inclination = parms.Inclination + rand.NextFloat(-1f, 1f),
                         AscendingNode = parms.AscendingNode + rand.NextFloat(-1f, 1f),
-                        Period = period,
-                        TimeSincePerhelion = elapsed % period,
-                        Theta = parms.Theta,
-                        ParentDistance = parms.ParentDistance,
-                        ParentPosition = parms.ParentPosition,
-                        SolarPosition = parms.SolarPosition
+                        Period = period
+                    });
+                ecb.AddComponent<OrbitalPosition>(entities[i], new OrbitalPosition {
+                        ElapsedTime = elapsed,
+                        Theta = pos.Theta,
+                        Altitude = pos.Altitude,
+                        LocalToWorld = pos.LocalToWorld,
+                        LocalToParent = pos.LocalToParent
                     });
             }
 
