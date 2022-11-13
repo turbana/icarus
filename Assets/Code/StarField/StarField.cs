@@ -7,9 +7,14 @@ public class StarField : MonoBehaviour {
     public Object catalog;
     public Sprite sprite;
     public Material material;
-    public GameObject follow;
+    
+    // private GameObject player;
 
-    public void Update() {
-        this.transform.position = follow.transform.position;
-    }
+    // public void Start() {
+    //     player = GameObject.FindWithTag("Player");
+    // }
+
+    // public void Update() {
+    //     this.transform.position = player.transform.position;
+    // }
 }
