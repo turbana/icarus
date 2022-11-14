@@ -1,3 +1,4 @@
+using UnityEngine;
 using Unity.Entities;
 using Unity.Transforms;
 
@@ -8,6 +9,12 @@ namespace Icarus.Orbit {
     [UpdateInGroup(typeof(UpdateOrbitSystemGroup))]
     [UpdateAfter(typeof(UpdateOrbitalPositionSystem))]
     public partial class StarfieldRotationSystem : SystemBase {
+        private GameObject PlayerObject;
+
+        protected override void OnCreate() {
+            PlayerObject = GameObject.FindWithTag("Player");
+        }
+        
         protected override void OnUpdate() {
             OrbitalPosition ppos = GetComponent<OrbitalPosition>(
                 GetSingletonEntity<PlayerOrbitTag>());
@@ -18,13 +25,11 @@ namespace Icarus.Orbit {
                 .WithAll<StarfieldTag>()
                 .ForEach((ref TransformAspect transform) => {
                     var ltw = transform.LocalToWorld;
-                    ltw.Rotation = ppos.LocalToWorld.Rotation;
-                    ltw.Position = pltw.Position;
+                    ltw.Position = PlayerObject.transform.position;
                     transform.LocalToWorld = ltw;
-                    // transform.Position = pltw.Position;
-                    // transform.LocalRotation = ppos.LocalToWorld.Rotation;
                 })
-                .Schedule();
+                .WithoutBurst()
+                .Run();
         }
     }
 }

@@ -12,27 +12,9 @@ namespace Icarus.Misc {
         public class Baker : Unity.Entities.Baker<PlayerAuthoring> {
             public override void Bake(PlayerAuthoring parms) {
                 GameObject player = GameObject.FindWithTag("Player");
-                AddComponent(new PlayerTag {
-                        Obj = GetEntity(player)
-                        // Obj = player
-                    });
+                AddComponentObject<GameObject>(player);
+                AddComponent(new PlayerTag());
             }
-        }
-    }
-
-    [RequireMatchingQueriesForUpdate]
-    [UpdateInGroup(typeof(TransformSystemGroup))]
-    public partial class PlayerSlaveToGameObjectSystem : SystemBase {
-        protected override void OnUpdate() {
-            Entities
-                // .WithAll<PlayerTag>()
-                .ForEach((ref TransformAspect transform, in PlayerTag player) => {
-                    LocalToWorld pltw = GetComponent<LocalToWorld>(player.Obj);
-                    var ltw = transform.LocalToWorld;
-                    ltw.Position = pltw.Position;
-                    transform.LocalToWorld = ltw;
-                    })
-                .Schedule();
         }
     }
 }
