@@ -1,5 +1,6 @@
 using UnityEngine;
 using Unity.Entities;
+using Unity.Mathematics;
 using Unity.Transforms;
 
 using Icarus.Misc;
@@ -16,17 +17,18 @@ namespace Icarus.Orbit {
         }
         
         protected override void OnUpdate() {
-            OrbitalPosition ppos = GetComponent<OrbitalPosition>(
-                GetSingletonEntity<PlayerOrbitTag>());
-            LocalToWorld pltw = GetComponent<LocalToWorld>(
-                GetSingletonEntity<PlayerTag>());
+            quaternion playerRot = GetComponent<PlayerRotation>(
+                GetSingletonEntity<PlayerTag>()).Value;
             
             Entities
                 .WithAll<StarfieldTag>()
                 .ForEach((ref TransformAspect transform) => {
-                    var ltw = transform.LocalToWorld;
-                    ltw.Position = PlayerObject.transform.position;
-                    transform.LocalToWorld = ltw;
+                    // var ltw = transform.LocalToWorld;
+                    // ltw.Position = PlayerObject.transform.position;
+                    // ltw.Rotation = math.inverse(playerRot);
+                    // transform.LocalToWorld = ltw;
+                    transform.Position = PlayerObject.transform.position;
+                    transform.Rotation = math.inverse(playerRot);
                 })
                 .WithoutBurst()
                 .Run();
