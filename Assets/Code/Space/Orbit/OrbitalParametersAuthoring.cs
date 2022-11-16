@@ -76,7 +76,11 @@ namespace Icarus.Orbit {
                                                             math.radians(parms.AscendingNode),
                                                             0f)
                     });
-                AddComponent(new OrbitalPosition());
+                UniformScaleTransform blank = new UniformScaleTransform {Scale = 1f};
+                AddComponent(new OrbitalPosition {
+                        LocalToParent = blank,
+                        LocalToWorld = blank
+                    });
             }
         }
     }

@@ -16,7 +16,7 @@ namespace Icarus.Orbit {
             public override void Bake(OrbitalParentAuthoring obj) {
                 AddComponent(new OrbitalParent {
                         Value = GetEntity(obj.ParentBody.gameObject),
-                        ParentToWorld = new UniformScaleTransform()
+                        ParentToWorld = new UniformScaleTransform {Scale = 1f}
                     });
             }
         }

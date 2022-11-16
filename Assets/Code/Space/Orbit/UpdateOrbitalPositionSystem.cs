@@ -29,8 +29,14 @@ namespace Icarus.Orbit {
                         pos.Altitude = parms.SemiMajorAxis * (1f - e * math.cos(E));
                         // update position within orbit
                         quaternion rot = math.mul(parms.OrbitRotation, quaternion.RotateY(-pos.Theta));
-                        pos.LocalToParent.Position = math.mul(rot, math.forward() * pos.Altitude);
-                        pos.LocalToWorld = pos.LocalToParent.TransformTransform(parent.ParentToWorld);                    })
+                        // pos.LocalToParent.Position = math.mul(rot, math.forward() * pos.Altitude);
+                        float3 loc = math.mul(rot, math.forward() * pos.Altitude);
+                        var ltp = pos.LocalToParent;
+                        ltp.Position = loc;
+                        pos.LocalToParent = ltp;
+                        // pos.LocalToWorld = pos.LocalToParent.TransformTransform(parent.ParentToWorld);
+                        pos.LocalToWorld = parent.ParentToWorld.TransformTransform(pos.LocalToParent);
+                    })
                 .ScheduleParallel();
         }
         
