@@ -86,7 +86,7 @@ namespace Icarus.Orbit {
                         float rdist = math.distance(pos.LocalToWorld.Position, playerPosition.LocalToWorld.Position);
                         float rr = scale.Radius;
                         float rmag = 2f * math.degrees(math.asin(rr / rdist));
-                        UnityEngine.Debug.Log($"i={entityInQueryIndex} wmag={wmag} rmag={rmag} dist={dist} rdist={rdist} gdist={gdist} rr={rr} <<<R={scale.Radius}>>>");
+                        // UnityEngine.Debug.Log($"i={entityInQueryIndex} wmag={wmag} rmag={rmag} dist={dist} rdist={rdist} gdist={gdist} rr={rr} <<<R={scale.Radius}>>>");
                     })
                 .WithoutBurst()
                 .ScheduleParallel();
