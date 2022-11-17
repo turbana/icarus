@@ -4,11 +4,12 @@ using Unity.Entities;
 
 namespace Icarus.Orbit {
     public struct RotationalParameters : IComponentData {
-        public float AxialTilt;
+        public float Tilt;
         public float NorthPoleRA;
         public float Period;
         public float ElapsedTime;
-        public quaternion Tilt;
+        public quaternion AxialTilt;
+        public quaternion AxialRotation;
     }
 
     [AddComponentMenu("Icarus/Orbits/Rotational Parameters")]
@@ -21,13 +22,14 @@ namespace Icarus.Orbit {
         public class Baker : Unity.Entities.Baker<RotationalParametersAuthoring> {
             public override void Bake(RotationalParametersAuthoring parms) {
                 quaternion tilt = math
-                    .mul(quaternion.RotateX(math.radians(parms.AxialTilt)),
-                         quaternion.RotateY(-parms.NorthPoleRA));
+                    .mul(quaternion.RotateX(-math.radians(parms.AxialTilt)),
+                         quaternion.RotateY(-math.radians(parms.NorthPoleRA)));
                 AddComponent(new RotationalParameters {
-                        AxialTilt = parms.AxialTilt,
+                        Tilt = parms.AxialTilt,
                         NorthPoleRA = parms.NorthPoleRA,
                         Period = parms.SiderealRotationPeriod,
-                        Tilt = tilt,
+                        AxialTilt = tilt,
+                        AxialRotation = quaternion.EulerXYZ(0f),
                         ElapsedTime = parms.ElapsedTime
                     });
             }

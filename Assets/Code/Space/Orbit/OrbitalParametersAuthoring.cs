@@ -40,8 +40,7 @@ namespace Icarus.Orbit {
         public float Inclination;
         public float AscendingNode;
         
-        public float TimeSincePerhelion;
-        public float Theta;
+        public float ElapsedTime;
 
         public static IComponentData OrbitTypeTag(OrbitTypeEnum t) => t switch {
             OrbitTypeEnum.Planet => new PlanetTag(),
@@ -76,10 +75,10 @@ namespace Icarus.Orbit {
                                                             math.radians(parms.AscendingNode),
                                                             0f)
                     });
-                UniformScaleTransform blank = new UniformScaleTransform {Scale = 1f};
                 AddComponent(new OrbitalPosition {
-                        LocalToParent = blank,
-                        LocalToWorld = blank
+                        ElapsedTime = parms.ElapsedTime,
+                        LocalToParent = UniformScaleTransform.FromPosition(float3.zero),
+                        LocalToWorld = UniformScaleTransform.FromPosition(float3.zero)
                     });
             }
         }

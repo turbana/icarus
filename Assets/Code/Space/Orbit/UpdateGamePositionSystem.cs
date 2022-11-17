@@ -32,7 +32,7 @@ namespace Icarus.Orbit {
                     (int entityInQueryIndex, Entity entity,
                      ref TransformAspect transform,
                      in OrbitalPosition pos, in OrbitalParameters parms, in OrbitalScale scale,
-                     in OrbitalParent parent) =>
+                     in OrbitalParent parent, in RotationalParameters rot) =>
                     {
                         float rscale;
                         float X = 149597870.700f;
@@ -68,14 +68,27 @@ namespace Icarus.Orbit {
                             newpos = ppos;
                             rscale = 1f;
                         }
+                        // quaternion nrot = math.mul(rot.AxialRotation, rot.AxialTilt);
+                        // nrot = math.mul(nrot, playerRotation.Value);
+                        // quaternion prot = math.mul(rot.AxialTilt, math.inverse(playerRotation.Value));
+                        quaternion prot = math.inverse(playerRotation.Value);
+                        // prot = math.mul(rot.AxialRotation, prot);
+                        // prot = math.mul(prot, math.inverse(rot.AxialTilt));
+                        // prot = math.mul(prot, rot.AxialTilt);
+                        // prot = math.mul(math.inverse(rot.AxialTilt), prot);
                         var ltw = transform.LocalToWorld;
                         // ltw.Position = newpos;
                         ltw.Scale = rscale;
                         // ltw.Rotation = math.mul(ltw.Rotation, math.inverse(playerRot));
-                        ltw.Rotation = math.inverse(playerRotation.Value);
+                        ltw.Rotation = prot;
+                        // ltw.Position = ltw.TransformPoint(newpos);
+                        // ltw.Rotation = math.mul(rot.AxialRotation, prot);
                         transform.LocalToWorld = ltw;
                         // transform.Position = newpos;
                         transform.Position = transform.TransformRotationLocalToWorld(newpos);
+                        // ltw.Rotation = math.mul(math.inverse(rot.AxialRotation), prot);
+                        // transform.LocalToWorld = ltw;
+                        transform.LocalRotation = math.mul(rot.AxialTilt, rot.AxialRotation);
 
                         // transform.RotateWorld(math.inverse(playerRot));
 

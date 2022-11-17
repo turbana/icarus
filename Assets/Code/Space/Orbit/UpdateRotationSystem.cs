@@ -13,13 +13,19 @@ namespace Icarus.Orbit {
 
             Entities
                 .ForEach(
-                    (ref OrbitalPosition pos, ref RotationalParameters rot) => {
+                    (ref RotationalParameters rot, ref OrbitalPosition pos) => {
                         rot.ElapsedTime = (rot.ElapsedTime + dt) % rot.Period;
                         // y = radians rotated
                         float y = 2f * math.PI * rot.ElapsedTime / rot.Period;
-                        var ltp = pos.LocalToParent;
-                        ltp.Rotation = math.mul(rot.Tilt, quaternion.RotateY(-y));
-                        pos.LocalToParent = ltp;
+                        rot.AxialRotation = quaternion.RotateY(-y);
+                        // pos.LocalToParent = UniformScaleTransform
+                        //     .FromPositionRotation(pos.LocalToParent.Position, rot.AxialRotation);
+                        // quaternion rotation = math.mul(rot.Tilt, quaternion.RotateY(-y));
+                        // var ltp = pos.LocalToParent;
+                        // ltp.Rotation = math.mul(rot.Tilt, quaternion.RotateY(-y));
+                        // pos.LocalToParent = ltp;
+                        // pos.LocalToParent = UniformScaleTransform
+                        //     .FromPositionRotation(pos.LocalToParent.Position, rotation);
                     })
                 .ScheduleParallel();
         }
