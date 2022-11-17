@@ -5,7 +5,7 @@ using Unity.Transforms;
 namespace Icarus.Orbit {
     [RequireMatchingQueriesForUpdate]
     [UpdateInGroup(typeof(UpdateOrbitSystemGroup))]
-    [UpdateAfter(typeof(UpdateOrbitalPositionSystem))]
+    [UpdateBefore(typeof(UpdateOrbitalPositionSystem))]
     public partial class UpdateParentRelativePositionSystem : SystemBase {
         protected override void OnUpdate() {
             Entities

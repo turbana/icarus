@@ -30,7 +30,7 @@ namespace Icarus.Orbit {
         protected override void OnUpdate() {
             OrbitalOptions opts = SystemAPI.GetSingleton<OrbitalOptions>();
             float dt = SystemAPI.Time.DeltaTime * opts.TimeScale;
-            float3 rps = math.radians(new float3(0f, 1f, 0f) * dt);
+            float3 rps = math.radians(new float3(0f, 0f, 0f) * dt);
             Entities
                 .ForEach((ref PlayerRotation rot) => {
                     rot.Value = math.mul(rot.Value, quaternion.EulerYXZ(rps));
