@@ -58,8 +58,9 @@ namespace Icarus.Orbit {
                         float S = -((A * desired) / (A - 1f));
                         rscale = S * 2f;
                         // ppos = math.normalize(math.mul(math.inverse(playerRot), ppos - playerPos));
-                        ppos = math.normalize(ppos - playerPos);
-                        float3 newpos = ppos * (desired + rscale / 2f);
+                        // ppos = math.normalize(ppos - playerPos);
+                        ppos = ppos - playerPos;
+                        float3 newpos = math.normalize(ppos) * (desired + rscale / 2f);
                         // float3 up = math.cross(ppos, new float3(0f, 1f, 0f));
                         // quaternion rotToPlayer = math.inverse(playerRot);
                         // quaternion rotToPlayer = quaternion.LookRotation(up, ppos);
