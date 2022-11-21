@@ -39,8 +39,8 @@ namespace Icarus.Test {
             ecb.AddComponent<RotationalParameters>(entities, rot);
             ecb.AddComponent<ShipTag>(entities);
             for (int i=0; i<spawn.Count; i++) {
-                float period = parms.Period + rand.NextFloat(-30f, 30f);
-                float elapsed = pos.ElapsedTime + rand.NextFloat(-30f, 30f);
+                float period = parms.Period + rand.NextFloat(-300f, 300f);
+                float elapsed = pos.ElapsedTime + rand.NextFloat(-300f, 300f);
                 if (elapsed < 0f) elapsed += period;
                 var nparms = new OrbitalParameters {
                     Period = period,
