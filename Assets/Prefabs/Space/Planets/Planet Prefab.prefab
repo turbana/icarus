@@ -9,11 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4418530422164530707}
-  - component: {fileID: 229553529976400512}
-  - component: {fileID: 1682525608659925320}
-  - component: {fileID: 2984157648537601083}
-  - component: {fileID: 718797923678113168}
   - component: {fileID: 7737716753445971855}
+  - component: {fileID: 1480366274640537994}
   m_Layer: 0
   m_Name: Planet Prefab
   m_TagString: Untagged
@@ -41,68 +38,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &229553529976400512
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1016956720448963668}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 52e4d8b8f147bb64eac54afd5277e333, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  IsPlayer: 0
-  OrbitType: 0
-  Period: 0
-  Eccentricity: 0
-  SemiMajorAxis: 0
-  Inclination: 0
-  AscendingNode: 0
-  ElapsedTime: 0
---- !u!114 &1682525608659925320
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1016956720448963668}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 275c2a4752e844a4cbc19fd74a08b24c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  AxialTilt: 0
-  NorthPoleRA: 0
-  SiderealRotationPeriod: 0
-  ElapsedTime: 0
---- !u!114 &2984157648537601083
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1016956720448963668}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 93d274a535418a74fb544df7ce5ca4c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Radius: 0
---- !u!114 &718797923678113168
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1016956720448963668}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e42bacb839119ba4ab62d3d2e2687788, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ParentBody: {fileID: 0}
 --- !u!205 &7737716753445971855
 LODGroup:
   m_ObjectHideFlags: 0
@@ -138,6 +73,19 @@ LODGroup:
     renderers:
     - renderer: {fileID: 7961054649086364217}
   m_Enabled: 1
+--- !u!114 &1480366274640537994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1016956720448963668}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 587e24bb420765b419ba2b9b61b12969, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: 
 --- !u!1 &1032671043898679312
 GameObject:
   m_ObjectHideFlags: 0

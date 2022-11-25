@@ -1,0 +1,12 @@
+Body,Type,Parent,Radius (km),Period (seconds),Eccentricity,Semi-Major Axis,Inclination,Ascending Node,Elapsed Time (seconds in orbit),Axial Tilt,North Pole RA,Sidereal Rotation Period,Elapsed Time (seconds revolving)
+Sun,Planet,Sun,695700,0,0,0,0,0,0,0,0,0,0
+Mercury,Planet,Sun,2439.7,7600530,0.20563,57909050,7.005,48.331,0,0.034,281.01,84450,0
+Venus,Planet,Sun,6051.8,19414170,0.006772,108208000,3.39458,76.68,0,2.64,272.76,53153.11,0
+Earth,Planet,Sun,6371,31558150,0.0167086,149598000,0.00005,-14.26064,0,23.43928,0,86164.1,0
+Moon,Moon,Earth,1737.4,2360592,0.0549,384399,23.47,0,0,6.687,266.86,2360592,0
+Mars,Planet,Sun,3389.5,59355070,0.0934,227939366,1.85,49.57854,0,25.19,317.6814,88642.69,0
+Earth - Equatorial,Player,Earth,,5574,0.007,6793,0,0,2000,,,,
+Earth - ISS,Player,Earth,,5574,0.007,6793,51.64,180,0,,,,
+Earth - Geostationary,Player,Earth,,86164.1,0,42164,0,0,40000,,,,
+Moon - Apollo 11,Player,Moon,,7140.86,0.0058954,1849,0,0,0,,,,
+Earth - Test - Equatorial,Ship,Earth,2,5574,0.007,6793,0,0,1999.5,0,0,0,0
