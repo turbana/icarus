@@ -32,14 +32,10 @@ namespace Icarus.Orbit {
             }
         }
         protected override void OnUpdate() {
-            Entities
-                .ForEach((Entity entity, in SunLightComponent sun, in TransformAspect transform) => {
-                    // LightObject.transform.position = new Vector3(0f, 10f, 0f);
-                    LightObject.transform.position = transform.Position;
-                    LightObject.transform.LookAt(Vector3.zero);
-                })
-                .WithoutBurst()
-                .Run();
+            var entity = GetSingletonEntity<SunLightComponent>();
+            var ltw = GetComponent<LocalToWorld>(entity);
+            LightObject.transform.position = ltw.Position;
+            LightObject.transform.LookAt(Vector3.zero);
         }
     }
 }
