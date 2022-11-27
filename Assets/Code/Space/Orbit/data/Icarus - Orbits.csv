@@ -10,3 +10,9 @@ Earth - ISS,Player,Earth,,5574,0.007,6793,51.64,180,0,,,,
 Earth - Geostationary,Player,Earth,,86164.1,0,42164,0,0,40000,,,,
 Moon - Apollo 11,Player,Moon,,7140.86,0.0058954,1849,0,0,0,,,,
 Earth - Test - Equatorial,Ship,Earth,2,5574,0.007,6793,0,0,1999.5,0,0,0,0
+Jupiter,,,,,,,,,,,,,
+Saturn,Planet,Sun,58232,32666976,0.0565,1433530000,2.485,113.665,0,26.73,40.589,37955.88,0
+Uranus,,,,,,,,,,,,,
+Neptune,,,,,,,,,,,,,
+Titan,Moon,Saturn,2574.73,1377648,0.0288,1221870,0,0,0,0,0,1377648,0
+Saturn - Titan - 45 inc,Player,Saturn,2574.73,1377648,0.0288,1221870,45,0,0,0,0,1377648,0
