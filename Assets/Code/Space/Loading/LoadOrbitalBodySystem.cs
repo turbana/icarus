@@ -6,8 +6,6 @@ using Unity.Transforms;
 using Icarus.Orbit;
 
 namespace Icarus.Loading {
-    public struct AddOrbitalParentTag : IComponentData {}
-    
     [RequireMatchingQueriesForUpdate]
     [UpdateInGroup(typeof(LoadingSystemGroup))]
     public partial class LoadOrbitalBodySystem : SystemBase {
@@ -23,6 +21,8 @@ namespace Icarus.Loading {
                     // set orbital tag
                     if (data.Type == "Planet") ecb.AddComponent<PlanetTag>(entity);
                     else if (data.Type == "Moon") ecb.AddComponent<MoonTag>(entity);
+                    else if (data.Type == "DwarfPlanet") ecb.AddComponent<DwarfPlanetTag>(entity);
+                    else if (data.Type == "Asteroid") ecb.AddComponent<AsteroidTag>(entity);
                     else if (data.Type == "Ship") ecb.AddComponent<ShipTag>(entity);
                     else if (data.Type == "Player") ecb.AddComponent<ShipTag>(entity);
                     else throw new System.Exception("invalid orbital body type: " + data.Type);
@@ -86,7 +86,6 @@ namespace Icarus.Loading {
                         });
                     
                     // remove fixup components
-                    ecb.RemoveComponent<AddOrbitalParentTag>(entity);
                     ecb.RemoveComponent<OrbitalBodyToLoadComponent>(entity);
                 })
                 .Schedule();

@@ -1,18 +1,18 @@
-Body,Type,Parent,Radius (km),Period (seconds),Eccentricity,Semi-Major Axis,Inclination,Ascending Node,Elapsed Time (seconds in orbit),Axial Tilt,North Pole RA,Sidereal Rotation Period,Elapsed Time (seconds revolving)
-Sun,Planet,Sun,695700,0,0,0,0,0,0,0,0,0,0
-Mercury,Planet,Sun,2439.7,7600530,0.20563,57909050,7.005,48.331,0,0.034,281.01,84450,0
-Venus,Planet,Sun,6051.8,19414170,0.006772,108208000,3.39458,76.68,0,2.64,272.76,53153.11,0
-Earth,Planet,Sun,6371,31558150,0.0167086,149598000,0.00005,-14.26064,0,23.43928,0,86164.1,0
-Moon,Moon,Earth,1737.4,2360592,0.0549,384399,23.47,0,0,6.687,266.86,2360592,0
-Mars,Planet,Sun,3389.5,59355070,0.0934,227939366,1.85,49.57854,0,25.19,317.6814,88642.69,0
-Earth - Equatorial,Player,Earth,,5574,0.007,6793,0,0,2000,,,,
-Earth - ISS,Player,Earth,,5574,0.007,6793,51.64,180,0,,,,
-Earth - Geostationary,Player,Earth,,86164.1,0,42164,0,0,40000,,,,
-Moon - Apollo 11,Player,Moon,,7140.86,0.0058954,1849,0,0,0,,,,
-Earth - Test - Equatorial,Ship,Earth,2,5574,0.007,6793,0,0,1999.5,0,0,0,0
-Jupiter,,,,,,,,,,,,,
-Saturn,Planet,Sun,58232,32666976,0.0565,1433530000,2.485,113.665,0,26.73,40.589,37955.88,0
-Uranus,,,,,,,,,,,,,
-Neptune,,,,,,,,,,,,,
-Titan,Moon,Saturn,2574.73,1377648,0.0288,1221870,0,0,0,0,0,1377648,0
-Saturn - Titan - 45 inc,Player,Saturn,2574.73,1377648,0.0288,1221870,45,0,0,0,0,1377648,0
+Body,Type,Parent,Radius (km),Period (seconds),Eccentricity,Semi-Major Axis,Inclination,Ascending Node,Elapsed Time (seconds in orbit),Axial Tilt,North Pole RA,Sidereal Rotation Period,Elapsed Time (seconds revolving),
+Sun,Planet,Sun,695700,0,0,0,0,0,0,0,0,0,0,
+Mercury,Planet,Sun,2439.7,7600530,0.20563,57909050,7.005,48.331,0,0.034,281.01,84450,0,
+Venus,Planet,Sun,6051.8,19414170,0.006772,108208000,3.39458,76.68,0,2.64,272.76,53153.11,0,
+Earth,Planet,Sun,6371,31558150,0.0167086,149598000,0.00005,-14.26064,0,23.43928,0,86164.1,0,
+Moon,Moon,Earth,1737.4,,,,,,0,6.687,266.86,2360592,0,
+Mars,Planet,Sun,3389.5,59355070,0.0934,227939366,1.85,49.57854,0,25.19,317.6814,88642.69,0,
+Jupiter,Planet,Sun,69911,374335776,0.0489,778479000,1.303,100.464,0,3.13,268.057,35730,0,
+Saturn,Planet,Sun,58232,32666976,0.0565,1433530000,2.485,113.665,0,26.73,40.589,37955.88,0,
+Uranus,Planet,Sun,25362,2651486400,0.04717,2870972000,0.773,74.006,0,97.77,257.311,62063.712,0,rotation retrograde
+Neptune,Planet,Sun,24622,5200848000,0.008678,4500000000,1.770,131.783,0,28.32,299.3,58000.32,0,
+Pluto,DwarfPlanet,Sun,1188.3,7824384000,0.2488,5906380000,17.16,110.299,0,122.53,132.993,551856.672,0,rotation retrograde
+Earth - Equatorial,Player,Earth,,5574,0.007,6793,0,0,2000,,,,,
+Earth - ISS,Player,Earth,,5574,0.007,6793,51.64,180,0,,,,,
+Earth - Geostationary,Player,Earth,,86164.1,0,42164,0,0,40000,,,,,
+Moon - Apollo 11,Player,Moon,,7140.86,0.0058954,1849,0,0,0,,,,,
+Earth - Test - Equatorial,Ship,Earth,2,5574,0.007,6793,0,0,1999.5,0,0,0,0,
+Saturn - Titan - 45 inc,Player,Saturn,2574.73,1377648,0.0288,1221870,45,0,0,0,0,1377648,0,

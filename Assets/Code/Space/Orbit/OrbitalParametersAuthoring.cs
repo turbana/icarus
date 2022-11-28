@@ -25,6 +25,8 @@ namespace Icarus.Orbit {
     public struct PlayerOrbitTag : IComponentData {}
     public struct PlanetTag : IComponentData {}
     public struct MoonTag : IComponentData {}
+    public struct DwarfPlanetTag : IComponentData {}
+    public struct AsteroidTag : IComponentData {}
     public struct ShipTag : IComponentData {}
 
     public enum OrbitTypeEnum {Planet, Moon, Ship};
