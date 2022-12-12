@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4418530422164530707}
   - component: {fileID: 7737716753445971855}
-  - component: {fileID: 1480366274640537994}
+  - component: {fileID: 4386010914439523063}
   m_Layer: 0
   m_Name: Planet Prefab
   m_TagString: Untagged
@@ -36,7 +36,7 @@ Transform:
   - {fileID: 4678432265545134059}
   - {fileID: 5133664533141775540}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!205 &7737716753445971855
 LODGroup:
@@ -73,7 +73,7 @@ LODGroup:
     renderers:
     - renderer: {fileID: 7961054649086364217}
   m_Enabled: 1
---- !u!114 &1480366274640537994
+--- !u!114 &4386010914439523063
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -82,10 +82,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1016956720448963668}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 587e24bb420765b419ba2b9b61b12969, type: 3}
+  m_Script: {fileID: 11500000, guid: 3a8ec469e0c0d1c418c1a6199343703e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Name: 
 --- !u!1 &1032671043898679312
 GameObject:
   m_ObjectHideFlags: 0

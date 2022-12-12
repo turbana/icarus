@@ -11,11 +11,78 @@ using Unity.Transforms;
 using Random = Unity.Mathematics.Random;
 
 namespace Icarus.Orbit {
+    using BodyName = FixedString64Bytes;
     using OrbitalDatabase = NativeHashMap<FixedString64Bytes, OrbitalDatabaseData>;
+    using EntityDatabase = NativeHashMap<FixedString64Bytes, Entity>;
+    
+    public struct OrbitalDatabaseDataComponent : IBufferElementData {
+        public FixedString64Bytes Name;
+        public Entity Value;
+    }
     
     public struct OrbitalDatabaseComponent : IComponentData {
-        public NativeHashMap<FixedString64Bytes, Entity> EntityMap;
-        public OrbitalDatabase DataMap;
+        private static FixedString64Bytes DEFAULT_PREFAB = "Planet Prefab";
+
+        private OrbitalDatabase DataMap;
+        private EntityDatabase EntityMap;
+        private EntityDatabase PrefabMap;
+
+        public OrbitalDatabaseComponent(OrbitalDatabase dmap) {
+            this.DataMap = dmap;
+            this.EntityMap = new NativeHashMap<FixedString64Bytes, Entity>(0, Allocator.Persistent);
+            this.PrefabMap = new NativeHashMap<FixedString64Bytes, Entity>(0, Allocator.Persistent);
+        }
+
+        public int DataCount {
+            get => DataMap.Count;
+        }
+
+        public int EntityCount {
+            get => EntityMap.Count;
+        }
+
+        public int PrefabCount {
+            get => PrefabMap.Count;
+        }
+
+        public int EntityCapacity {
+            get => EntityMap.Capacity;
+            set => EntityMap.Capacity = value;
+        }
+
+        public int PrefabCapacity {
+            get => PrefabMap.Capacity;
+            set => PrefabMap.Capacity = value;
+        }
+
+        public OrbitalDatabaseData LookupData(BodyName name) {
+            return DataMap[name];
+        }
+
+        public Entity LookupEntity(BodyName name) {
+            return EntityMap[name];
+        }
+
+        public void SaveEntity(BodyName name, Entity entity) {
+            EntityMap[name] = entity;
+        }
+
+        public Entity LookupPrefab(BodyName name) {
+            var key = PrefabMap.ContainsKey(name) ? name : DEFAULT_PREFAB;
+            return PrefabMap[key];
+        }
+
+        public void SavePrefab(BodyName name, Entity prefab) {
+            PrefabMap[name] = prefab;
+        }
+
+        public NativeArray<BodyName> GetDataKeyArray(AllocatorManager.AllocatorHandle allocator) {
+            return DataMap.GetKeyArray(allocator);
+        }
+
+        public NativeArray<BodyName> GetPrefabKeys(AllocatorManager.AllocatorHandle allocator) {
+            return PrefabMap.GetKeyArray(allocator);
+        }
     }
 
     public struct OrbitalDatabaseData {
@@ -40,6 +107,7 @@ namespace Icarus.Orbit {
     [AddComponentMenu("Icarus/Orbit/Orbital Database")]
     public class OrbitalDatabaseAuthoring : MonoBehaviour {
         public uint RandomSeed = 1;
+        public Object PrefabPath;
         [Space]
         public Object CustomDatabase;
         public Object SatelliteDatabase;
@@ -66,7 +134,7 @@ namespace Icarus.Orbit {
             "90482 Orcus (2004 DW)",
             "225088 Gonggong (2007 OR10)"
         };
-        
+
         public class OrbitalDatabaseAuthoringBaker : Baker<OrbitalDatabaseAuthoring> {
             public override void Bake(OrbitalDatabaseAuthoring auth) {
                 DependsOn(auth.CustomDatabase);
@@ -82,10 +150,9 @@ namespace Icarus.Orbit {
 
                 var GuessSize = 100;
 
-                var emap = new NativeHashMap<FixedString64Bytes, Entity>
-                    (GuessSize, Allocator.Persistent);
-                var dmap = new NativeHashMap<FixedString64Bytes, OrbitalDatabaseData>
-                    (GuessSize, Allocator.Persistent);
+                var dmap = new OrbitalDatabase(GuessSize, Allocator.Persistent);
+                var emap = new EntityDatabase(GuessSize, Allocator.Persistent);
+                var pmap = new EntityDatabase(GuessSize, Allocator.Persistent);
 
                 if (auth.IncludeCustomDatabase) {
                     LoadCustomDatabase(dmap, CustomDatabasePath);
@@ -102,18 +169,31 @@ namespace Icarus.Orbit {
                     LoadSmallBodiesDatabase(dmap, SmallBodiesTopDatabasePath);
                 }
 
+                this.SetPrefabs(pmap, auth.PrefabPath);
                 FixupData(dmap, rand);
                 AssertData(dmap);
-                ShowStatistics(dmap);
+                ShowStatistics(dmap, pmap);
 
-                AddComponent<OrbitalDatabaseComponent>(new OrbitalDatabaseComponent {
-                        EntityMap = emap,
-                        DataMap = dmap
-                    });
+                var comp = new OrbitalDatabaseComponent(dmap);
+                AddComponent<OrbitalDatabaseComponent>(comp);
+            }
+
+            private void SetPrefabs(EntityDatabase pmap, Object dir) {
+                string[] root = new string[] { AssetDatabase.GetAssetPath(dir) };
+                string[] assets = AssetDatabase.FindAssets("t:GameObject", root);
+                var prefabs = AddBuffer<OrbitalDatabaseDataComponent>();
+                for (int i=0; i<assets.Length; i++) {
+                    string path = AssetDatabase.GUIDToAssetPath(assets[i]);
+                    GameObject prefab = AssetDatabase.LoadMainAssetAtPath(path) as GameObject;
+                    var comp = new OrbitalDatabaseDataComponent {
+                        Name = prefab.name, Value = GetEntity(prefab) };
+                    prefabs.Add(comp);
+                    pmap[prefab.name] = GetEntity(prefab);
+                }
             }
         }
 
-        public static void ShowStatistics(OrbitalDatabase db) {
+        private static void ShowStatistics(OrbitalDatabase db, EntityDatabase pmap) {
             var bodies = db.GetValueArray(Allocator.TempJob);
             int planets = -1;   // don't count the sun even though it's set as a planet
             int moons = 0;
@@ -121,9 +201,9 @@ namespace Icarus.Orbit {
             int dwarfplanets = 0;
             int ships = 0;
             int players = 0;
+            int prefabs = pmap.Count;
             
             foreach (var body in bodies) {
-                // Debug.Log(body);
                 if (body.Type == "Planet") planets += 1;
                 else if (body.Type == "Moon") moons += 1;
                 else if (body.Type == "Asteroid") asteroids += 1;
@@ -132,16 +212,12 @@ namespace Icarus.Orbit {
                 else if (body.Type == "Player") players += 1;
                 else throw new System.Exception($"Invalid type for {body}");
             }
-                
-            // foreach (var name in new string[] {"Moon", "1 Ceres (A801 AA)"}) {
-            //     Debug.Log(db[name]);
-            // }
-                        
-            Debug.Log($"Loaded {bodies.Length} total bodies ({planets} planets, {moons} moons, {dwarfplanets} dwarf planets, {asteroids} asteroids, {ships} ships, {players} players)");
+
+            Debug.Log($"Orbital database now contains {bodies.Length} total bodies ({planets} planets, {moons} moons, {dwarfplanets} dwarf planets, {asteroids} asteroids, {ships} ships, {players} players) and {prefabs} prefabs");
             bodies.Dispose();
         }
 
-        public static void AddBody(OrbitalDatabase db, OrbitalDatabaseData body) {
+        private static void AddBody(OrbitalDatabase db, OrbitalDatabaseData body) {
             var name = body.Name;
             if (db.ContainsKey(name)) {
                 body = MergeBody(body, db[name]);
@@ -241,8 +317,6 @@ namespace Icarus.Orbit {
                 data.NorthPoleRA = float.NaN;
                 data.RotationPeriod = ParseFloat(line[9]) * 60f * 60f;
                 data.RotationElapsedTime = float.NaN; // TODO in data with epoch
-                // check for what I consider a dwarf planet
-                // if (data.Radius > DwarfPlanetRadius) data.Type = "DwarfPlanet";
                 if (System.Array.IndexOf(DWARF_PLANETS, data.Name.ToString()) >= 0) {
                     data.Type = "DwarfPlanet";
                 }
