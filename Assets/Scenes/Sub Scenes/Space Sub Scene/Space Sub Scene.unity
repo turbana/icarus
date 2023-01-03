@@ -289,6 +289,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Orbit: Earth - Equatorial
+  ParentBody: 
+  SemiMajorAxis: 0
+  Inclination: 0
+  Eccentricity: 0
+  AscendingNode: 0
+  ArgumentOfPeriapsis: 0
 --- !u!4 &1420874569
 Transform:
   m_ObjectHideFlags: 0
