@@ -13,7 +13,7 @@ namespace Icarus.Orbit {
 
             Entities
                 .ForEach(
-                    (ref RotationalParameters rot, ref OrbitalPosition pos) => {
+                    (ref RotationalParameters rot) => {
                         rot.ElapsedTime = (rot.ElapsedTime + dt) % rot.Period;
                         // y = radians rotated
                         float y = 2f * math.PI * rot.ElapsedTime / rot.Period;

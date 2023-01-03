@@ -22,40 +22,4 @@ namespace Icarus.Orbit {
             }
         }
     }
-
-    [RequireMatchingQueriesForUpdate]
-    [UpdateInGroup(typeof(UpdateOrbitSystemGroup))]
-    [UpdateAfter(typeof(UpdateOrbitalPositionSystem))]
-    [UpdateAfter(typeof(UpdateRotationSystem))]
-    partial class UpdateOrbitsToPlayerRotationSystem : SystemBase {
-        protected override void OnUpdate() {
-            quaternion playerRot = GetComponent<PlayerRotation>(
-                GetSingletonEntity<PlayerTag>()).Value;
-
-            Entities
-                .WithAll<OrbitalOptions>()
-                .ForEach((ref TransformAspect transform) => {
-                    // transform.Rotation = math.inverse(playerRot);
-                })
-                .Schedule();
-        }
-    }
-
-    [RequireMatchingQueriesForUpdate]
-    [UpdateInGroup(typeof(UpdateOrbitSystemGroup))]
-    [UpdateBefore(typeof(UpdateOrbitalPositionSystem))]
-    [UpdateBefore(typeof(UpdateRotationSystem))]
-    partial class ResetOrbitsToPlayerRotationSystem : SystemBase {
-        protected override void OnUpdate() {
-            quaternion playerRot = GetComponent<PlayerRotation>(
-                GetSingletonEntity<PlayerTag>()).Value;
-
-            Entities
-                .WithAll<OrbitalOptions>()
-                .ForEach((ref TransformAspect transform) => {
-                    transform.Rotation = quaternion.EulerXYZ(0f);
-                })
-                .Schedule();
-        }
-    }
 }

@@ -3,15 +3,17 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 
+using Icarus.Orbit;
+
 namespace Icarus.Misc {
     public struct PlayerTag : IComponentData {}
 
     [AddComponentMenu("Icarus/Misc/Player Tag")]
     public class PlayerAuthoring : MonoBehaviour {
-        public class Baker : Unity.Entities.Baker<PlayerAuthoring> {
+        public class PlayerAuthoringBaker : Baker<PlayerAuthoring> {
             public override void Bake(PlayerAuthoring parms) {
                 AddComponent(new PlayerTag());
-                AddComponent(new Icarus.Orbit.PlayerRotation {
+                AddComponent(new PlayerRotation {
                         Value = quaternion.EulerXYZ(0f)
                     });
             }
@@ -23,7 +25,9 @@ namespace Icarus.Orbit {
     public struct PlayerRotation : IComponentData {
         public quaternion Value;
     }
+}
 
+namespace Icarus.Test {
     [RequireMatchingQueriesForUpdate]
     [UpdateInGroup(typeof(UpdateOrbitSystemGroup))]
     public partial class TestChangePlayerRotationSystem : SystemBase {
