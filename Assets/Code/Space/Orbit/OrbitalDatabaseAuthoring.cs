@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 
 using UnityEditor;
 using UnityEngine;
@@ -8,7 +10,6 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 
-using Random = Unity.Mathematics.Random;
 
 namespace Icarus.Orbit {
     using BodyName = FixedString64Bytes;
@@ -85,11 +86,13 @@ namespace Icarus.Orbit {
         }
     }
 
+    [System.Serializable]
     public struct OrbitalDatabaseData {
         public FixedString64Bytes Name;
         public FixedString32Bytes Type;
         public FixedString64Bytes Parent;
         public float Radius;
+        public float Mass;
         public float Period;
         public float Eccentricity;
         public float SemiMajorAxis;
@@ -101,52 +104,102 @@ namespace Icarus.Orbit {
         public float RotationPeriod;
         public float RotationElapsedTime;
 
-        public override string ToString() => $"<database-data Name=\"{Name}\" Type={Type} Parent=\"{Parent}\" Radius={Radius} Period={Period} Eccentricity={Eccentricity} SemiMajorAxis={SemiMajorAxis} Inclination={Inclination} AscendingNode={AscendingNode} ElapsedTime={ElapsedTime} AxialTilt={AxialTilt} NorthPoleRA={NorthPoleRA} RotationPeriod={RotationPeriod} RotationElapsedTime={RotationElapsedTime}>";
+        public override string ToString() => $"<database-data Name=\"{Name}\" Type={Type} Parent=\"{Parent}\" Radius={Radius} Mass={Mass} Period={Period} Eccentricity={Eccentricity} SemiMajorAxis={SemiMajorAxis} Inclination={Inclination} AscendingNode={AscendingNode} ElapsedTime={ElapsedTime} AxialTilt={AxialTilt} NorthPoleRA={NorthPoleRA} RotationPeriod={RotationPeriod} RotationElapsedTime={RotationElapsedTime}>";
+
+        public void StreamWrite(BinaryWriter writer) {
+            writer.Write(Name.ToString());
+            writer.Write(Type.ToString());
+            writer.Write(Parent.ToString());
+            writer.Write(Radius);
+            writer.Write(Mass);
+            writer.Write(Period);
+            writer.Write(Eccentricity);
+            writer.Write(SemiMajorAxis);
+            writer.Write(Inclination);
+            writer.Write(AscendingNode);
+            writer.Write(ElapsedTime);
+            writer.Write(AxialTilt);
+            writer.Write(NorthPoleRA);
+            writer.Write(RotationPeriod);
+            writer.Write(RotationElapsedTime);
+        }
+
+        public void StreamRead(BinaryReader reader) {
+            Name = new FixedString64Bytes(reader.ReadString());
+            Type = new FixedString32Bytes(reader.ReadString());
+            Parent = new FixedString64Bytes(reader.ReadString());
+            Radius = reader.ReadSingle();
+            Mass = reader.ReadSingle();
+            Period = reader.ReadSingle();
+            Eccentricity = reader.ReadSingle();
+            SemiMajorAxis = reader.ReadSingle();
+            Inclination = reader.ReadSingle();
+            AscendingNode = reader.ReadSingle();
+            ElapsedTime = reader.ReadSingle();
+            AxialTilt = reader.ReadSingle();
+            NorthPoleRA = reader.ReadSingle();
+            RotationPeriod = reader.ReadSingle();
+            RotationElapsedTime = reader.ReadSingle();
+        }
     }
 
     [AddComponentMenu("Icarus/Orbit/Orbital Database")]
     public class OrbitalDatabaseAuthoring : MonoBehaviour {
+        [Tooltip("The seed used to generate any random parameters (asteroid mass, composition, etc)")]
         public uint RandomSeed = 1;
+        [Tooltip("The root path for prefab assets")]
         public Object PrefabPath;
+        [Tooltip("The final orbital database")]
+        public Object OrbitalDatabase;
         [Space]
+        [Tooltip("Custom orbital database")]
         public Object CustomDatabase;
+        [Tooltip("SDDB Satellite database")]
         public Object SatelliteDatabase;
+        [Tooltip("SDDB Small Bodies database")]
         public Object SmallBodiesDatabase;
-        public Object SmallBodiesTopDatabase;
-        [Space]
-        public bool IncludeCustomDatabase;
-        public bool IncludeSatelliteDatabase;
-        public bool IncludeSmallBodiesDatabase;
-        public bool IncludeSmallBodiesTopDatabase;
-        [Space]
-        public bool FiddleToReloadDatabase;
 
-        // these objects are considered dwarf planets
-        // https://en.wikipedia.org/wiki/Dwarf_planet#Population_of_dwarf_planets
-        private static string[] DWARF_PLANETS = new string[] {
-            "1 Ceres (A801 AA)",
-            "134340 Pluto (1930 BM)",
-            "136199 Eris (2003 UB313)",
-            "136108 Haumea (2003 EL61)",
-            "136472 Makemake (2005 FY9)",
-            "50000 Quaoar (2002 LM60)",
-            "90377 Sedna (2003 VB12)",
-            "90482 Orcus (2004 DW)",
-            "225088 Gonggong (2007 OR10)"
-        };
+        public OrbitalDatabaseData LookupBody(BodyName body) {
+            var db = new OrbitalDatabase(100, Allocator.TempJob);
+            LoadDatabase(db);
+            var data = db[body];
+            db.Dispose();
+            return data;
+        }
+
+        public void SaveDatabase(OrbitalDatabase db) {
+            string path =
+                AssetDatabase.GetAssetPath(this.OrbitalDatabase);
+            var values = db.GetValueArray(Allocator.TempJob);
+            var encoder = new UTF8Encoding(true, true);
+            using (var stream = File.Open(path, FileMode.Create)) {
+                using (var writer = new BinaryWriter(stream, Encoding.UTF8, false)) {
+                    for (int i=0; i<values.Length; i++) {
+                        values[i].StreamWrite(writer);
+                    }
+                }
+            }
+            values.Dispose();
+            EditorUtility.SetDirty(this);
+        }
+
+        public void LoadDatabase(OrbitalDatabase db) {
+            string path =
+                AssetDatabase.GetAssetPath(this.OrbitalDatabase);
+            using (var stream = File.Open(path, FileMode.Open)) {
+                using (var reader = new BinaryReader(stream, Encoding.UTF8, false)) {
+                    while (reader.PeekChar() != -1) {
+                        var data = new OrbitalDatabaseData();
+                        data.StreamRead(reader);
+                        db.Add(data.Name, data);
+                    }
+                }
+            }
+        }
 
         public class OrbitalDatabaseAuthoringBaker : Baker<OrbitalDatabaseAuthoring> {
             public override void Bake(OrbitalDatabaseAuthoring auth) {
-                DependsOn(auth.CustomDatabase);
-                DependsOn(auth.SatelliteDatabase);
-                DependsOn(auth.SmallBodiesDatabase);
-                DependsOn(auth.SmallBodiesTopDatabase);
-
-                string CustomDatabasePath = AssetDatabase.GetAssetPath(auth.CustomDatabase);
-                string SatelliteDatabasePath = AssetDatabase.GetAssetPath(auth.SatelliteDatabase);
-                string SmallBodiesDatabasePath = AssetDatabase.GetAssetPath(auth.SmallBodiesDatabase);
-                string SmallBodiesTopDatabasePath = AssetDatabase.GetAssetPath(auth.SmallBodiesTopDatabase);
-                var rand = new Random(auth.RandomSeed);
+                DependsOn(auth.OrbitalDatabase);
 
                 var GuessSize = 100;
 
@@ -154,24 +207,8 @@ namespace Icarus.Orbit {
                 var emap = new EntityDatabase(GuessSize, Allocator.Persistent);
                 var pmap = new EntityDatabase(GuessSize, Allocator.Persistent);
 
-                if (auth.IncludeCustomDatabase) {
-                    LoadCustomDatabase(dmap, CustomDatabasePath);
-                }
-                if (auth.IncludeSatelliteDatabase) {
-                    LoadSatelliteDatabase(dmap, SatelliteDatabasePath);
-                }
-                if (auth.IncludeSmallBodiesDatabase) {
-                    Debug.Log("Loading Small Bodies database, this may take a while...");
-                    LoadSmallBodiesDatabase(dmap, SmallBodiesDatabasePath);
-                    Debug.Log("Loaded Small Bodies database");
-                }
-                if (auth.IncludeSmallBodiesTopDatabase) {
-                    LoadSmallBodiesDatabase(dmap, SmallBodiesTopDatabasePath);
-                }
-
-                this.SetPrefabs(pmap, auth.PrefabPath);
-                FixupData(dmap, rand);
-                AssertData(dmap);
+                auth.LoadDatabase(dmap);
+                SetPrefabs(pmap, auth.PrefabPath);
                 ShowStatistics(dmap, pmap);
 
                 var comp = new OrbitalDatabaseComponent(dmap);
@@ -215,160 +252,6 @@ namespace Icarus.Orbit {
 
             Debug.Log($"Orbital database now contains {bodies.Length} total bodies ({planets} planets, {moons} moons, {dwarfplanets} dwarf planets, {asteroids} asteroids, {ships} ships, {players} players) and {prefabs} prefabs");
             bodies.Dispose();
-        }
-
-        private static void AddBody(OrbitalDatabase db, OrbitalDatabaseData body) {
-            var name = body.Name;
-            if (db.ContainsKey(name)) {
-                body = MergeBody(body, db[name]);
-            }
-            db[name] = body;
-        }
-        
-        private static OrbitalDatabaseData MergeBody(OrbitalDatabaseData left, OrbitalDatabaseData right) {
-            left.Radius = float.IsNaN(left.Radius) ? right.Radius : left.Radius;
-            left.Period = float.IsNaN(left.Period) ? right.Period : left.Period;
-            left.Eccentricity = float.IsNaN(left.Eccentricity) ? right.Eccentricity : left.Eccentricity;
-            left.SemiMajorAxis = float.IsNaN(left.SemiMajorAxis) ? right.SemiMajorAxis : left.SemiMajorAxis;
-            left.Inclination = float.IsNaN(left.Inclination) ? right.Inclination : left.Inclination;
-            left.AscendingNode = float.IsNaN(left.AscendingNode) ? right.AscendingNode : left.AscendingNode;
-            left.ElapsedTime = float.IsNaN(left.ElapsedTime) ? right.ElapsedTime : left.ElapsedTime;
-            left.AxialTilt = float.IsNaN(left.AxialTilt) ? right.AxialTilt : left.AxialTilt;
-            left.NorthPoleRA = float.IsNaN(left.NorthPoleRA) ? right.NorthPoleRA : left.NorthPoleRA;
-            left.RotationPeriod = float.IsNaN(left.RotationPeriod) ? right.RotationPeriod : left.RotationPeriod;
-            left.RotationElapsedTime = float.IsNaN(left.RotationElapsedTime) ? right.RotationElapsedTime : left.RotationElapsedTime;
-            return left;
-        }
-
-        private static IEnumerable<string[]> ReadCsv(string path) {
-            bool skip = true;
-            foreach (var line in System.IO.File.ReadLines(path)) {
-                if (skip) {
-                    skip = false;
-                } else {
-                    yield return line.Split(',');
-                }
-            }
-        }
-
-        private static void LoadCustomDatabase(OrbitalDatabase db, string path) {
-            foreach (var line in ReadCsv(path)) {
-                var data = new OrbitalDatabaseData {
-                    Name = line[0],
-                    Type = line[1],
-                    Parent = line[2]
-                };
-                data.Radius = ParseFloat(line[3]);
-                data.Period = ParseFloat(line[4]);
-                data.Eccentricity = ParseFloat(line[5]);
-                data.SemiMajorAxis = ParseFloat(line[6]);
-                data.Inclination = ParseFloat(line[7]);
-                data.AscendingNode = ParseFloat(line[8]);
-                data.ElapsedTime = ParseFloat(line[9]);
-                data.AxialTilt = ParseFloat(line[10]);
-                data.NorthPoleRA = ParseFloat(line[11]);
-                data.RotationPeriod = ParseFloat(line[12]);
-                data.RotationElapsedTime = ParseFloat(line[13]);
-                // check for 0-length Periods and set them to a small value;
-                if (data.Period == 0f) data.Period = 1f;
-                if (data.RotationPeriod == 0f) data.RotationPeriod = 1f;
-                AddBody(db, data);
-            }
-        }
-
-        private static void LoadSatelliteDatabase(OrbitalDatabase db, string path) {
-            foreach (var line in ReadCsv(path)) {
-                var data = new OrbitalDatabaseData {
-                    Name = line[1],
-                    Type = "Moon",
-                    Parent = line[0]
-                };
-                data.Radius = float.NaN;
-                data.Period = ParseFloat(line[12]) * 24f * 60f * 60f;
-                data.Eccentricity = ParseFloat(line[7]);
-                data.SemiMajorAxis = ParseFloat(line[6]);
-                data.Inclination = ParseFloat(line[10]);
-                data.AscendingNode = ParseFloat(line[11]);
-                data.ElapsedTime = float.NaN;
-                data.AxialTilt = ParseFloat(line[17]);
-                data.NorthPoleRA = ParseFloat(line[15]);
-                data.RotationPeriod = float.NaN;
-                data.RotationElapsedTime = float.NaN;
-                // TODO find inclination in parent-equator plane
-                AddBody(db, data);
-            }
-        }
-
-        private static void LoadSmallBodiesDatabase(OrbitalDatabase db, string path) {
-            foreach (var line in ReadCsv(path)) {
-                var data = new OrbitalDatabaseData {
-                    Name = line[1].Trim(new char[] {' ', '"'}),
-                    Type = "Asteroid", // assume asteroid
-                    Parent = "Sun"
-                };
-                data.Radius = ParseFloat(line[10]) / 2f;
-                data.Period = ParseFloat(line[4]) * 24f * 60f * 60f;
-                data.Eccentricity = ParseFloat(line[5]);
-                data.SemiMajorAxis = ParseFloat(line[6]);
-                data.Inclination = ParseFloat(line[7]);
-                data.AscendingNode = ParseFloat(line[8]);
-                data.ElapsedTime = float.NaN;
-                data.AxialTilt = float.NaN;
-                data.NorthPoleRA = float.NaN;
-                data.RotationPeriod = ParseFloat(line[9]) * 60f * 60f;
-                data.RotationElapsedTime = float.NaN; // TODO in data with epoch
-                if (System.Array.IndexOf(DWARF_PLANETS, data.Name.ToString()) >= 0) {
-                    data.Type = "DwarfPlanet";
-                }
-                AddBody(db, data);
-            }
-        }
-
-        private static float ParseFloat(string str) {
-            float data;
-            if (!float.TryParse(str, out data)) {
-                data = float.NaN;
-            }
-            return data;
-        }
-
-        private static void FixupData(OrbitalDatabase db, Random rand) {
-            var names = db.GetKeyArray(Allocator.TempJob);
-            foreach (var name in names) {
-                var body = db[name];
-                if (float.IsNaN(body.Radius)) body.Radius = rand.NextFloat(0.05f, 1f);
-                if (float.IsNaN(body.ElapsedTime)) body.ElapsedTime = 0f;
-                if (float.IsNaN(body.AxialTilt)) body.AxialTilt = rand.NextFloat(-180f, 180f);
-                if (float.IsNaN(body.NorthPoleRA)) body.NorthPoleRA = rand.NextFloat(-180f, 180f);
-                if (float.IsNaN(body.RotationPeriod)) body.RotationPeriod = rand.NextFloat(1000f, 100000f);
-                if (float.IsNaN(body.RotationElapsedTime)) body.RotationElapsedTime = 0f;
-                db[name] = body;
-            }
-            names.Dispose();
-        }
-
-        private static void AssertData(OrbitalDatabase db) {
-            var names = db.GetKeyArray(Allocator.TempJob);
-            foreach (var name in names) {
-                var body = db[name];
-                bool hasNaN =
-                    float.IsNaN(body.Radius) ||
-                    float.IsNaN(body.Period) ||
-                    float.IsNaN(body.Eccentricity) ||
-                    float.IsNaN(body.SemiMajorAxis) ||
-                    float.IsNaN(body.Inclination) ||
-                    float.IsNaN(body.AscendingNode) ||
-                    float.IsNaN(body.ElapsedTime) ||
-                    float.IsNaN(body.AxialTilt) ||
-                    float.IsNaN(body.NorthPoleRA) ||
-                    float.IsNaN(body.RotationPeriod) ||
-                    float.IsNaN(body.RotationElapsedTime);
-                bool hasParent = db.ContainsKey(body.Parent);
-                Debug.Assert(!hasNaN, $"NaN detected in {body}");
-                Debug.Assert(hasParent, $"Parent not found in {body}");
-                db[name] = body;
-            }
-            names.Dispose();
         }
     }
 }

@@ -99,3 +99,4 @@ $RECYCLE.BIN/
 # custom ignores
 /Inspiration/
 *~
+/Assets/Code/Space/Orbit/data/orbital_database.dat*

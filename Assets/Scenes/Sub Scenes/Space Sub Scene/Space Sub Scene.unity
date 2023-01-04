@@ -288,8 +288,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b11dbec4664364e4aa1cdad30b140b07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Orbit: Earth - Equatorial
-  ParentBody: 
+  Orbit: Earth - Geostationary
+  ParentBody: Earth
+  UseParentRadius: 1
   SemiMajorAxis: 0
   Inclination: 0
   Eccentricity: 0
@@ -387,15 +388,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RandomSeed: 1
   PrefabPath: {fileID: 102900000, guid: 40ea3147090d364478d39b3def8b1b5a, type: 3}
+  OrbitalDatabase: {fileID: 102900000, guid: 083f65b83b506354c82362fa5733514a, type: 3}
   CustomDatabase: {fileID: 4900000, guid: 90bfd11fbd55a604d9258f6f2ca3e9d5, type: 3}
   SatelliteDatabase: {fileID: 4900000, guid: 0195db04d1a8fb9479cab14af4c9e236, type: 3}
-  SmallBodiesDatabase: {fileID: 4900000, guid: a48a26e30c3a4ae4883c581465893e62, type: 3}
-  SmallBodiesTopDatabase: {fileID: 4900000, guid: cf523c6832215f746b399bb3e361ce94, type: 3}
-  IncludeCustomDatabase: 1
-  IncludeSatelliteDatabase: 1
-  IncludeSmallBodiesDatabase: 0
-  IncludeSmallBodiesTopDatabase: 1
-  FiddleToReloadDatabase: 0
+  SmallBodiesDatabase: {fileID: 4900000, guid: cf523c6832215f746b399bb3e361ce94, type: 3}
 --- !u!4 &2005292898
 Transform:
   m_ObjectHideFlags: 0
