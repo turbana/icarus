@@ -52,17 +52,19 @@ namespace Icarus.Space {
 
         private void SetupStar(Entity entity, StarData star, float dist) {
             // find stellar magnitude
-            float mag = math.pow(2.512f / 2.0f, -(star.mag - 1f));
+            float mag = 1f - math.pow(0.9f, (7f - star.mag));
             // find scale
-            float scale = dist / 50f * mag;
+            float scale = dist / 25f * mag;
             // find rotation
-            quaternion rot = quaternion.EulerZXY(
-                math.radians(-star.dec), math.radians(-star.ra * DEGREES_PER_HOUR), 0f);
+            quaternion rot =
+                quaternion.EulerXYZ(-math.radians(star.dec),
+                                    -math.radians(star.ra * DEGREES_PER_HOUR),
+                                    0f);
             // find position
             float3 pos = math.mul(rot, math.forward() * dist);
             // update local transform
             var transform = UniformScaleTransform
-                .FromPositionRotationScale(pos, math.inverse(rot), scale);
+                .FromPositionRotationScale(pos, rot, scale);
             var ltpt = new LocalToParentTransform { Value = transform };
             this.EntityManager.AddComponentData<LocalToParentTransform>(entity, ltpt);
             // find star color
