@@ -232,7 +232,7 @@ Material:
     - _SpecularAAThreshold: 0.2
     - _SpecularLand: 0.367
     - _SpecularOcclusionMode: 1
-    - _SpecularWater: 0.8
+    - _SpecularWater: 0.65
     - _SrcBlend: 1
     - _StencilRef: 0
     - _StencilRefDepth: 8
