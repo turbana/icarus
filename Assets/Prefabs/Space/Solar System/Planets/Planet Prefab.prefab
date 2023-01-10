@@ -36,7 +36,7 @@ Transform:
   - {fileID: 4678432265545134059}
   - {fileID: 5133664533141775540}
   m_Father: {fileID: 0}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!205 &7737716753445971855
 LODGroup:
@@ -56,11 +56,11 @@ LODGroup:
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 3166919079142445404}
-  - screenRelativeHeight: 0.7
+  - screenRelativeHeight: 0.6
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 1751505356855585151}
-  - screenRelativeHeight: 0.4
+  - screenRelativeHeight: 0.2
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 2658397618504827414}
