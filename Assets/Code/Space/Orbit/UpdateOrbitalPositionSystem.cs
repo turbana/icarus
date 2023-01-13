@@ -13,7 +13,7 @@ namespace Icarus.Orbit {
             Entities
                 .ForEach(
                     (Entity entity, ref OrbitalPosition pos,
-                     in OrbitalParent parent, in OrbitalParameters parms) => {
+                     in OrbitalParentPosition ppos, in OrbitalParameters parms) => {
                         // update elapsed time
                         pos.ElapsedTime = (pos.ElapsedTime + dt) % parms.Period;
                         // mean motion
@@ -32,8 +32,11 @@ namespace Icarus.Orbit {
                         // update position within orbit
                         quaternion rot = math.mul(parms.OrbitRotation, quaternion.RotateY(-pos.Theta));
                         // rot = math.mul(rot, parent.ParentToWorld.Rotation);
-                        quaternion ptilt = GetComponent<RotationalParameters>(parent.Value).AxialTilt;
-                        rot = math.mul(ptilt, rot);
+                        
+                        // XXX are these two lines needed?
+                        // quaternion ptilt = GetComponent<RotationalParameters>(parent.Value).AxialTilt;
+                        // rot = math.mul(ptilt, rot);
+                        
                         // pos.LocalToParent.Position = math.mul(rot, math.forward() * pos.Altitude);
                         float3 loc = math.mul(rot, math.forward() * pos.Altitude);
                         var ltp = pos.LocalToParent;
@@ -41,7 +44,7 @@ namespace Icarus.Orbit {
                         // ltp.Position = parent.ParentToWorld.TransformPoint(loc);
                         pos.LocalToParent = ltp;
                         // pos.LocalToWorld = pos.LocalToParent.TransformTransform(parent.ParentToWorld);
-                        pos.LocalToWorld = parent.ParentToWorld.TransformTransform(pos.LocalToParent);
+                        pos.LocalToWorld = ppos.Value.TransformTransform(pos.LocalToParent);
                     })
                 .ScheduleParallel();
         }

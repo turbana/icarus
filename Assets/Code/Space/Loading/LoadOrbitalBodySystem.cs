@@ -2,6 +2,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
+using Unity.Rendering;
 using Unity.Transforms;
 
 using UnityEngine;
@@ -38,12 +39,11 @@ namespace Icarus.Loading {
                 var name = keys[i];
                 var prefab = database.LookupPrefab(name);
                 entities[i] = ecb.Instantiate(prefab);
-                ecb.SetName(entities[i], name);
+                // ecb.SetName(entities[i], name);
                 // Debug.Log($"instantiated prefab for {name} -> {prefab} : {this.EntityManager.GetName(prefab)}");
                 var comp = new OrbitalBodyToLoadComponent { Name = name };
                 ecb.AddComponent<OrbitalBodyToLoadComponent>(entities[i], comp);
                 ecb.RemoveComponent<Parent>(entities[i]);
-                // ecb.RemoveComponent<LocalToParentTransform>(entities[i]);
             }
 
             ecb.Playback(this.EntityManager);
@@ -72,6 +72,10 @@ namespace Icarus.Loading {
             this.Dependency.Complete();
             ecb.Playback(this.EntityManager);
             ecb.Dispose();
+            
+            var player = GetSingletonEntity<PlayerOrbitTag>();
+            var parent = this.EntityManager.GetSharedComponent<OrbitalParent>(player).Value;
+            this.EntityManager.AddComponent<PlayerParentOrbitTag>(parent);
         }
 
         
@@ -103,9 +107,11 @@ namespace Icarus.Loading {
             var data = database.LookupData(name);
             // Debug.Log($"looking up {name} ({entity}) -> {data.Parent} == ({database.EntityMap[data.Parent]})");
 
-            ecb.AddComponent<OrbitalParent>(entity, new OrbitalParent {
-                    Value = database.LookupEntity(data.Parent),
-                    ParentToWorld = LocalTransform.FromScale(1f)
+            ecb.AddSharedComponent<OrbitalParent>(entity, new OrbitalParent {
+                    Value = database.LookupEntity(data.Parent)
+                });
+            ecb.AddComponent<OrbitalParentPosition>(entity, new OrbitalParentPosition {
+                    Value = LocalTransform.FromScale(1f)
                 });
         }
 

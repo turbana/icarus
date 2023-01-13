@@ -22,7 +22,11 @@ namespace Icarus.Orbit {
         public LocalTransform LocalToParent;
     }
 
+    // special orbits
     public struct PlayerOrbitTag : IComponentData {}
+    public struct PlayerParentOrbitTag : IComponentData {}
+
+    // orbital body types
     public struct SunTag : IComponentData {}
     public struct PlanetTag : IComponentData {}
     public struct MoonTag : IComponentData {}

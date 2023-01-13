@@ -14,7 +14,8 @@ namespace Icarus.Test {
             Entity player = GetSingletonEntity<PlayerOrbitTag>();
             OrbitalParameters parms = GetComponent<OrbitalParameters>(player);
             OrbitalPosition pos = GetComponent<OrbitalPosition>(player);
-            OrbitalParent parent = GetComponent<OrbitalParent>(player);
+            OrbitalParent parent = this.EntityManager.GetSharedComponent<OrbitalParent>(player);
+            OrbitalParentPosition ppos = GetComponent<OrbitalParentPosition>(player);
             SpawnSatellitesComponent spawn =
                 GetComponent<SpawnSatellitesComponent>(
                     GetSingletonEntity<SpawnSatellitesComponent>());
@@ -34,7 +35,8 @@ namespace Icarus.Test {
 
             UnityEngine.Debug.Log(".");
             ecb.Instantiate(spawn.Prefab, entities);
-            ecb.AddComponent<OrbitalParent>(entities, parent);
+            ecb.AddSharedComponent<OrbitalParent>(entities, parent);
+            ecb.AddComponent<OrbitalParentPosition>(entities, ppos);
             ecb.AddComponent<OrbitalScale>(entities, scale);
             ecb.AddComponent<RotationalParameters>(entities, rot);
             ecb.AddComponent<ShipTag>(entities);

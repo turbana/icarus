@@ -3,9 +3,12 @@ using Unity.Entities;
 using Unity.Transforms;
 
 namespace Icarus.Orbit {
-    public struct OrbitalParent : IComponentData {
+    public struct OrbitalParent : ISharedComponentData {
         public Entity Value;
-        public LocalTransform ParentToWorld;
+    }
+
+    public struct OrbitalParentPosition : IComponentData {
+        public LocalTransform Value;
     }
 
     [AddComponentMenu("Icarus/Orbits/Orbital Parent")]
@@ -14,9 +17,11 @@ namespace Icarus.Orbit {
 
         public class Baker : Unity.Entities.Baker<OrbitalParentAuthoring> {
             public override void Bake(OrbitalParentAuthoring obj) {
-                AddComponent(new OrbitalParent {
-                        Value = GetEntity(obj.ParentBody.gameObject),
-                        ParentToWorld = LocalTransform.FromScale(1f)
+                AddSharedComponent(new OrbitalParent {
+                        Value = GetEntity(obj.ParentBody.gameObject)
+                    });
+                AddComponent(new OrbitalParentPosition {
+                        Value = LocalTransform.FromScale(1f)
                     });
             }
         }
