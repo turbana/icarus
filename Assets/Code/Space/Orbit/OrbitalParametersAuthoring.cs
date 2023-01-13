@@ -18,11 +18,12 @@ namespace Icarus.Orbit {
         public float ElapsedTime;
         public float Theta;
         public float Altitude;
-        public UniformScaleTransform LocalToWorld;
-        public UniformScaleTransform LocalToParent;
+        public LocalTransform LocalToWorld;
+        public LocalTransform LocalToParent;
     }
 
     public struct PlayerOrbitTag : IComponentData {}
+    public struct SunTag : IComponentData {}
     public struct PlanetTag : IComponentData {}
     public struct MoonTag : IComponentData {}
     public struct DwarfPlanetTag : IComponentData {}
@@ -79,8 +80,8 @@ namespace Icarus.Orbit {
                     });
                 AddComponent(new OrbitalPosition {
                         ElapsedTime = parms.ElapsedTime,
-                        LocalToParent = UniformScaleTransform.FromPosition(float3.zero),
-                        LocalToWorld = UniformScaleTransform.FromPosition(float3.zero)
+                        LocalToParent = LocalTransform.FromPosition(float3.zero),
+                        LocalToWorld = LocalTransform.FromPosition(float3.zero)
                     });
             }
         }

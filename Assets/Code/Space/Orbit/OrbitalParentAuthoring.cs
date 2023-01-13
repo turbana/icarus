@@ -5,7 +5,7 @@ using Unity.Transforms;
 namespace Icarus.Orbit {
     public struct OrbitalParent : IComponentData {
         public Entity Value;
-        public UniformScaleTransform ParentToWorld;
+        public LocalTransform ParentToWorld;
     }
 
     [AddComponentMenu("Icarus/Orbits/Orbital Parent")]
@@ -16,7 +16,7 @@ namespace Icarus.Orbit {
             public override void Bake(OrbitalParentAuthoring obj) {
                 AddComponent(new OrbitalParent {
                         Value = GetEntity(obj.ParentBody.gameObject),
-                        ParentToWorld = new UniformScaleTransform {Scale = 1f}
+                        ParentToWorld = LocalTransform.FromScale(1f)
                     });
             }
         }

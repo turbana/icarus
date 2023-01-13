@@ -62,7 +62,7 @@ namespace Icarus.Orbit {
                         newpos = math.mul(prot, newpos);
                         orot = math.mul(prot, orot);
 
-                        transform.LocalToWorld = UniformScaleTransform.FromPositionRotationScale(newpos, orot, rscale);
+                        transform.LocalTransform = LocalTransform.FromPositionRotationScale(newpos, orot, rscale);
                         
                         float wdist = math.length(newpos);
                         float wr = rscale / 2f;

@@ -59,10 +59,10 @@ namespace Icarus.Misc {
             Entities
                 .ForEach(
                     (ref MeshLODGroupComponent lod,
-                     in InitialLODRangesComponent initial, in LocalToWorldTransform ltw) =>
+                     in InitialLODRangesComponent initial, in LocalTransform ltw) =>
                     {
-                        lod.LODDistances0 = ltw.Value.Scale * initial.LODDistances0;
-                        lod.LODDistances1 = ltw.Value.Scale * initial.LODDistances1;
+                        lod.LODDistances0 = ltw.Scale * initial.LODDistances0;
+                        lod.LODDistances1 = ltw.Scale * initial.LODDistances1;
                     })
                 .ScheduleParallel();
         }

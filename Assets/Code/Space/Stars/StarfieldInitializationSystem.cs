@@ -63,10 +63,9 @@ namespace Icarus.Space {
             // find position
             float3 pos = math.mul(rot, math.forward() * dist);
             // update local transform
-            var transform = UniformScaleTransform
+            var transform = LocalTransform
                 .FromPositionRotationScale(pos, rot, scale);
-            var ltpt = new LocalToParentTransform { Value = transform };
-            this.EntityManager.AddComponentData<LocalToParentTransform>(entity, ltpt);
+            this.EntityManager.AddComponentData<LocalTransform>(entity, transform);
             // find star color
             // scale the temperature half closer to "white"
             float temp = star.temp + (5800f - star.temp) / 2f;

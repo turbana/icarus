@@ -43,7 +43,7 @@ namespace Icarus.Loading {
                 var comp = new OrbitalBodyToLoadComponent { Name = name };
                 ecb.AddComponent<OrbitalBodyToLoadComponent>(entities[i], comp);
                 ecb.RemoveComponent<Parent>(entities[i]);
-                ecb.RemoveComponent<LocalToParentTransform>(entities[i]);
+                // ecb.RemoveComponent<LocalToParentTransform>(entities[i]);
             }
 
             ecb.Playback(this.EntityManager);
@@ -105,7 +105,7 @@ namespace Icarus.Loading {
 
             ecb.AddComponent<OrbitalParent>(entity, new OrbitalParent {
                     Value = database.LookupEntity(data.Parent),
-                    ParentToWorld = UniformScaleTransform.FromScale(1f)
+                    ParentToWorld = LocalTransform.FromScale(1f)
                 });
         }
 
@@ -124,6 +124,9 @@ namespace Icarus.Loading {
             else if (data.Type == "Ship") ecb.AddComponent<ShipTag>(entity);
             else if (data.Type == "Player") ecb.AddComponent<ShipTag>(entity);
             else throw new System.Exception("invalid orbital body type: " + data.Type);
+
+            // special sun tag
+            if (data.Name == "Sun") ecb.AddComponent<SunTag>(entity);
                     
             // add orbital parameters
             ecb.AddComponent<OrbitalParameters>(entity, new OrbitalParameters {
@@ -141,8 +144,8 @@ namespace Icarus.Loading {
             // add orbital position
             ecb.AddComponent<OrbitalPosition>(entity, new OrbitalPosition {
                     ElapsedTime = data.ElapsedTime,
-                    LocalToParent = UniformScaleTransform.FromPosition(float3.zero),
-                    LocalToWorld = UniformScaleTransform.FromPosition(float3.zero)
+                    LocalToParent = LocalTransform.FromPosition(float3.zero),
+                    LocalToWorld = LocalTransform.FromPosition(float3.zero)
                 });
                     
             // skip rotational and scale components on the player
