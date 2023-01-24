@@ -1,3 +1,5 @@
+using Unity.Burst.Intrinsics;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -9,44 +11,63 @@ namespace Icarus.Orbit {
         protected override void OnUpdate() {
             OrbitalOptions opts = SystemAPI.GetSingleton<OrbitalOptions>();
             float dt = SystemAPI.Time.DeltaTime * opts.TimeScale;
+            var OrbitalParentTypeHandle = GetSharedComponentTypeHandle<OrbitalParent>();
+            var RotationalParametersLookup = GetComponentLookup<RotationalParameters>(true);
 
-            Entities
-                .ForEach(
-                    (Entity entity, ref OrbitalPosition pos,
-                     in OrbitalParentPosition ppos, in OrbitalParameters parms) => {
-                        // update elapsed time
-                        pos.ElapsedTime = (pos.ElapsedTime + dt) % parms.Period;
-                        // mean motion
-                        float n = (2f * math.PI) / parms.Period;
-                        // mean anomaly
-                        float M = n * pos.ElapsedTime;
-                        // eccentric anomaly
-                        float e = parms.Eccentricity;
-                        float E = EccentricAnomaly(M, e);
-                        // true anomaly
-                        // https://en.wikipedia.org/wiki/True_anomaly#From_the_eccentric_anomaly
-                        float beta = e / (1f + math.sqrt(1 - math.pow(e, 2f)));
-                        pos.Theta = E + 2f * math.atan((beta * math.sin(E)) / (1f - beta * math.cos(E)));
-                        // parent distance
-                        pos.Altitude = parms.SemiMajorAxis * (1f - e * math.cos(E));
-                        // update position within orbit
-                        quaternion rot = math.mul(parms.OrbitRotation, quaternion.RotateY(-pos.Theta));
-                        // rot = math.mul(rot, parent.ParentToWorld.Rotation);
+            new UpdateOrbitalPositionJob {
+                DeltaTime = dt,
+                OrbitalParentTypeHandle = OrbitalParentTypeHandle,
+                RotationalParametersLookup = RotationalParametersLookup
+            }.ScheduleParallel();
+        }
+
+        public partial struct UpdateOrbitalPositionJob : IJobEntity, IJobEntityChunkBeginEnd {
+            [ReadOnly]
+            public float DeltaTime;
+            [ReadOnly]
+            public SharedComponentTypeHandle<OrbitalParent> OrbitalParentTypeHandle;
+            [ReadOnly]
+            public ComponentLookup<RotationalParameters> RotationalParametersLookup;
+
+            private quaternion ParentTilt;
+
+            public bool OnChunkBegin(in ArchetypeChunk chunk, int index, bool useMask, in v128 mask) {
+                var parent = chunk.GetSharedComponent<OrbitalParent>(OrbitalParentTypeHandle);
+                ParentTilt = RotationalParametersLookup[parent.Value].AxialTilt;
+                return true;
+            }
+
+            public void OnChunkEnd(in ArchetypeChunk chunk, int index, bool useMask, in v128 mask, bool wasExecuted) {}
+
+            public void Execute(Entity entity, ref OrbitalPosition pos,
+                                in OrbitalParentPosition ppos, in OrbitalParameters parms)
+            {
+                // update elapsed time
+                pos.ElapsedTime = (pos.ElapsedTime + DeltaTime) % parms.Period;
+                // mean motion
+                float n = (2f * math.PI) / parms.Period;
+                // mean anomaly
+                float M = n * pos.ElapsedTime;
+                // eccentric anomaly
+                float e = parms.Eccentricity;
+                float E = EccentricAnomaly(M, e);
+                // true anomaly
+                // https://en.wikipedia.org/wiki/True_anomaly#From_the_eccentric_anomaly
+                float beta = e / (1f + math.sqrt(1 - math.pow(e, 2f)));
+                pos.Theta = E + 2f * math.atan((beta * math.sin(E)) / (1f - beta * math.cos(E)));
+                // parent distance
+                pos.Altitude = parms.SemiMajorAxis * (1f - e * math.cos(E));
+                // update position within orbit
+                quaternion rot = math.mul(parms.OrbitRotation, quaternion.RotateY(-pos.Theta));
+                // place our orbit relative to our parent's axial tilt
+                rot = math.mul(ParentTilt, rot);
                         
-                        // XXX are these two lines needed?
-                        // quaternion ptilt = GetComponent<RotationalParameters>(parent.Value).AxialTilt;
-                        // rot = math.mul(ptilt, rot);
-                        
-                        // pos.LocalToParent.Position = math.mul(rot, math.forward() * pos.Altitude);
-                        float3 loc = math.mul(rot, math.forward() * pos.Altitude);
-                        var ltp = pos.LocalToParent;
-                        ltp.Position = loc;
-                        // ltp.Position = parent.ParentToWorld.TransformPoint(loc);
-                        pos.LocalToParent = ltp;
-                        // pos.LocalToWorld = pos.LocalToParent.TransformTransform(parent.ParentToWorld);
-                        pos.LocalToWorld = ppos.Value.TransformTransform(pos.LocalToParent);
-                    })
-                .ScheduleParallel();
+                // update game position
+                var ltp = pos.LocalToParent;
+                ltp.Position = math.mul(rot, math.forward() * pos.Altitude);
+                pos.LocalToParent = ltp;
+                pos.LocalToWorld = ppos.Value.TransformTransform(pos.LocalToParent);
+            }
         }
         
         // taken from: https://squarewidget.com/keplers-equation/
