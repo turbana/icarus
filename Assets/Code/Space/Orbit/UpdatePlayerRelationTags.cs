@@ -10,8 +10,10 @@ namespace Icarus.Orbit {
     public partial class UpdatePlayerRelationTags : SystemBase {
         private EntityQuery CurrentSiblings;
         private EntityQuery DesiredSiblings;
+        private ComponentLookup<PlanetTag> PlanetTags;
 
         protected override void OnCreate() {
+            PlanetTags = GetComponentLookup<PlanetTag>(true);
             DesiredSiblings = new EntityQueryBuilder(Allocator.TempJob)
                 .WithNone<PlayerOrbitTag>()
                 .WithAll<OrbitalParent>()
@@ -22,6 +24,7 @@ namespace Icarus.Orbit {
         }
         
         protected override void OnUpdate() {
+            PlanetTags.Update(this);
             var ecb0 = new EntityCommandBuffer(Allocator.TempJob);
             var ecb1 = new EntityCommandBuffer(Allocator.TempJob);
 
@@ -33,8 +36,11 @@ namespace Icarus.Orbit {
             if (parent.Value != cparent) {
                 if (found) {
                     ecb0.RemoveComponent<PlayerParentOrbitTag>(cparent);
-                    ecb0.RemoveComponent<OrbitRenderingEnabled>(cparent);
-                    ecb0.AddComponent<OrbitRenderingDisabled>(cparent);
+                    // disable rendering only if a non-planet
+                    if (!PlanetTags.HasComponent(cparent)) {
+                        ecb0.RemoveComponent<OrbitRenderingEnabled>(cparent);
+                        ecb0.AddComponent<OrbitRenderingDisabled>(cparent);
+                    }
                 }
                 ecb0.AddComponent<PlayerParentOrbitTag>(parent.Value);
                 ecb0.RemoveComponent<OrbitRenderingDisabled>(parent.Value);
@@ -48,6 +54,7 @@ namespace Icarus.Orbit {
             var job0 = new UpdateSiblingRelationJob {
                 pecb = ecb0.AsParallelWriter(),
                 OtherQuery = DesiredSiblings,
+                PlanetTags = PlanetTags,
                 add = false
             }.Schedule(CurrentSiblings, this.Dependency);
 
@@ -55,6 +62,7 @@ namespace Icarus.Orbit {
             var job1 = new UpdateSiblingRelationJob {
                 pecb = ecb1.AsParallelWriter(),
                 OtherQuery = CurrentSiblings,
+                PlanetTags = PlanetTags,
                 add = true
             }.Schedule(DesiredSiblings, this.Dependency);
             
@@ -75,6 +83,8 @@ namespace Icarus.Orbit {
         [Unity.Collections.LowLevel.Unsafe.NativeDisableUnsafePtrRestriction]
         public EntityQuery OtherQuery;
         [ReadOnly]
+        public ComponentLookup<PlanetTag> PlanetTags;
+        [ReadOnly]
         public bool add;
         
         public void Execute(Entity entity, [ChunkIndexInQuery] int index) {
@@ -85,8 +95,11 @@ namespace Icarus.Orbit {
                     pecb.AddComponent<OrbitRenderingEnabled>(index, entity);
                 } else {
                     pecb.RemoveComponent<PlayerSiblingOrbitTag>(index, entity);
-                    pecb.RemoveComponent<OrbitRenderingEnabled>(index, entity);
-                    pecb.AddComponent<OrbitRenderingDisabled>(index, entity);
+                    // disable rendering for non-planet, non-siblings
+                    if (!PlanetTags.HasComponent(entity)) {
+                        pecb.RemoveComponent<OrbitRenderingEnabled>(index, entity);
+                        pecb.AddComponent<OrbitRenderingDisabled>(index, entity);
+                    }
                 }
             }
         }
