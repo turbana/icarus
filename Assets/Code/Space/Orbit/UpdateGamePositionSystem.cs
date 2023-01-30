@@ -12,6 +12,7 @@ namespace Icarus.Orbit {
     [UpdateInGroup(typeof(UpdateOrbitSystemGroup))]
     [UpdateAfter(typeof(UpdateOrbitalPositionSystem))]
     [UpdateAfter(typeof(UpdateOrbitalRenderingSystem))]
+    [UpdateAfter(typeof(UpdatePlayerRelationTags))]
     public partial class UpdateGamePositionSystem : SystemBase {
         private EntityQuery SiblingQuery;
         private EntityQuery PlanetQuery;
@@ -19,20 +20,21 @@ namespace Icarus.Orbit {
 
         protected override void OnCreate() {
             SiblingQuery = new EntityQueryBuilder(Allocator.TempJob)
-                .WithNone<PlayerOrbitTag>()
+                .WithAll<PlayerSiblingOrbitTag, OrbitRenderingEnabled>()
+                .WithNone<PlanetTag>()
                 .WithAllRW<LocalTransform>()
                 .WithAll<OrbitalPosition, OrbitalParameters, OrbitalScale>()
                 .WithAll<RotationalParameters, OrbitalParent>()
                 .Build(this);
             PlanetQuery = new EntityQueryBuilder(Allocator.TempJob)
-                .WithAll<PlanetTag>()
+                .WithAll<PlanetTag, OrbitRenderingEnabled>()
                 .WithNone<PlayerParentOrbitTag>()
                 .WithAllRW<LocalTransform>()
                 .WithAll<OrbitalPosition, OrbitalParameters, OrbitalScale>()
                 .WithAll<RotationalParameters, OrbitalParent>()
                 .Build(this);
             ParentQuery = new EntityQueryBuilder(Allocator.TempJob)
-                .WithAll<PlayerParentOrbitTag>()
+                .WithAll<PlayerParentOrbitTag, OrbitRenderingEnabled>()
                 .WithAllRW<LocalTransform>()
                 .WithAll<OrbitalPosition, OrbitalParameters, OrbitalScale>()
                 .WithAll<RotationalParameters, OrbitalParent>()
@@ -48,7 +50,6 @@ namespace Icarus.Orbit {
                 GetSingletonEntity<PlayerTag>());
             
             // planets
-            PlanetQuery.SetSharedComponentFilter(new OrbitalParent { Value = sun });
             var handle0 = new UpdateGamePositionJob {
                 player = player,
                 playerParent = playerParent,
@@ -59,7 +60,6 @@ namespace Icarus.Orbit {
             }.ScheduleParallel(PlanetQuery, this.Dependency);
             
             // siblings
-            SiblingQuery.SetSharedComponentFilter(playerParent);
             var handle1 = new UpdateGamePositionJob {
                 player = player,
                 playerParent = playerParent,

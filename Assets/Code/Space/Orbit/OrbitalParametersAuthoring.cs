@@ -25,6 +25,7 @@ namespace Icarus.Orbit {
     // special orbits
     public struct PlayerOrbitTag : IComponentData {}
     public struct PlayerParentOrbitTag : IComponentData {}
+    public struct PlayerSiblingOrbitTag : IComponentData {}
 
     // orbital body types
     public struct SunTag : IComponentData {}

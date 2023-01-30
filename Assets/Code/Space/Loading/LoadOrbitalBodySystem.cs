@@ -72,10 +72,6 @@ namespace Icarus.Loading {
             this.Dependency.Complete();
             ecb.Playback(this.EntityManager);
             ecb.Dispose();
-            
-            var player = GetSingletonEntity<PlayerOrbitTag>();
-            var parent = this.EntityManager.GetSharedComponent<OrbitalParent>(player).Value;
-            this.EntityManager.AddComponent<PlayerParentOrbitTag>(parent);
         }
 
         
@@ -172,8 +168,12 @@ namespace Icarus.Loading {
                         Radius = data.Radius
                     });
                 
-                // assume we don't want to render this body
-                ecb.AddComponent<OrbitRenderingDisabled>(entity);
+                // assume we don't want to render this body (unless a planet)
+                if (data.Type == "Planet") {
+                    ecb.AddComponent<OrbitRenderingEnabled>(entity);
+                } else {
+                    ecb.AddComponent<OrbitRenderingDisabled>(entity);
+                }
             }
 
             // add special sunlight component on the sun
