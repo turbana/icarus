@@ -105,18 +105,18 @@ namespace Icarus.Orbit.Editor {
                     Type = line[1],
                     Parent = line[2]
                 };
-                data.Radius = ParseFloat(line[3]);
+                data.Radius = ParseFloat(line[9]);
                 data.Mass = float.NaN;
                 data.Period = ParseFloat(line[4]);
                 data.Eccentricity = ParseFloat(line[5]);
                 data.SemiMajorAxis = ParseFloat(line[6]);
                 data.Inclination = ParseFloat(line[7]);
                 data.AscendingNode = ParseFloat(line[8]);
-                data.ElapsedTime = ParseFloat(line[9]);
-                data.AxialTilt = ParseFloat(line[10]);
-                data.NorthPoleRA = ParseFloat(line[11]);
-                data.RotationPeriod = ParseFloat(line[12]);
-                data.RotationElapsedTime = ParseFloat(line[13]);
+                data.ElapsedTime = ParseFloat(line[3]);
+                data.AxialTilt = ParseFloat(line[11]);
+                data.NorthPoleRA = ParseFloat(line[12]);
+                data.RotationPeriod = ParseFloat(line[13]);
+                data.RotationElapsedTime = ParseFloat(line[14]);
                 // check for 0-length Periods and set them to a small value;
                 if (data.Period == 0f) data.Period = 1f;
                 if (data.RotationPeriod == 0f) data.RotationPeriod = 1f;
