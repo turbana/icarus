@@ -57,6 +57,7 @@ namespace Icarus.Misc {
     public partial class DynamicLODScalingSystem : SystemBase {
         protected override void OnUpdate() {
             Entities
+                .WithNone<DisableRendering>()
                 .ForEach(
                     (ref MeshLODGroupComponent lod,
                      in InitialLODRangesComponent initial, in LocalTransform ltw) =>

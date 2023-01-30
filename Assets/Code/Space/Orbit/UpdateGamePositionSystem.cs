@@ -9,9 +9,9 @@ using Unity.Transforms;
 using Icarus.Misc;
 
 namespace Icarus.Orbit {
-    [RequireMatchingQueriesForUpdate]
     [UpdateInGroup(typeof(UpdateOrbitSystemGroup))]
     [UpdateAfter(typeof(UpdateOrbitalPositionSystem))]
+    [UpdateAfter(typeof(UpdateOrbitalRenderingSystem))]
     public partial class UpdateGamePositionSystem : SystemBase {
         private EntityQuery SiblingQuery;
         private EntityQuery PlanetQuery;
@@ -83,6 +83,7 @@ namespace Icarus.Orbit {
         }
     }
 
+    [WithAll(typeof(NeverMatchTag))]
     public partial struct UpdateGamePositionJob : IJobEntity {
         public EntityCommandBuffer.ParallelWriter ecb;
         public Entity player;

@@ -171,6 +171,9 @@ namespace Icarus.Loading {
                 ecb.AddComponent<OrbitalScale>(entity, new OrbitalScale {
                         Radius = data.Radius
                     });
+                
+                // assume we don't want to render this body
+                ecb.AddComponent<OrbitRenderingDisabled>(entity);
             }
 
             // add special sunlight component on the sun
