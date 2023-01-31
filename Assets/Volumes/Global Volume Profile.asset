@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c4cd2dc26319704b8a9b61a81b7e97c, type: 3}
   m_Name: DimStarsShaderProcess
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   intensity:
     m_OverrideState: 1
     m_Value: 1
