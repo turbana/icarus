@@ -1,3 +1,4 @@
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -8,95 +9,92 @@ namespace Icarus.Orbit {
     [RequireMatchingQueriesForUpdate]
     [UpdateInGroup(typeof(UpdateOrbitSystemGroup))]
     public partial class UpdatePlayerRelationTags : SystemBase {
-        private EntityQuery CurrentSiblings;
-        private EntityQuery DesiredSiblings;
         private ComponentLookup<PlanetTag> PlanetTags;
+        private ComponentLookup<PlayerSiblingOrbitTag> PlayerSiblings;
+        private SharedComponentTypeHandle<OrbitalParent> OrbitalParentTypeHandle;
 
         protected override void OnCreate() {
             PlanetTags = GetComponentLookup<PlanetTag>(true);
-            DesiredSiblings = new EntityQueryBuilder(Allocator.TempJob)
-                .WithNone<PlayerOrbitTag>()
-                .WithAll<OrbitalParent>()
-                .Build(this);
-            CurrentSiblings = new EntityQueryBuilder(Allocator.TempJob)
-                .WithAll<PlayerSiblingOrbitTag>()
-                .Build(this);
+            PlayerSiblings = GetComponentLookup<PlayerSiblingOrbitTag>(false);
+            OrbitalParentTypeHandle = GetSharedComponentTypeHandle<OrbitalParent>();
         }
         
         protected override void OnUpdate() {
             PlanetTags.Update(this);
-            var ecb0 = new EntityCommandBuffer(Allocator.TempJob);
-            var ecb1 = new EntityCommandBuffer(Allocator.TempJob);
-
-            // check parent
-            var player = GetSingletonEntity<PlayerOrbitTag>();
-            var parent = this.EntityManager.GetSharedComponent<OrbitalParent>(player);
+            PlayerSiblings.Update(this);
+            OrbitalParentTypeHandle.Update(this);
+            
+            var ecb = new EntityCommandBuffer(Allocator.TempJob);
+            var player = SystemAPI.GetSingletonEntity<PlayerOrbitTag>();
+            var parent = this.EntityManager.GetSharedComponent<OrbitalParent>(player).Value;
             Entity cparent;
             var found = SystemAPI.TryGetSingletonEntity<PlayerParentOrbitTag>(out cparent);
-            if (parent.Value != cparent) {
+
+            // update parent
+            if (cparent != parent) {
                 if (found) {
-                    ecb0.RemoveComponent<PlayerParentOrbitTag>(cparent);
-                    // disable rendering only if a non-planet
-                    if (!PlanetTags.HasComponent(cparent)) {
-                        ecb0.RemoveComponent<OrbitRenderingEnabled>(cparent);
-                        ecb0.AddComponent<OrbitRenderingDisabled>(cparent);
-                    }
+                    ecb.RemoveComponent<PlayerParentOrbitTag>(cparent);
                 }
-                ecb0.AddComponent<PlayerParentOrbitTag>(parent.Value);
-                ecb0.RemoveComponent<OrbitRenderingDisabled>(parent.Value);
-                ecb0.AddComponent<OrbitRenderingEnabled>(parent.Value);
+                ecb.AddComponent<PlayerParentOrbitTag>(parent);
             }
 
-            // update desired query
-            DesiredSiblings.SetSharedComponentFilter(parent);
-
-            // add new siblings
-            var job0 = new UpdateSiblingRelationJob {
-                pecb = ecb0.AsParallelWriter(),
-                OtherQuery = DesiredSiblings,
+            // update siblings
+            new UpdateSiblingRelationJob {
+                pecb = ecb.AsParallelWriter(),
+                OrbitalParentTypeHandle = OrbitalParentTypeHandle,
+                PlayerParent = parent,
                 PlanetTags = PlanetTags,
-                add = false
-            }.Schedule(CurrentSiblings, this.Dependency);
+                PlayerSiblings = PlayerSiblings
+            }.ScheduleParallel();
 
-            // remove old siblings
-            var job1 = new UpdateSiblingRelationJob {
-                pecb = ecb1.AsParallelWriter(),
-                OtherQuery = CurrentSiblings,
-                PlanetTags = PlanetTags,
-                add = true
-            }.Schedule(DesiredSiblings, this.Dependency);
-            
-            this.Dependency = JobHandle.CombineDependencies(job0, job1);
             this.Dependency.Complete();
-            
-            ecb0.Playback(this.EntityManager);
-            ecb0.Dispose();
-            ecb1.Playback(this.EntityManager);
-            ecb1.Dispose();
+            ecb.Playback(this.EntityManager);
+            ecb.Dispose();
         }
     }
 
-    [WithAll(typeof(NeverMatchTag))] // disable internal query generation
-    public partial struct UpdateSiblingRelationJob : IJobEntity {
+    [WithAll(typeof(OrbitalParent))]
+    [WithNone(typeof(PlayerOrbitTag))]
+    [WithChangeFilter(typeof(OrbitalParent))]
+    public partial struct UpdateSiblingRelationJob : IJobEntity, IJobEntityChunkBeginEnd {
         public EntityCommandBuffer.ParallelWriter pecb;
         [ReadOnly]
-        [Unity.Collections.LowLevel.Unsafe.NativeDisableUnsafePtrRestriction]
-        public EntityQuery OtherQuery;
+        public SharedComponentTypeHandle<OrbitalParent> OrbitalParentTypeHandle;
+        [ReadOnly]
+        public Entity PlayerParent;
         [ReadOnly]
         public ComponentLookup<PlanetTag> PlanetTags;
         [ReadOnly]
-        public bool add;
-        
-        public void Execute(Entity entity, [ChunkIndexInQuery] int index) {
-            if (!OtherQuery.Matches(entity)) {
-                if (add) {
+        public ComponentLookup<PlayerSiblingOrbitTag> PlayerSiblings;
+
+        private Entity parent;
+
+        [BurstCompile]
+        public bool OnChunkBegin(in ArchetypeChunk chunk, int index, bool useMask, in v128 mask) {
+            var comp = chunk.GetSharedComponent<OrbitalParent>(OrbitalParentTypeHandle);
+            parent = comp.Value;
+            return true;
+        }
+
+        public void OnChunkEnd(in ArchetypeChunk chunk, int index, bool useMask, in v128 mask, bool wasExecuted) {}
+
+        public void Execute(Entity entity, [EntityIndexInQuery] int index) {
+            var planet = PlanetTags.HasComponent(entity);
+            var sibling = PlayerSiblings.HasComponent(entity);
+            
+            if (parent == PlayerParent || planet) {
+                // set sibling
+                if (!sibling) {
                     pecb.AddComponent<PlayerSiblingOrbitTag>(index, entity);
                     pecb.RemoveComponent<OrbitRenderingDisabled>(index, entity);
                     pecb.AddComponent<OrbitRenderingEnabled>(index, entity);
-                } else {
+                }
+            } else {
+                // clear sibling
+                if (sibling) {
                     pecb.RemoveComponent<PlayerSiblingOrbitTag>(index, entity);
                     // disable rendering for non-planet, non-siblings
-                    if (!PlanetTags.HasComponent(entity)) {
+                    if (!planet) {
                         pecb.RemoveComponent<OrbitRenderingEnabled>(index, entity);
                         pecb.AddComponent<OrbitRenderingDisabled>(index, entity);
                     }
