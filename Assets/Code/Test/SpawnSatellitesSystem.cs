@@ -9,6 +9,12 @@ namespace Icarus.Test {
     [UpdateInGroup(typeof(UpdateOrbitSystemGroup))]
     [UpdateBefore(typeof(UpdateOrbitalPositionSystem))]
     public partial class SpawnSatellitesSystem : SystemBase {
+        private static Random random;
+        
+        protected override void OnCreate() {
+            random = new Random((uint)System.Diagnostics.Stopwatch.GetTimestamp());
+        }
+        
         protected override void OnUpdate() {
             if (!UnityEngine.Input.GetKeyDown("q")) return;
             Entity player = GetSingletonEntity<PlayerOrbitTag>();
@@ -31,7 +37,6 @@ namespace Icarus.Test {
                         
             EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
             NativeArray<Entity> entities = new NativeArray<Entity>(spawn.Count, Allocator.TempJob);
-            var rand = new Random((uint)System.Diagnostics.Stopwatch.GetTimestamp());
 
             UnityEngine.Debug.Log(".");
             ecb.Instantiate(spawn.Prefab, entities);
@@ -40,16 +45,18 @@ namespace Icarus.Test {
             ecb.AddComponent<OrbitalScale>(entities, scale);
             ecb.AddComponent<RotationalParameters>(entities, rot);
             ecb.AddComponent<ShipTag>(entities);
+            ecb.AddComponent<OrbitRenderingEnabled>(entities);
+            ecb.AddComponent<PlayerSiblingOrbitTag>(entities);
             for (int i=0; i<spawn.Count; i++) {
-                float period = parms.Period + rand.NextFloat(-300f, 300f);
-                float elapsed = pos.ElapsedTime + rand.NextFloat(-300f, 300f);
+                float period = parms.Period + NextFloat(0f);
+                float elapsed = pos.ElapsedTime + NextFloat(0.1f);
                 if (elapsed < 0f) elapsed += period;
                 var nparms = new OrbitalParameters {
                     Period = period,
-                    Eccentricity = parms.Eccentricity + rand.NextFloat(-0.01f, 0.01f),
-                    SemiMajorAxis = parms.SemiMajorAxis + rand.NextFloat(-100f, 100f),
-                    Inclination = parms.Inclination + rand.NextFloat(-1f, 1f),
-                    AscendingNode = parms.AscendingNode + rand.NextFloat(-1f, 1f)
+                    Eccentricity = parms.Eccentricity + NextFloat(0.0000001f),
+                    SemiMajorAxis = parms.SemiMajorAxis + NextFloat(0.1f),
+                    Inclination = parms.Inclination + NextFloat(0.001f),
+                    AscendingNode = parms.AscendingNode + NextFloat(0f)
                 };
                 nparms.OrbitRotation = quaternion.EulerYXZ(math.radians(nparms.Inclination),
                                                            math.radians(nparms.AscendingNode),
@@ -67,6 +74,10 @@ namespace Icarus.Test {
             ecb.Playback(this.EntityManager);
             ecb.Dispose();
             entities.Dispose();
+        }
+
+        private static float NextFloat(float range) {
+            return random.NextFloat(-range, range);
         }
     }
 }
