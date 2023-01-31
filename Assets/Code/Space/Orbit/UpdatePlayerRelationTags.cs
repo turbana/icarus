@@ -1,3 +1,4 @@
+using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
@@ -8,17 +9,20 @@ using Icarus.Misc;
 namespace Icarus.Orbit {
     [RequireMatchingQueriesForUpdate]
     [UpdateInGroup(typeof(UpdateOrbitSystemGroup))]
+    [BurstCompile]
     public partial class UpdatePlayerRelationTags : SystemBase {
         private ComponentLookup<PlanetTag> PlanetTags;
         private ComponentLookup<PlayerSiblingOrbitTag> PlayerSiblings;
         private SharedComponentTypeHandle<OrbitalParent> OrbitalParentTypeHandle;
 
+        [BurstCompile]
         protected override void OnCreate() {
             PlanetTags = GetComponentLookup<PlanetTag>(true);
             PlayerSiblings = GetComponentLookup<PlayerSiblingOrbitTag>(false);
             OrbitalParentTypeHandle = GetSharedComponentTypeHandle<OrbitalParent>();
         }
         
+        [BurstCompile]
         protected override void OnUpdate() {
             PlanetTags.Update(this);
             PlayerSiblings.Update(this);
@@ -56,6 +60,7 @@ namespace Icarus.Orbit {
     [WithAll(typeof(OrbitalParent))]
     [WithNone(typeof(PlayerOrbitTag))]
     [WithChangeFilter(typeof(OrbitalParent))]
+    [BurstCompile]
     public partial struct UpdateSiblingRelationJob : IJobEntity, IJobEntityChunkBeginEnd {
         public EntityCommandBuffer.ParallelWriter pecb;
         [ReadOnly]
@@ -76,8 +81,10 @@ namespace Icarus.Orbit {
             return true;
         }
 
+        [BurstCompile]
         public void OnChunkEnd(in ArchetypeChunk chunk, int index, bool useMask, in v128 mask, bool wasExecuted) {}
 
+        [BurstCompile]
         public void Execute(Entity entity, [EntityIndexInQuery] int index) {
             var planet = PlanetTags.HasComponent(entity);
             var sibling = PlayerSiblings.HasComponent(entity);

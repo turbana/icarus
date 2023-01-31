@@ -1,3 +1,4 @@
+using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
@@ -21,6 +22,7 @@ namespace Icarus.Orbit {
             }.ScheduleParallel();
         }
 
+        [BurstCompile]
         public partial struct UpdateOrbitalPositionJob : IJobEntity, IJobEntityChunkBeginEnd {
             [ReadOnly]
             public float DeltaTime;
@@ -31,14 +33,17 @@ namespace Icarus.Orbit {
 
             private quaternion ParentTilt;
 
+            [BurstCompile]
             public bool OnChunkBegin(in ArchetypeChunk chunk, int index, bool useMask, in v128 mask) {
                 var parent = chunk.GetSharedComponent<OrbitalParent>(OrbitalParentTypeHandle);
                 ParentTilt = RotationalParametersLookup[parent.Value].AxialTilt;
                 return true;
             }
 
+            [BurstCompile]
             public void OnChunkEnd(in ArchetypeChunk chunk, int index, bool useMask, in v128 mask, bool wasExecuted) {}
 
+            [BurstCompile]
             public void Execute(Entity entity, ref OrbitalPosition pos,
                                 in OrbitalParentPosition ppos, in OrbitalParameters parms)
             {
@@ -72,6 +77,7 @@ namespace Icarus.Orbit {
         
         // taken from: https://squarewidget.com/keplers-equation/
         // which itself was taken from: Meeus, Jean. Astronomical Algorithms. 2nd Ed. Willmann-Bell. 1998. (p. 199)
+        [BurstCompile]
         private static float EccentricAnomaly(float M, float e) {
             float E0 = M;
             float E1 = 0;

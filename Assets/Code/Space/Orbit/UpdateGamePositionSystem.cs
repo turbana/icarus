@@ -1,7 +1,8 @@
 using System;
 
-using Unity.Entities;
+using Unity.Burst;
 using Unity.Collections;
+using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -18,6 +19,7 @@ namespace Icarus.Orbit {
         private EntityQuery PlanetQuery;
         private EntityQuery ParentQuery;
 
+        [BurstCompile]
         protected override void OnCreate() {
             SiblingQuery = new EntityQueryBuilder(Allocator.TempJob)
                 .WithAll<PlayerSiblingOrbitTag, OrbitRenderingEnabled>()
@@ -40,7 +42,8 @@ namespace Icarus.Orbit {
                 .WithAll<RotationalParameters, OrbitalParent>()
                 .Build(this);
         }
-        
+
+        [BurstCompile]
         protected override void OnUpdate() {
             Entity sun = GetSingletonEntity<SunTag>();
             Entity player = GetSingletonEntity<PlayerOrbitTag>();
@@ -84,6 +87,7 @@ namespace Icarus.Orbit {
     }
 
     [WithAll(typeof(NeverMatchTag))]
+    [BurstCompile]
     public partial struct UpdateGamePositionJob : IJobEntity {
         public EntityCommandBuffer.ParallelWriter ecb;
         public Entity player;
@@ -93,6 +97,7 @@ namespace Icarus.Orbit {
         public bool isSibling;
         public bool isParent;
         
+        [BurstCompile]
         void Execute(Entity entity,
                      ref LocalTransform transform,
                      in OrbitalPosition pos, in OrbitalParameters parms, in OrbitalScale scale,
