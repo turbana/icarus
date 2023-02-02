@@ -51,10 +51,15 @@ namespace Icarus.Space {
         }
 
         private void SetupStar(Entity entity, StarData star, float dist) {
-            // find stellar magnitude
-            float mag = 1f - math.pow(0.9f, (7f - star.mag));
+            // see here for a magnitude visualization:
+            // https://www.desmos.com/calculator/ekwgkaealx
+            // find scale magnitude
+            float smag = math.min(1f, math.atan(-star.mag / 2f + 1f) / 3f + 0.75f);
+            // find alpha magnitude
+            // float amag = math.sin(star.mag / 2.65f + 2f) / 2f + 0.5f;
+            float amag = math.min(1f, math.sin(star.mag / 2.5f + 2.5f) / 1.5f + 0.7f);
             // find scale
-            float scale = dist / 25f * mag;
+            float scale = dist / 50f * smag;
             // find rotation
             quaternion rot =
                 quaternion.EulerXYZ(-math.radians(star.dec),
@@ -67,10 +72,10 @@ namespace Icarus.Space {
                 .FromPositionRotationScale(pos, rot, scale);
             this.EntityManager.AddComponentData<LocalTransform>(entity, transform);
             // find star color
-            // scale the temperature half closer to "white"
-            float temp = star.temp + (5800f - star.temp) / 2f;
+            // scale the temperature closer to "white"
+            float temp = star.temp + (5800f - star.temp) / 3f;
             Color color = Mathf.CorrelatedColorTemperatureToRGB(temp);
-            color.a = math.min(1f, mag);
+            color.a = amag;
             // update sprite
             SpriteRenderer sprite = this.EntityManager
                 .GetComponentObject<SpriteRenderer>(entity);
