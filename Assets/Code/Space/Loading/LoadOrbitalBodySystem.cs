@@ -107,7 +107,7 @@ namespace Icarus.Loading {
                     Value = database.LookupEntity(data.Parent)
                 });
             ecb.AddComponent<OrbitalParentPosition>(entity, new OrbitalParentPosition {
-                    Value = LocalTransform.FromScale(1f)
+                    Value = double3.zero
                 });
         }
 
@@ -146,8 +146,8 @@ namespace Icarus.Loading {
             // add orbital position
             ecb.AddComponent<OrbitalPosition>(entity, new OrbitalPosition {
                     ElapsedTime = data.ElapsedTime,
-                    LocalToParent = LocalTransform.FromPosition(float3.zero),
-                    LocalToWorld = LocalTransform.FromPosition(float3.zero)
+                    LocalToParent = double3.zero,
+                    LocalToWorld = double3.zero
                 });
                     
             // skip rotational and scale components on the player

@@ -1,5 +1,6 @@
 using UnityEngine;
 using Unity.Entities;
+using Unity.Mathematics;
 using Unity.Transforms;
 
 namespace Icarus.Orbit {
@@ -8,7 +9,7 @@ namespace Icarus.Orbit {
     }
 
     public struct OrbitalParentPosition : IComponentData {
-        public LocalTransform Value;
+        public double3 Value;
     }
 
     [AddComponentMenu("Icarus/Orbits/Orbital Parent")]
@@ -21,7 +22,7 @@ namespace Icarus.Orbit {
                         Value = GetEntity(obj.ParentBody.gameObject)
                     });
                 AddComponent(new OrbitalParentPosition {
-                        Value = LocalTransform.FromScale(1f)
+                        Value = double3.zero
                     });
             }
         }

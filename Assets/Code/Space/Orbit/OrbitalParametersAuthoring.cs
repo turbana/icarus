@@ -3,23 +3,25 @@ using Unity.Mathematics;
 using Unity.Entities;
 using Unity.Transforms;
 
+using Icarus.Mathematics;
+
 namespace Icarus.Orbit {
     public struct OrbitalParameters : IComponentData {
-        public float Period;
-        public float Eccentricity;
-        public float SemiMajorAxis;
+        public double Period;
+        public double Eccentricity;
+        public double SemiMajorAxis;
 
-        public float Inclination;
-        public float AscendingNode;
-        public quaternion OrbitRotation;
+        public double Inclination;
+        public double AscendingNode;
+        public dquaternion OrbitRotation;
     }
 
     public struct OrbitalPosition : IComponentData {
-        public float ElapsedTime;
-        public float Theta;
-        public float Altitude;
-        public LocalTransform LocalToWorld;
-        public LocalTransform LocalToParent;
+        public double ElapsedTime;
+        public double Theta;
+        public double Altitude;
+        public double3 LocalToWorld;
+        public double3 LocalToParent;
     }
 
     // special orbits
@@ -41,14 +43,14 @@ namespace Icarus.Orbit {
     public class OrbitalParametersAuthoring : MonoBehaviour {
         public bool IsPlayer = false;
         public OrbitTypeEnum OrbitType;
-        public float Period;
-        public float Eccentricity;
-        public float SemiMajorAxis;
+        public double Period;
+        public double Eccentricity;
+        public double SemiMajorAxis;
 
-        public float Inclination;
-        public float AscendingNode;
+        public double Inclination;
+        public double AscendingNode;
         
-        public float ElapsedTime;
+        public double ElapsedTime;
 
         public static IComponentData OrbitTypeTag(OrbitTypeEnum t) => t switch {
             OrbitTypeEnum.Planet => new PlanetTag(),
@@ -79,14 +81,15 @@ namespace Icarus.Orbit {
                         SemiMajorAxis = parms.SemiMajorAxis,
                         Inclination = parms.Inclination,
                         AscendingNode = parms.AscendingNode,
-                        OrbitRotation = quaternion.EulerYXZ(math.radians(parms.Inclination),
-                                                            math.radians(parms.AscendingNode),
-                                                            0f)
+                        OrbitRotation = dquaternion.EulerYXZ(
+                            math.radians(parms.Inclination),
+                            math.radians(parms.AscendingNode),
+                            0f)
                     });
                 AddComponent(new OrbitalPosition {
                         ElapsedTime = parms.ElapsedTime,
-                        LocalToParent = LocalTransform.FromPosition(float3.zero),
-                        LocalToWorld = LocalTransform.FromPosition(float3.zero)
+                        LocalToParent = double3.zero,
+                        LocalToWorld = double3.zero
                     });
             }
         }

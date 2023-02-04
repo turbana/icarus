@@ -3,6 +3,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 
 using Icarus.Orbit;
+using Icarus.Mathematics;
 
 namespace Icarus.Test {
     [RequireMatchingQueriesForUpdate]
@@ -48,8 +49,8 @@ namespace Icarus.Test {
             ecb.AddComponent<OrbitRenderingEnabled>(entities);
             ecb.AddComponent<PlayerSiblingOrbitTag>(entities);
             for (int i=0; i<spawn.Count; i++) {
-                float period = parms.Period + NextFloat(0f);
-                float elapsed = pos.ElapsedTime + NextFloat(0.1f);
+                double period = parms.Period + NextFloat(0f);
+                double elapsed = pos.ElapsedTime + NextFloat(0.1f);
                 if (elapsed < 0f) elapsed += period;
                 var nparms = new OrbitalParameters {
                     Period = period,
@@ -58,9 +59,9 @@ namespace Icarus.Test {
                     Inclination = parms.Inclination + NextFloat(0.001f),
                     AscendingNode = parms.AscendingNode + NextFloat(0f)
                 };
-                nparms.OrbitRotation = quaternion.EulerYXZ(math.radians(nparms.Inclination),
-                                                           math.radians(nparms.AscendingNode),
-                                                           0f);
+                nparms.OrbitRotation = dquaternion.EulerYXZ(math.radians(nparms.Inclination),
+                                                            math.radians(nparms.AscendingNode),
+                                                            0f);
                 ecb.AddComponent<OrbitalParameters>(entities[i], nparms);
                 ecb.AddComponent<OrbitalPosition>(entities[i], new OrbitalPosition {
                         ElapsedTime = elapsed,
@@ -76,8 +77,8 @@ namespace Icarus.Test {
             entities.Dispose();
         }
 
-        private static float NextFloat(float range) {
-            return random.NextFloat(-range, range);
+        private static double NextFloat(double range) {
+            return random.NextDouble(-range, range);
         }
     }
 }

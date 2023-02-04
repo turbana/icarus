@@ -2,28 +2,30 @@ using UnityEngine;
 using Unity.Mathematics;
 using Unity.Entities;
 
+using Icarus.Mathematics;
+
 namespace Icarus.Orbit {
     public struct RotationalParameters : IComponentData {
-        public float Tilt;
-        public float NorthPoleRA;
-        public float Period;
-        public float ElapsedTime;
-        public quaternion AxialTilt;
-        public quaternion AxialRotation;
+        public double Tilt;
+        public double NorthPoleRA;
+        public double Period;
+        public double ElapsedTime;
+        public dquaternion AxialTilt;
+        public dquaternion AxialRotation;
     }
 
     [AddComponentMenu("Icarus/Orbits/Rotational Parameters")]
     public class RotationalParametersAuthoring : MonoBehaviour {
-        public float AxialTilt;
-        public float NorthPoleRA;
-        public float SiderealRotationPeriod;
-        public float ElapsedTime;
+        public double AxialTilt;
+        public double NorthPoleRA;
+        public double SiderealRotationPeriod;
+        public double ElapsedTime;
 
         public class Baker : Unity.Entities.Baker<RotationalParametersAuthoring> {
             public override void Bake(RotationalParametersAuthoring parms) {
-                quaternion tilt = math
-                    .mul(quaternion.RotateX(-math.radians(parms.AxialTilt)),
-                         quaternion.RotateY(-math.radians(parms.NorthPoleRA)));
+                dquaternion tilt = dmath
+                    .mul(dquaternion.RotateX(-math.radians(parms.AxialTilt)),
+                         dquaternion.RotateY(-math.radians(parms.NorthPoleRA)));
                 AddComponent(new RotationalParameters {
                         Tilt = parms.AxialTilt,
                         NorthPoleRA = parms.NorthPoleRA,

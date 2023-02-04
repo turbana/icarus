@@ -5,6 +5,8 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 
+using Icarus.Mathematics;
+
 namespace Icarus.Orbit {
     [RequireMatchingQueriesForUpdate]
     [UpdateInGroup(typeof(UpdateOrbitSystemGroup))]
@@ -31,7 +33,7 @@ namespace Icarus.Orbit {
             [ReadOnly]
             public ComponentLookup<RotationalParameters> RotationalParametersLookup;
 
-            private quaternion ParentTilt;
+            private dquaternion ParentTilt;
 
             [BurstCompile]
             public bool OnChunkBegin(in ArchetypeChunk chunk, int index, bool useMask, in v128 mask) {
@@ -50,37 +52,36 @@ namespace Icarus.Orbit {
                 // update elapsed time
                 pos.ElapsedTime = (pos.ElapsedTime + DeltaTime) % parms.Period;
                 // mean motion
-                float n = (2f * math.PI) / parms.Period;
+                double n = (2.0 * System.Math.PI) / parms.Period;
                 // mean anomaly
-                float M = n * pos.ElapsedTime;
+                double M = n * pos.ElapsedTime;
                 // eccentric anomaly
-                float e = parms.Eccentricity;
-                float E = EccentricAnomaly(M, e);
+                double e = parms.Eccentricity;
+                double E = EccentricAnomaly(M, e);
                 // true anomaly
                 // https://en.wikipedia.org/wiki/True_anomaly#From_the_eccentric_anomaly
-                float beta = e / (1f + math.sqrt(1 - math.pow(e, 2f)));
+                double beta = e / (1f + math.sqrt(1 - math.pow(e, 2f)));
                 pos.Theta = E + 2f * math.atan((beta * math.sin(E)) / (1f - beta * math.cos(E)));
                 // parent distance
                 pos.Altitude = parms.SemiMajorAxis * (1f - e * math.cos(E));
                 // update position within orbit
-                quaternion rot = math.mul(parms.OrbitRotation, quaternion.RotateY(-pos.Theta));
+                dquaternion rot = dmath.mul(parms.OrbitRotation,
+                                            dquaternion.RotateY(-pos.Theta));
                 // place our orbit relative to our parent's axial tilt
-                rot = math.mul(ParentTilt, rot);
-                        
+                rot = dmath.mul(ParentTilt, rot);
                 // update game position
-                var ltp = pos.LocalToParent;
-                ltp.Position = math.mul(rot, math.forward() * pos.Altitude);
+                var ltp = dmath.forward(rot) * pos.Altitude;
                 pos.LocalToParent = ltp;
-                pos.LocalToWorld = ppos.Value.TransformTransform(pos.LocalToParent);
+                pos.LocalToWorld = ppos.Value + ltp;
             }
         }
         
         // taken from: https://squarewidget.com/keplers-equation/
         // which itself was taken from: Meeus, Jean. Astronomical Algorithms. 2nd Ed. Willmann-Bell. 1998. (p. 199)
         [BurstCompile]
-        private static float EccentricAnomaly(float M, float e) {
-            float E0 = M;
-            float E1 = 0;
+        private static double EccentricAnomaly(double M, double e) {
+            double E0 = M;
+            double E1 = 0;
             for(int i = 0; i < 6; i++) {
                 E1 = E0 + (math.mad(e, math.sin(E0), M) - E0) /
                           (1f - e * math.cos(E0));

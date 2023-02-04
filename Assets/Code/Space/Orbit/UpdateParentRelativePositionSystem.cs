@@ -29,7 +29,7 @@ namespace Icarus.Orbit {
         [ReadOnly]
         public ComponentLookup<OrbitalPosition> OrbitalPositionLookup;
         
-        private LocalTransform shared;
+        private double3 shared;
 
         [BurstCompile]
         public bool OnChunkBegin(in ArchetypeChunk chunk, int index, bool useMask, in v128 mask) {

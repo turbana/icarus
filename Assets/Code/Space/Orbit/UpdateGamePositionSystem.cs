@@ -7,6 +7,7 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
 
+using Icarus.Mathematics;
 using Icarus.Misc;
 
 namespace Icarus.Orbit {
@@ -103,47 +104,47 @@ namespace Icarus.Orbit {
                      in OrbitalPosition pos, in OrbitalParameters parms, in OrbitalScale scale,
                      in OrbitalParentPosition parentPos, in RotationalParameters rot)
         {
-            float rscale;
-            float dist;
-            float3 ppos;
-            float3 newpos;
-            float3 playerPos;
+            double rscale;
+            double dist;
+            double3 ppos;
+            double3 newpos;
+            double3 playerPos;
 
             if (isSibling) {
-                ppos = pos.LocalToParent.Position;
-                playerPos = playerPosition.LocalToParent.Position;
+                ppos = pos.LocalToParent;
+                playerPos = playerPosition.LocalToParent;
             } else if (isParent) {
-                ppos = float3.zero;
-                playerPos = playerPosition.LocalToParent.Position;
+                ppos = double3.zero;
+                playerPos = playerPosition.LocalToParent;
             } else {
-                ppos = pos.LocalToWorld.Position;
-                playerPos = playerPosition.LocalToWorld.Position;
+                ppos = pos.LocalToWorld;
+                playerPos = playerPosition.LocalToWorld;
             }
             
             ppos = ppos - playerPos;
             dist = math.length(ppos);
             
-            if (dist < 1f) {
-                newpos = ppos * 1000f;
-                rscale = 1f;
+            if (dist < 1.0) {
+                newpos = ppos * 1000.0;
+                rscale = 1.0;
             } else {
-                float sdist = dist - scale.Radius;
-                float X = 149597870.700f;
-                float desired = 1000f + math.sqrt(sdist / X) * 100f;
-                float theta = scale.Radius / dist;
-                float radius = -((theta * desired) / (theta - 1f));
+                double sdist = dist - scale.Radius;
+                double X = 149597870.700;
+                double desired = 1000.0 + math.sqrt(sdist / X) * 100.0;
+                double theta = scale.Radius / dist;
+                double radius = -((theta * desired) / (theta - 1.0));
                 newpos = math.normalize(ppos) * (desired + radius);
-                rscale = radius * 2f;
+                rscale = radius * 2.0;
             }
-                        
-            quaternion prot = math.inverse(playerRotation.Value);
-            quaternion pprot = playerRotation.Value;
-            quaternion orot = math.mul(rot.AxialTilt, rot.AxialRotation);
-            newpos = math.mul(prot, newpos);
-            orot = math.mul(prot, orot);
+
+            dquaternion prot = dmath.inverse(playerRotation.Value);
+            dquaternion pprot = playerRotation.Value;
+            dquaternion orot = dmath.mul(rot.AxialTilt, rot.AxialRotation);
+            newpos = dmath.mul(prot, newpos);
+            orot = dmath.mul(prot, orot);
 
             transform = LocalTransform
-                .FromPositionRotationScale(newpos, orot, rscale);
+                .FromPositionRotationScale((float3)newpos, orot, (float)rscale);
         }
     }
 }
