@@ -17,8 +17,8 @@ namespace Icarus.Orbit {
         }
         
         protected override void OnUpdate() {
-            quaternion playerRot = GetComponent<PlayerRotation>(
-                GetSingletonEntity<PlayerTag>()).Value;
+            quaternion playerRot = SystemAPI.GetComponent<PlayerRotation>(
+                SystemAPI.GetSingletonEntity<PlayerTag>()).Value;
             
             Entities
                 .WithAll<StarfieldTag>()
@@ -27,8 +27,8 @@ namespace Icarus.Orbit {
                     // ltw.Position = PlayerObject.transform.position;
                     // ltw.Rotation = math.inverse(playerRot);
                     // transform.LocalToWorld = ltw;
-                    transform.Position = PlayerObject.transform.position;
-                    transform.Rotation = math.inverse(playerRot);
+                    transform.LocalPosition = PlayerObject.transform.position;
+                    transform.LocalRotation = math.inverse(playerRot);
                 })
                 .WithoutBurst()
                 .Run();

@@ -17,7 +17,7 @@ namespace Icarus.Loading {
         
         protected override void OnStartRunning() {
             // Debug.Log("start LoadInitialOrbitalDatabaseSystem");
-            var entity = GetSingletonEntity<OrbitalDatabaseComponent>();
+            var entity = SystemAPI.GetSingletonEntity<OrbitalDatabaseComponent>();
             var database = this.EntityManager.GetComponentData<OrbitalDatabaseComponent>(entity);
             var prefabs = this.EntityManager.GetBuffer<OrbitalDatabaseDataComponent>(entity);
             var keys = database.GetDataKeyArray(Allocator.TempJob);
@@ -56,7 +56,7 @@ namespace Icarus.Loading {
         }
         
         protected override void OnUpdate() {
-            var database = GetSingletonRW<OrbitalDatabaseComponent>();
+            var database = SystemAPI.GetSingletonRW<OrbitalDatabaseComponent>();
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
 
             new AddCoreOrbitalParametersJob {

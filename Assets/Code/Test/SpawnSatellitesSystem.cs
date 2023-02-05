@@ -18,14 +18,14 @@ namespace Icarus.Test {
         
         protected override void OnUpdate() {
             if (!UnityEngine.Input.GetKeyDown("q")) return;
-            Entity player = GetSingletonEntity<PlayerOrbitTag>();
-            OrbitalParameters parms = GetComponent<OrbitalParameters>(player);
-            OrbitalPosition pos = GetComponent<OrbitalPosition>(player);
+            Entity player = SystemAPI.GetSingletonEntity<PlayerOrbitTag>();
+            OrbitalParameters parms = SystemAPI.GetComponent<OrbitalParameters>(player);
+            OrbitalPosition pos = SystemAPI.GetComponent<OrbitalPosition>(player);
             OrbitalParent parent = this.EntityManager.GetSharedComponent<OrbitalParent>(player);
-            OrbitalParentPosition ppos = GetComponent<OrbitalParentPosition>(player);
+            OrbitalParentPosition ppos = SystemAPI.GetComponent<OrbitalParentPosition>(player);
             SpawnSatellitesComponent spawn =
-                GetComponent<SpawnSatellitesComponent>(
-                    GetSingletonEntity<SpawnSatellitesComponent>());
+                SystemAPI.GetComponent<SpawnSatellitesComponent>(
+                    SystemAPI.GetSingletonEntity<SpawnSatellitesComponent>());
             OrbitalScale scale = new OrbitalScale { Radius = 0.001f };
             RotationalParameters rot = new RotationalParameters {
                 Tilt = 0f,

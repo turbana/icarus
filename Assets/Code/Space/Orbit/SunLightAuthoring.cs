@@ -31,9 +31,10 @@ namespace Icarus.Orbit {
                 }
             }
         }
+        
         protected override void OnUpdate() {
-            var entity = GetSingletonEntity<SunLightComponent>();
-            var ltw = GetComponent<LocalToWorld>(entity);
+            var entity = SystemAPI.GetSingletonEntity<SunLightComponent>();
+            var ltw = SystemAPI.GetComponent<LocalToWorld>(entity);
             LightObject.transform.position = ltw.Position;
             LightObject.transform.LookAt(Vector3.zero);
         }

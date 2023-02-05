@@ -25,10 +25,9 @@ namespace Icarus.Space {
         private const float DEGREES_PER_HOUR = 360f / 24f;
         
         protected override void OnUpdate() {
-            Entity entity = GetSingletonEntity<StarfieldComponent>();
-            StarfieldComponent config = this.EntityManager
-                .GetComponentObject<StarfieldComponent>(entity);
-            string catalog = AssetDatabase.GetAssetPath(config.Catalog);
+            Entity entity = SystemAPI.GetSingletonEntity<StarfieldComponent>();
+            StarfieldComponent config = SystemAPI.GetComponent<StarfieldComponent>(entity);
+            string catalog = config.Catalog.ToString();
             List<StarData> data = new List<StarData>(ParseStars(catalog));
             Parent parent = new Parent { Value = entity };
 

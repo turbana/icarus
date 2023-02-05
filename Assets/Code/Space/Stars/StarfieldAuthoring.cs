@@ -1,10 +1,13 @@
 using UnityEngine;
+using UnityEditor;
+
+using Unity.Collections;
 using Unity.Entities;
 
 namespace Icarus.Space {
-    public class StarfieldComponent : IComponentData {
+    public struct StarfieldComponent : IComponentData {
         public float Distance;
-        public Object Catalog;
+        public FixedString512Bytes Catalog;
         public Entity Prefab;
     }
 
@@ -16,9 +19,9 @@ namespace Icarus.Space {
         
         public class StarfieldAuthoringBaker : Baker<StarfieldAuthoring> {
             public override void Bake(StarfieldAuthoring auth) {
-                AddComponentObject(new StarfieldComponent {
+                AddComponent(new StarfieldComponent {
                         Distance = auth.Distance,
-                        Catalog = auth.Catalog,
+                        Catalog = AssetDatabase.GetAssetPath(auth.Catalog),
                         Prefab = GetEntity(auth.Prefab)
                     });
             }

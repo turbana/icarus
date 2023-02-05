@@ -46,12 +46,12 @@ namespace Icarus.Orbit {
 
         [BurstCompile]
         protected override void OnUpdate() {
-            Entity sun = GetSingletonEntity<SunTag>();
-            Entity player = GetSingletonEntity<PlayerOrbitTag>();
+            Entity sun = SystemAPI.GetSingletonEntity<SunTag>();
+            Entity player = SystemAPI.GetSingletonEntity<PlayerOrbitTag>();
             OrbitalParent playerParent = this.EntityManager.GetSharedComponent<OrbitalParent>(player);
-            OrbitalPosition playerPosition = GetComponent<OrbitalPosition>(player);
-            PlayerRotation playerRotation = GetComponent<PlayerRotation>(
-                GetSingletonEntity<PlayerTag>());
+            OrbitalPosition playerPosition = SystemAPI.GetComponent<OrbitalPosition>(player);
+            PlayerRotation playerRotation = SystemAPI.GetComponent<PlayerRotation>(
+                SystemAPI.GetSingletonEntity<PlayerTag>());
             
             // planets
             var handle0 = new UpdateGamePositionJob {
@@ -123,7 +123,7 @@ namespace Icarus.Orbit {
             
             ppos = ppos - playerPos;
             dist = math.length(ppos);
-            
+
             if (dist < 1.0) {
                 newpos = ppos * 1000.0;
                 rscale = 1.0;
