@@ -472,7 +472,7 @@ namespace Icarus.Mathematics
         }
     }
 
-    public static class dmath
+    public static partial class dmath
     {
         /// <summary>Returns a dquaternion constructed from four double values.</summary>
         /// <param name="x">The x component of the dquaternion.</param>
