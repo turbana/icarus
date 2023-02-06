@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Random = Unity.Mathematics.Random;
 
 using UnityEditor;
@@ -6,6 +7,7 @@ using UnityEngine;
 using Unity.Collections;
 using Unity.Entities;
 
+using Icarus.Mathematics;
 using Icarus.Orbit;
 
 namespace Icarus.Orbit.Editor {
@@ -73,7 +75,7 @@ namespace Icarus.Orbit.Editor {
         
         private static OrbitalDatabaseData MergeBody(OrbitalDatabaseData left, OrbitalDatabaseData right) {
             left.Radius = float.IsNaN(left.Radius) ? right.Radius : left.Radius;
-            left.Mass = float.IsNaN(left.Mass) ? right.Mass : left.Mass;
+            left.Mass = double.IsNaN(left.Mass) ? right.Mass : left.Mass;
             left.Period = float.IsNaN(left.Period) ? right.Period : left.Period;
             left.Eccentricity = float.IsNaN(left.Eccentricity) ? right.Eccentricity : left.Eccentricity;
             left.SemiMajorAxis = float.IsNaN(left.SemiMajorAxis) ? right.SemiMajorAxis : left.SemiMajorAxis;
@@ -106,7 +108,7 @@ namespace Icarus.Orbit.Editor {
                     Parent = line[2]
                 };
                 data.Radius = ParseFloat(line[9]);
-                data.Mass = float.NaN;
+                data.Mass = ParseDouble(line[10]);
                 data.Period = ParseFloat(line[4]);
                 data.Eccentricity = ParseFloat(line[5]);
                 data.SemiMajorAxis = ParseFloat(line[6]);
@@ -132,7 +134,7 @@ namespace Icarus.Orbit.Editor {
                     Parent = line[0]
                 };
                 data.Radius = float.NaN;
-                data.Mass = float.NaN;
+                data.Mass = double.NaN;
                 data.Period = ParseFloat(line[12]) * 24f * 60f * 60f;
                 data.Eccentricity = ParseFloat(line[7]);
                 data.SemiMajorAxis = ParseFloat(line[6]);
@@ -148,15 +150,20 @@ namespace Icarus.Orbit.Editor {
             }
         }
 
+        private static Regex rxName = new Regex(@"^\d+\s+\b(\w+)\b\s+\(.*\)$",
+                                                RegexOptions.Compiled);
         private static void LoadSmallBodiesDatabase(OrbitalDatabase db, string path) {
             foreach (var line in ReadCsv(path)) {
+                string name = line[1].Trim(new char[] {' ', '"'});
                 var data = new OrbitalDatabaseData {
-                    Name = line[1].Trim(new char[] {' ', '"'}),
                     Type = "Asteroid", // assume asteroid
+                    Name = "",
                     Parent = "Sun"
                 };
+                var matches = rxName.Matches(name);
+                if (matches.Count == 1) data.Name = matches[0].Groups[1].Value;
                 data.Radius = ParseFloat(line[10]) / 2f;
-                data.Mass = float.NaN;
+                data.Mass = ParseDouble(line[13]) / dmath.G;
                 data.Period = ParseFloat(line[4]) * 24f * 60f * 60f;
                 data.Eccentricity = ParseFloat(line[5]);
                 data.SemiMajorAxis = ParseFloat(line[6]);
@@ -182,6 +189,14 @@ namespace Icarus.Orbit.Editor {
             return data;
         }
 
+        private static double ParseDouble(string str) {
+            double data;
+            if (!double.TryParse(str, out data)) {
+                data = double.NaN;
+            }
+            return data;
+        }
+
         private static void FixupData(OrbitalDatabase db, Random rand) {
             var names = db.GetKeyArray(Allocator.TempJob);
             foreach (var name in names) {
@@ -192,6 +207,16 @@ namespace Icarus.Orbit.Editor {
                 if (float.IsNaN(body.NorthPoleRA)) body.NorthPoleRA = rand.NextFloat(-180f, 180f);
                 if (float.IsNaN(body.RotationPeriod)) body.RotationPeriod = rand.NextFloat(1000f, 100000f);
                 if (float.IsNaN(body.RotationElapsedTime)) body.RotationElapsedTime = 0f;
+                if (double.IsNaN(body.Mass)) {
+                    // assume a density of ~2g/cm3
+                    // https://en.wikipedia.org/wiki/Standard_asteroid_physical_characteristics#Density
+                    const double density = 2000;
+                    // TODO use extents here
+                    double height = body.Radius * 2;
+                    double width = height;
+                    double length = height;
+                    body.Mass = (dmath.PI * height * width * length * density) / 6.0;
+                }
                 db[name] = body;
             }
             names.Dispose();
@@ -203,7 +228,7 @@ namespace Icarus.Orbit.Editor {
                 var body = db[name];
                 bool hasNaN =
                     float.IsNaN(body.Radius) ||
-                    float.IsNaN(body.Mass) ||
+                    double.IsNaN(body.Mass) ||
                     float.IsNaN(body.Period) ||
                     float.IsNaN(body.Eccentricity) ||
                     float.IsNaN(body.SemiMajorAxis) ||

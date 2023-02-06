@@ -92,7 +92,7 @@ namespace Icarus.Orbit {
         public FixedString32Bytes Type;
         public FixedString64Bytes Parent;
         public float Radius;
-        public float Mass;
+        public double Mass;
         public float Period;
         public float Eccentricity;
         public float SemiMajorAxis;
@@ -129,7 +129,7 @@ namespace Icarus.Orbit {
             Type = new FixedString32Bytes(reader.ReadString());
             Parent = new FixedString64Bytes(reader.ReadString());
             Radius = reader.ReadSingle();
-            Mass = reader.ReadSingle();
+            Mass = reader.ReadDouble();
             Period = reader.ReadSingle();
             Eccentricity = reader.ReadSingle();
             SemiMajorAxis = reader.ReadSingle();
