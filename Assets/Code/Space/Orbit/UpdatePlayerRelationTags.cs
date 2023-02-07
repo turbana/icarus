@@ -40,6 +40,8 @@ namespace Icarus.Orbit {
                     ecb.RemoveComponent<PlayerParentOrbitTag>(cparent);
                 }
                 ecb.AddComponent<PlayerParentOrbitTag>(parent);
+                ecb.AddComponent<OrbitRenderingEnabled>(parent);
+                ecb.RemoveComponent<OrbitRenderingDisabled>(parent);
             }
 
             // update siblings

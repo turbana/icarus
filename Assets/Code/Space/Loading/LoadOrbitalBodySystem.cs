@@ -8,8 +8,13 @@ using Unity.Transforms;
 using UnityEngine;
 
 using Icarus.Orbit;
+using Icarus.Mathematics;
 
 namespace Icarus.Loading {
+    public partial struct AddOrbitalParent : IComponentData {
+        public FixedString64Bytes Value;
+    }
+    
     [RequireMatchingQueriesForUpdate]
     [UpdateInGroup(typeof(LoadingSystemGroup))]
     public partial class LoadOrbitalBodySystem : SystemBase {
@@ -69,6 +74,11 @@ namespace Icarus.Loading {
                 ecb = ecb
             }.Schedule();
 
+            new AddOrbitalParentJob2 {
+                database = database.ValueRO,
+                ecb = ecb
+            }.Schedule();
+
             this.Dependency.Complete();
             ecb.Playback(this.EntityManager);
             ecb.Dispose();
@@ -93,6 +103,21 @@ namespace Icarus.Loading {
                 var data = database.LookupData(body.Name);
                 AddOrbitalParent(in entity, in body.Name, in database, ref ecb);
                 ecb.RemoveComponent<OrbitalBodyToLoadComponent>(entity);
+            }
+        }
+
+        public partial struct AddOrbitalParentJob2 : IJobEntity {
+            public OrbitalDatabaseComponent database;
+            public EntityCommandBuffer ecb;
+            
+            public void Execute(Entity entity, ref AddOrbitalParent parent) {
+                ecb.AddSharedComponent<OrbitalParent>(entity, new OrbitalParent {
+                        Value = database.LookupEntity(parent.Value)
+                    });
+                ecb.AddComponent<OrbitalParentPosition>(entity, new OrbitalParentPosition {
+                        Value = double3.zero
+                    });
+                ecb.RemoveComponent<AddOrbitalParent>(entity);
             }
         }
 
@@ -138,9 +163,9 @@ namespace Icarus.Loading {
                     Inclination = data.Inclination,
                     AscendingNode = data.AscendingNode,
                     // XXX shouldn't we have an argument of periapsis?
-                    OrbitRotation = quaternion.EulerYXZ(math.radians(data.Inclination),
-                                                        math.radians(data.AscendingNode),
-                                                        0f)
+                    OrbitRotation = dquaternion.EulerYXZ(math.radians(data.Inclination),
+                                                         math.radians(data.AscendingNode),
+                                                         0)
                 });
                     
             // add orbital position
