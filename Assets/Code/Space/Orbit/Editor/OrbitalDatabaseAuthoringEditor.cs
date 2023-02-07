@@ -31,6 +31,8 @@ namespace Icarus.Orbit.Editor {
             "225088 Gonggong (2007 OR10)"
         };
 
+        private static float KM_IN_AU = 149597870.700f;
+
         public override void OnInspectorGUI() {
             base.OnInspectorGUI();
 
@@ -166,7 +168,7 @@ namespace Icarus.Orbit.Editor {
                 data.Mass = ParseDouble(line[13]) / dmath.G;
                 data.Period = ParseFloat(line[4]) * 24f * 60f * 60f;
                 data.Eccentricity = ParseFloat(line[5]);
-                data.SemiMajorAxis = ParseFloat(line[6]);
+                data.SemiMajorAxis = ParseFloat(line[6]) * KM_IN_AU;
                 data.Inclination = ParseFloat(line[7]);
                 data.AscendingNode = ParseFloat(line[8]);
                 data.ElapsedTime = float.NaN;
