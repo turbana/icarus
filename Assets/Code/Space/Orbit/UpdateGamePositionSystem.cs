@@ -60,7 +60,8 @@ namespace Icarus.Orbit {
                 playerPosition = playerPosition,
                 playerRotation = playerRotation,
                 isSibling = false,
-                isParent = false
+                isParent = false,
+                distance = 20000.0
             }.ScheduleParallel(PlanetQuery, this.Dependency);
             
             // siblings
@@ -70,7 +71,8 @@ namespace Icarus.Orbit {
                 playerPosition = playerPosition,
                 playerRotation = playerRotation,
                 isSibling = true,
-                isParent = false
+                isParent = false,
+                distance = 20000.0
             }.ScheduleParallel(SiblingQuery, handle0);
 
             // parent
@@ -80,7 +82,8 @@ namespace Icarus.Orbit {
                 playerPosition = playerPosition,
                 playerRotation = playerRotation,
                 isSibling = false,
-                isParent = true
+                isParent = true,
+                distance = 1000.0
             }.ScheduleParallel(ParentQuery, handle1);
 
             this.Dependency = handle2;
@@ -97,6 +100,7 @@ namespace Icarus.Orbit {
         public PlayerRotation playerRotation;
         public bool isSibling;
         public bool isParent;
+        public double distance;
         
         [BurstCompile]
         void Execute(Entity entity,
@@ -125,12 +129,13 @@ namespace Icarus.Orbit {
             dist = math.length(ppos);
 
             if (dist < 1.0) {
-                newpos = ppos * 1000.0;
+                newpos = ppos * distance;
                 rscale = 1.0;
             } else {
                 double sdist = dist - scale.Radius;
                 double X = 149597870.700;
-                double desired = 1000.0 + math.sqrt(sdist / X) * 100.0;
+                double increment = distance / 100;
+                double desired = distance + math.sqrt(sdist / X) * increment;
                 double theta = scale.Radius / dist;
                 double radius = -((theta * desired) / (theta - 1.0));
                 newpos = math.normalize(ppos) * (desired + radius);
