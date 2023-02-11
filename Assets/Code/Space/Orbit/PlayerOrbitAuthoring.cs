@@ -18,6 +18,7 @@ namespace Icarus.Orbit {
         public float Eccentricity = 0f;
         public float AscendingNode = 0f;
         public float ArgumentOfPeriapsis = 0f;
+        public double ElapsedTime = 0.0;
         public double Mass = 419725; // ISS mass (kg)
         
         public class PlayerOrbitAuthoringBaker : Baker<PlayerOrbitAuthoring> {
@@ -52,7 +53,7 @@ namespace Icarus.Orbit {
                                                              0)
                     });
                 AddComponent<OrbitalPosition>(new OrbitalPosition {
-                        ElapsedTime = 0,
+                        ElapsedTime = auth.ElapsedTime,
                         LocalToParent = double3.zero,
                         LocalToWorld = double3.zero
                     });
