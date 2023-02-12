@@ -56,7 +56,7 @@ namespace Icarus.Space {
             float smag = math.min(1f, math.atan(-star.mag / 2f + 1f) / 3f + 0.75f);
             // find alpha magnitude
             // float amag = math.sin(star.mag / 2.65f + 2f) / 2f + 0.5f;
-            float amag = math.min(1f, math.sin(star.mag / 2.5f + 2.5f) / 1.5f + 0.7f);
+            float amag = math.min(1f, math.sin(star.mag / 2.5f + 2.5f) / 1.5f + 0.8f);
             // find scale
             float scale = dist / 50f * smag;
             // find rotation
