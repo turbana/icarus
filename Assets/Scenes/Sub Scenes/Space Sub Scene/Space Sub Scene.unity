@@ -288,7 +288,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b11dbec4664364e4aa1cdad30b140b07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ParentBody: Jupiter
+  ParentBody: Saturn
   UseParentRadius: 1
   SemiMajorAxis: 1.1
   Inclination: 45
