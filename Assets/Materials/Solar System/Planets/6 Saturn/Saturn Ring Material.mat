@@ -225,6 +225,7 @@ Material:
     - _RequireSplitLighting: 0
     - _Ring_Cutoff: 0.885
     - _Ring_Push_Out: 0.5
+    - _Ring_Smoothness: 0.25
     - _Smoothness: 0.5
     - _SmoothnessRemapMax: 1
     - _SmoothnessRemapMin: 0

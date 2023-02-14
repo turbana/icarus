@@ -11,6 +11,9 @@
         },
         {
             "m_Id": "32041b9a03e24c66b6f9e0263c07036f"
+        },
+        {
+            "m_Id": "e33f05d5e9f64129b9899658b1a742f4"
         }
     ],
     "m_Keywords": [],
@@ -137,6 +140,9 @@
         },
         {
             "m_Id": "06f567c1bc704788bf8c983756895124"
+        },
+        {
+            "m_Id": "86f25829d2ff46f1b271cfbbb6664e57"
         }
     ],
     "m_GroupDatas": [],
@@ -410,6 +416,20 @@
                     "m_Id": "bec5e573d9514ea9b8b7bfdaaf0b92bc"
                 },
                 "m_SlotId": 2
+            }
+        },
+        {
+            "m_OutputSlot": {
+                "m_Node": {
+                    "m_Id": "86f25829d2ff46f1b271cfbbb6664e57"
+                },
+                "m_SlotId": 0
+            },
+            "m_InputSlot": {
+                "m_Node": {
+                    "m_Id": "5a4d9bc9e7c94d0c894e903bd3a5e7b5"
+                },
+                "m_SlotId": 1
             }
         },
         {
@@ -1127,6 +1147,21 @@
         "z": 0.0,
         "w": 0.0
     }
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId": "1feb92b72b314bf38e78f9637f6c1d1d",
+    "m_Id": 0,
+    "m_DisplayName": "Ring Smoothness",
+    "m_SlotType": 1,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "Out",
+    "m_StageCapability": 3,
+    "m_Value": 0.0,
+    "m_DefaultValue": 0.0,
+    "m_Labels": []
 }
 
 {
@@ -2642,6 +2677,42 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.PropertyNode",
+    "m_ObjectId": "86f25829d2ff46f1b271cfbbb6664e57",
+    "m_Group": {
+        "m_Id": ""
+    },
+    "m_Name": "Property",
+    "m_DrawState": {
+        "m_Expanded": true,
+        "m_Position": {
+            "serializedVersion": "2",
+            "x": -293.0,
+            "y": 387.0000305175781,
+            "width": 165.99998474121095,
+            "height": 34.0
+        }
+    },
+    "m_Slots": [
+        {
+            "m_Id": "1feb92b72b314bf38e78f9637f6c1d1d"
+        }
+    ],
+    "synonyms": [],
+    "m_Precision": 0,
+    "m_PreviewExpanded": true,
+    "m_DismissedVersion": 0,
+    "m_PreviewMode": 0,
+    "m_CustomColors": {
+        "m_SerializableColors": []
+    },
+    "m_Property": {
+        "m_Id": "e33f05d5e9f64129b9899658b1a742f4"
+    }
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.DynamicVectorMaterialSlot",
     "m_ObjectId": "88009265624e4a7fa83cb033f505e6d3",
     "m_Id": 3,
@@ -3148,6 +3219,9 @@
         },
         {
             "m_Id": "32041b9a03e24c66b6f9e0263c07036f"
+        },
+        {
+            "m_Id": "e33f05d5e9f64129b9899658b1a742f4"
         }
     ]
 }
@@ -4145,6 +4219,34 @@
         "y": 0.0,
         "z": 0.0,
         "w": 0.0
+    }
+}
+
+{
+    "m_SGVersion": 1,
+    "m_Type": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty",
+    "m_ObjectId": "e33f05d5e9f64129b9899658b1a742f4",
+    "m_Guid": {
+        "m_GuidSerialized": "b3670f54-ca30-42f0-b047-d208c35eaae0"
+    },
+    "m_Name": "Ring Smoothness",
+    "m_DefaultRefNameVersion": 1,
+    "m_RefNameGeneratedByDisplayName": "Ring Smoothness",
+    "m_DefaultReferenceName": "_Ring_Smoothness",
+    "m_OverrideReferenceName": "",
+    "m_GeneratePropertyBlock": true,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
+    "m_DismissedVersion": 0,
+    "m_Precision": 0,
+    "overrideHLSLDeclaration": false,
+    "hlslDeclarationOverride": 2,
+    "m_Hidden": false,
+    "m_Value": 0.30000001192092898,
+    "m_FloatType": 0,
+    "m_RangeValues": {
+        "x": 0.0,
+        "y": 1.0
     }
 }
 
