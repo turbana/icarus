@@ -62,14 +62,15 @@ namespace Icarus.Graphics {
 
     public class TestTextAuthoring : MonoBehaviour {
         public string key;
+        public bool dynamic = true;
         public TextStyle style;
         public TMP_FontAsset font;
         
         public class TestTextAuthoringBaker : Baker<TestTextAuthoring> {
             public override void Bake(TestTextAuthoring auth) {
                 AddComponent<DisplayText>(new DisplayText {
-                        Key = new FixedString64Bytes(auth.key),
-                        Value = new FixedString64Bytes(),
+                        Key = (auth.dynamic) ? auth.key : "",
+                        Value = (auth.dynamic) ? "" : auth.key,
                         Style = auth.style,
                     });
                 AddComponentObject<ManagedTextComponent>(new ManagedTextComponent {
@@ -107,7 +108,9 @@ namespace Icarus.Graphics {
                         tmp.horizontalAlignment = config.HAlign;
                         tmp.verticalAlignment = config.VAlign;
                         // register listener
-                        buffer.Add(new ListenerUpdate { Key=text.Key, Listener=entity });
+                        if (text.Key.Length > 0) {
+                            buffer.Add(new ListenerUpdate { Key=text.Key, Listener=entity });
+                        }
                     } else {
                         tmp = comp.GO.GetComponent<TextMeshPro>();
                         rt = comp.GO.GetComponent<RectTransform>();
