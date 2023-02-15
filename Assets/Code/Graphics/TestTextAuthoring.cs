@@ -35,6 +35,7 @@ namespace Icarus.Graphics {
     }
 
     public struct DisplayText : IComponentData {
+        public FixedString64Bytes Key;
         public FixedString64Bytes Value;
         public TextStyle Style;
     }
@@ -60,14 +61,15 @@ namespace Icarus.Graphics {
     }
 
     public class TestTextAuthoring : MonoBehaviour {
-        public string text;
+        public string key;
         public TextStyle style;
         public TMP_FontAsset font;
         
         public class TestTextAuthoringBaker : Baker<TestTextAuthoring> {
             public override void Bake(TestTextAuthoring auth) {
                 AddComponent<DisplayText>(new DisplayText {
-                        Value = new FixedString64Bytes(auth.text),
+                        Key = new FixedString64Bytes(auth.key),
+                        Value = new FixedString64Bytes(),
                         Style = auth.style,
                     });
                 AddComponentObject<ManagedTextComponent>(new ManagedTextComponent {
@@ -82,34 +84,39 @@ namespace Icarus.Graphics {
         protected override void OnUpdate() {
             Entities
                 .WithChangeFilter<DisplayText>()
-                .ForEach((ManagedTextComponent comp, in DisplayText text, in TransformAspect pos) => {
+                .ForEach((Entity entity, ManagedTextComponent comp, in DisplayText text, in TransformAspect pos) => {
+                    TextMeshPro tmp;
+                    RectTransform rt;
                     if (comp.GO is null) {
-                        comp.GO = new GameObject("text object", typeof(RectTransform), typeof(MeshRenderer), typeof(TextMeshPro));
+                        comp.GO = new GameObject($"DisplayText[{text.Key}]", typeof(RectTransform), typeof(MeshRenderer), typeof(TextMeshPro));
+                        tmp = comp.GO.GetComponent<TextMeshPro>();
+                        rt = comp.GO.GetComponent<RectTransform>();
+                        var rend = comp.GO.GetComponent<MeshRenderer>();
+                        var config = TextStyleConfig.CONFIG[(int)text.Style];
+                        // set common font settings
+                        rend.shadowCastingMode = ShadowCastingMode.Off;
+                        tmp.enableAutoSizing = false;
+                        tmp.textWrappingMode = TextWrappingModes.Normal;
+                        tmp.overflowMode = TextOverflowModes.Overflow;
+                        // set custom font settings
+                        rt.sizeDelta = config.Bounds;
+                        tmp.color = config.Color;
+                        tmp.fontSize = config.Size;
+                        tmp.fontStyle = config.Style;
+                        tmp.horizontalAlignment = config.HAlign;
+                        tmp.verticalAlignment = config.VAlign;
+                        // register listener
+                        TextUpdateSystem.RegisterListener(text.Key, in entity);
+                    } else {
+                        tmp = comp.GO.GetComponent<TextMeshPro>();
+                        rt = comp.GO.GetComponent<RectTransform>();
                     }
-                    var tmp = comp.GO.GetComponent<TextMeshPro>();
-                    var rt = comp.GO.GetComponent<RectTransform>();
-                    var rend = comp.GO.GetComponent<MeshRenderer>();
-                    var config = TextStyleConfig.CONFIG[(int)text.Style];
                     // update text
                     tmp.text = text.Value.ToString();
                     // update position / rotation / scale
                     rt.position = pos.WorldPosition;
                     rt.rotation = (Quaternion)pos.WorldRotation * Quaternion.Euler(0f, -90f, 0f);
-                    // rt.rotation = Quaternion.identity;
-                    // rt.rotation = math.mul(pos.WorldRotation, pos.LocalRotation);
                     rt.localScale = new Vector3(pos.WorldScale, pos.WorldScale, pos.WorldScale);
-                    // update common font settings
-                    rend.shadowCastingMode = ShadowCastingMode.Off;
-                    tmp.enableAutoSizing = false;
-                    tmp.textWrappingMode = TextWrappingModes.Normal;
-                    tmp.overflowMode = TextOverflowModes.Overflow;
-                    // update custom font settings
-                    rt.sizeDelta = config.Bounds;
-                    tmp.color = config.Color;
-                    tmp.fontSize = config.Size;
-                    tmp.fontStyle = config.Style;
-                    tmp.horizontalAlignment = config.HAlign;
-                    tmp.verticalAlignment = config.VAlign;
                     })
                 .WithoutBurst()
                 .Run();
