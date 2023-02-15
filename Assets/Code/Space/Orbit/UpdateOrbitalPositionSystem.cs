@@ -16,16 +16,23 @@ namespace Icarus.Orbit {
             float dt = SystemAPI.Time.DeltaTime * opts.TimeScale;
             var OrbitalParentTypeHandle = GetSharedComponentTypeHandle<OrbitalParent>();
             var RotationalParametersLookup = GetComponentLookup<RotationalParameters>(true);
+            var ecb = new EntityCommandBuffer(Allocator.TempJob);
 
             new UpdateOrbitalPositionJob {
+                ecb = ecb.AsParallelWriter(),
                 DeltaTime = dt,
                 OrbitalParentTypeHandle = OrbitalParentTypeHandle,
                 RotationalParametersLookup = RotationalParametersLookup
             }.ScheduleParallel();
+
+            this.Dependency.Complete();
+            ecb.Playback(this.EntityManager);
+            ecb.Dispose();
         }
 
         [BurstCompile]
         public partial struct UpdateOrbitalPositionJob : IJobEntity, IJobEntityChunkBeginEnd {
+            public EntityCommandBuffer.ParallelWriter ecb;
             [ReadOnly]
             public float DeltaTime;
             [ReadOnly]
@@ -45,34 +52,42 @@ namespace Icarus.Orbit {
             [BurstCompile]
             public void OnChunkEnd(in ArchetypeChunk chunk, int index, bool useMask, in v128 mask, bool wasExecuted) {}
 
-            [BurstCompile]
-            public void Execute(Entity entity, ref OrbitalPosition pos,
-                                in OrbitalParentPosition ppos, in OrbitalParameters parms)
+            // [BurstCompile]
+            public void Execute([ChunkIndexInQuery] int index, Entity entity,
+                                in OrbitalPosition pos, in OrbitalParentPosition ppos,
+                                in OrbitalParameters parms)
             {
                 // update elapsed time
-                pos.ElapsedTime = (pos.ElapsedTime + DeltaTime) % parms.Period;
+                double elapsed = (pos.ElapsedTime + DeltaTime) % parms.Period;
                 // mean motion
                 double n = (2.0 * System.Math.PI) / parms.Period;
                 // mean anomaly
-                double M = n * pos.ElapsedTime;
+                double M = n * elapsed;
                 // eccentric anomaly
                 double e = parms.Eccentricity;
                 double E = EccentricAnomaly(M, e);
                 // true anomaly
                 // https://en.wikipedia.org/wiki/True_anomaly#From_the_eccentric_anomaly
                 double beta = e / (1f + math.sqrt(1 - math.pow(e, 2f)));
-                pos.Theta = E + 2f * math.atan((beta * math.sin(E)) / (1f - beta * math.cos(E)));
+                double theta = E + 2f * math.atan((beta * math.sin(E)) / (1f - beta * math.cos(E)));
                 // parent distance
-                pos.Altitude = parms.SemiMajorAxis * (1f - e * math.cos(E));
+                double altitude = parms.SemiMajorAxis * (1f - e * math.cos(E));
                 // update position within orbit
                 dquaternion rot = dmath.mul(parms.OrbitRotation,
-                                            dquaternion.RotateY(-pos.Theta));
+                                            dquaternion.RotateY(-theta));
                 // place our orbit relative to our parent's axial tilt
                 rot = dmath.mul(ParentTilt, rot);
                 // update game position
-                var ltp = dmath.forward(rot) * pos.Altitude;
-                pos.LocalToParent = ltp;
-                pos.LocalToWorld = ppos.Value + ltp;
+                var ltp = dmath.forward(rot) * altitude;
+
+                // update component
+                ecb.SetComponent<OrbitalPosition>(index, entity, new OrbitalPosition {
+                        ElapsedTime = elapsed,
+                        Theta = theta,
+                        Altitude = altitude,
+                        LocalToWorld = ppos.Value + ltp,
+                        LocalToParent = ltp
+                    });
             }
         }
         
