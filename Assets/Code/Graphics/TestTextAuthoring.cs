@@ -82,6 +82,7 @@ namespace Icarus.Graphics {
 
     public partial class UpdateTextObjectsSystem : SystemBase {
         protected override void OnUpdate() {
+            var buffer = SystemAPI.GetSingletonBuffer<ListenerUpdate>();
             Entities
                 .WithChangeFilter<DisplayText>()
                 .ForEach((Entity entity, ManagedTextComponent comp, in DisplayText text, in TransformAspect pos) => {
@@ -106,7 +107,7 @@ namespace Icarus.Graphics {
                         tmp.horizontalAlignment = config.HAlign;
                         tmp.verticalAlignment = config.VAlign;
                         // register listener
-                        TextUpdateSystem.RegisterListener(text.Key, in entity);
+                        buffer.Add(new ListenerUpdate { Key=text.Key, Listener=entity });
                     } else {
                         tmp = comp.GO.GetComponent<TextMeshPro>();
                         rt = comp.GO.GetComponent<RectTransform>();

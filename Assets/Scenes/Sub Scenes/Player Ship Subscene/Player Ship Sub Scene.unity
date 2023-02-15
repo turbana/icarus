@@ -9730,7 +9730,7 @@ PrefabInstance:
       objectReference: {fileID: 1253536436}
     - target: {fileID: 8082600024676737843, guid: ed7fc988db695cc4ca4e3b4f4760a458, type: 3}
       propertyPath: key
-      value: Player.ElapsedTime
+      value: Player.Orbit.Time.Apoapsis
       objectReference: {fileID: 0}
     - target: {fileID: 8242890185276283056, guid: ed7fc988db695cc4ca4e3b4f4760a458, type: 3}
       propertyPath: m_Mesh
@@ -21056,7 +21056,7 @@ PrefabInstance:
       objectReference: {fileID: 937076628}
     - target: {fileID: 8082600024676737843, guid: ed7fc988db695cc4ca4e3b4f4760a458, type: 3}
       propertyPath: key
-      value: Player.ElapsedTime
+      value: Player.Orbit.Time.Periapsis
       objectReference: {fileID: 0}
     - target: {fileID: 8242890185276283056, guid: ed7fc988db695cc4ca4e3b4f4760a458, type: 3}
       propertyPath: m_Mesh
@@ -37404,7 +37404,7 @@ PrefabInstance:
       objectReference: {fileID: 619568801}
     - target: {fileID: 8082600024676737843, guid: ed7fc988db695cc4ca4e3b4f4760a458, type: 3}
       propertyPath: key
-      value: Player.ElapsedTime
+      value: Player.Orbit.ElapsedTime
       objectReference: {fileID: 0}
     - target: {fileID: 8242890185276283056, guid: ed7fc988db695cc4ca4e3b4f4760a458, type: 3}
       propertyPath: m_Mesh

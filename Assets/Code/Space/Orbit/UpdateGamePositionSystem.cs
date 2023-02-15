@@ -54,8 +54,6 @@ namespace Icarus.Orbit {
             PlayerRotation playerRotation = SystemAPI.GetComponent<PlayerRotation>(
                 SystemAPI.GetSingletonEntity<PlayerTag>());
             
-            TextUpdateSystem.Update("Player.ElapsedTime", playerPosition.ElapsedTime.ToString("000000000.00"));
-            
             // planets
             var handle0 = new UpdateGamePositionJob {
                 player = player,
