@@ -336,7 +336,7 @@ MonoBehaviour:
   UseParentRadius: 1
   SemiMajorAxis: 1.1
   Inclination: 45
-  Eccentricity: 0
+  Eccentricity: 0.05
   AscendingNode: 0
   ArgumentOfPeriapsis: 0
   ElapsedTime: 2700

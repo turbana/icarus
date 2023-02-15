@@ -102,10 +102,10 @@ namespace Icarus.Orbit {
 
                 if (entity == Player) {
                     // orbital position
-                    Text(index, "Player.Orbit.MeanMotion", n, TextUpdateFormat.Number6_5);
-                    Text(index, "Player.Orbit.MeanAnomaly", M, TextUpdateFormat.Number6_5);
-                    Text(index, "Player.Orbit.EccentricAnomaly", E, TextUpdateFormat.Number6_5);
-                    Text(index, "Player.Orbit.Beta", beta, TextUpdateFormat.Number6_5);
+                    Text(index, "Player.Orbit.MeanMotion", n, TextUpdateFormat.Number1_10);
+                    Text(index, "Player.Orbit.MeanAnomaly", M, TextUpdateFormat.Number1_10);
+                    Text(index, "Player.Orbit.EccentricAnomaly", E, TextUpdateFormat.Number1_10);
+                    Text(index, "Player.Orbit.Beta", beta, TextUpdateFormat.Number1_10);
                     Text(index, "Player.Orbit.ElapsedTime", elapsed, TextUpdateFormat.Number9_2);
                     Text(index, "Player.Orbit.Theta", theta, TextUpdateFormat.Number1_10);
                     Text(index, "Player.Orbit.Altitude", altitude, TextUpdateFormat.Number12_0);
