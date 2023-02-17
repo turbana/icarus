@@ -122,6 +122,8 @@ namespace Icarus.Graphics {
                 // UnityEngine.Debug.Log($"added listener for [{listener.Key}]");
                 listeners.Add(in listener.Listener);
                 Listeners[listener.Key] = listeners;
+                // assume listener's text is changed so it gets updated at least once
+                Changed.Add(listener.Key);
             }
             
             // collate all changes
