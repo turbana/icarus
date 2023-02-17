@@ -115,8 +115,10 @@ namespace Icarus.Graphics {
         protected override void OnUpdate() {
             var buffer = SystemAPI.GetSingletonBuffer<ListenerUpdate>();
             Entities
-                .WithChangeFilter<DisplayText>()
+                // BUG in entities 1.0-pre44: this should be uncommented
+                // .WithChangeFilter<DisplayText>()
                 .ForEach((Entity entity, ManagedTextComponent comp, in DisplayText text, in TransformAspect pos) => {
+                    // UnityEngine.Debug.Log($"update [{text.Key}]");
                     TextMeshPro tmp;
                     RectTransform rt;
                     if (comp.GO is null) {
