@@ -10,7 +10,10 @@ using TMPro;
 
 namespace Icarus.Graphics {
     public enum TextStyle {
-        Display1
+        Display1,
+        Label1,
+        Label1R,
+        Label1L,
     };
 
     public class TextStyleConfig {
@@ -29,6 +32,33 @@ namespace Icarus.Graphics {
                 Style = FontStyles.Normal,
                 Color = new Color(1f, 1f, 1f),
                 HAlign = HorizontalAlignmentOptions.Center,
+                VAlign = VerticalAlignmentOptions.Middle,
+            },
+            // Label1
+            new TextStyleConfig {
+                Bounds = new Vector2(0.45f, 0.06f),
+                Size = 0.6f,
+                Style = FontStyles.Normal,
+                Color = new Color(0f, 0f, 0f),
+                HAlign = HorizontalAlignmentOptions.Center,
+                VAlign = VerticalAlignmentOptions.Middle,
+            },
+            // Label1R
+            new TextStyleConfig {
+                Bounds = new Vector2(0.45f, 0.06f),
+                Size = 0.6f,
+                Style = FontStyles.Normal,
+                Color = new Color(0f, 0f, 0f),
+                HAlign = HorizontalAlignmentOptions.Right,
+                VAlign = VerticalAlignmentOptions.Middle,
+            },
+            // Label1L
+            new TextStyleConfig {
+                Bounds = new Vector2(0.45f, 0.06f),
+                Size = 0.6f,
+                Style = FontStyles.Normal,
+                Color = new Color(0f, 0f, 0f),
+                HAlign = HorizontalAlignmentOptions.Left,
                 VAlign = VerticalAlignmentOptions.Middle,
             },
         };
