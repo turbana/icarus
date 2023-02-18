@@ -479,6 +479,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1555240849038293809, guid: e95be3f6ef9cc8243994bdcda968a0e5, type: 3}
+      propertyPath: m_SphereRadius
+      value: 0.85
+      objectReference: {fileID: 0}
+    - target: {fileID: 1555240849038293809, guid: e95be3f6ef9cc8243994bdcda968a0e5, type: 3}
+      propertyPath: m_Capsule.Height
+      value: 1.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1555240849038293809, guid: e95be3f6ef9cc8243994bdcda968a0e5, type: 3}
+      propertyPath: m_Cylinder.Height
+      value: 1.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1555240849038293809, guid: e95be3f6ef9cc8243994bdcda968a0e5, type: 3}
+      propertyPath: m_PrimitiveSize.z
+      value: 1.7
+      objectReference: {fileID: 0}
     - target: {fileID: 1555240849038293810, guid: e95be3f6ef9cc8243994bdcda968a0e5, type: 3}
       propertyPath: m_RootOrder
       value: 8
@@ -529,11 +545,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2674214978767437844, guid: e95be3f6ef9cc8243994bdcda968a0e5, type: 3}
       propertyPath: Character.JumpSpeed
-      value: 8
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 2674214978767437844, guid: e95be3f6ef9cc8243994bdcda968a0e5, type: 3}
       propertyPath: Character.AirMaxSpeed
-      value: 5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2674214978767437844, guid: e95be3f6ef9cc8243994bdcda968a0e5, type: 3}
       propertyPath: Character.GroundMaxSpeed
@@ -545,7 +561,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6401532902016766949, guid: e95be3f6ef9cc8243994bdcda968a0e5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.4
+      value: 1.7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
