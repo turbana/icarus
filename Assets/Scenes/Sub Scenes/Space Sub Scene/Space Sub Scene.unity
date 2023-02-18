@@ -360,6 +360,10 @@ PrefabInstance:
       value: FirstPersonPlayer
       objectReference: {fileID: 0}
     - target: {fileID: 7698645590983583992, guid: 8c22dcbefac332745a1efbea69cb8bfc, type: 3}
+      propertyPath: MouseSensitivity
+      value: 1.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 7698645590983583992, guid: 8c22dcbefac332745a1efbea69cb8bfc, type: 3}
       propertyPath: ControlledCharacter
       value: 
       objectReference: {fileID: 1981133544}
@@ -522,6 +526,26 @@ PrefabInstance:
     - target: {fileID: 1555240849038293811, guid: e95be3f6ef9cc8243994bdcda968a0e5, type: 3}
       propertyPath: m_Name
       value: FirstPersonCharacter
+      objectReference: {fileID: 0}
+    - target: {fileID: 2674214978767437844, guid: e95be3f6ef9cc8243994bdcda968a0e5, type: 3}
+      propertyPath: Character.JumpSpeed
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2674214978767437844, guid: e95be3f6ef9cc8243994bdcda968a0e5, type: 3}
+      propertyPath: Character.AirMaxSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2674214978767437844, guid: e95be3f6ef9cc8243994bdcda968a0e5, type: 3}
+      propertyPath: Character.GroundMaxSpeed
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2674214978767437844, guid: e95be3f6ef9cc8243994bdcda968a0e5, type: 3}
+      propertyPath: Character.GroundedMovementSharpness
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6401532902016766949, guid: e95be3f6ef9cc8243994bdcda968a0e5, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
