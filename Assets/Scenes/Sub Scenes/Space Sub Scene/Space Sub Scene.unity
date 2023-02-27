@@ -173,9 +173,9 @@ MonoBehaviour:
   DrawColliderAabbs: 0
   DrawBroadphase: 0
   DrawMassProperties: 0
-  DrawContacts: 1
-  DrawCollisionEvents: 1
-  DrawTriggerEvents: 1
+  DrawContacts: 0
+  DrawCollisionEvents: 0
+  DrawTriggerEvents: 0
   DrawJoints: 0
 --- !u!114 &553803964
 MonoBehaviour:

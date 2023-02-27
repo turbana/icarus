@@ -14,7 +14,7 @@ namespace Icarus.UI {
         private Camera MainCamera;
         
         private enum InteractionType {
-            None, LeftClick, ScrollUp, ScrollDown, Interact
+            None, LeftClick, LeftClickDown, ScrollUp, ScrollDown, GiveControl
         };
 
         [BurstCompile]
@@ -27,20 +27,19 @@ namespace Icarus.UI {
         protected override void OnUpdate() {
             LTWLookup.Update(this);
             InteractionLookup.Update(this);
-            var interact = InteractionType.None;
-            var scroll = Input.mouseScrollDelta[1];
-
-            if (Input.GetMouseButtonDown(0)) {
-                interact = InteractionType.LeftClick;
-            } else if (Input.GetKeyDown("e")) {
-                interact = InteractionType.Interact;
-            } else if (scroll > 0f) {
-                interact = InteractionType.ScrollUp;
-            } else if (scroll < 0f) {
-                interact = InteractionType.ScrollDown;
-            }
             
-            if (interact != InteractionType.None) {
+            // read user input
+            var scroll = Input.mouseScrollDelta[1];
+            var interaction = new Interaction() {
+                LeftClick = Input.GetMouseButtonDown(0),
+                LeftClickDown = Input.GetMouseButton(0),
+                ScrollUp = (scroll > 0f),
+                ScrollDown = (scroll < 0f),
+                GiveControl = Input.GetKeyDown("e"),
+            };
+
+            // do we have any input?
+            if (interaction.AnyInteraction) {
                 float3 rstart = MainCamera.transform.position;
                 float3 rend = rstart + (float3)(MainCamera.transform.forward * Constants.INTERACT_DISTANCE);
                 // Debug.Log($"ray casting from {rstart} to {rend} mask={INTERACTION_LAYER_MASK}");
@@ -51,13 +50,10 @@ namespace Icarus.UI {
                     // var entity = ref Raycast(ref pworld, rstart, rend);
                     Raycast(out entity, pworld, rstart, rend);
                     if (entity != Entity.Null) {
-                        // Debug.Log($"hit");
-                        _InteractionLookup[entity] = new Interaction() {
-                            Toggle = (interact == InteractionType.LeftClick),
-                            ScrollUp = (interact == InteractionType.ScrollUp),
-                            ScrollDown = (interact == InteractionType.ScrollDown),
-                            GiveControl = (interact == InteractionType.Interact),
-                        };
+                        // Debug.Log("hit");
+                        // Debug.Log($"hit entity={EntityManager.GetName(entity)}");
+                        _InteractionLookup[entity] = interaction;
+                        // Debug.Log($"interaction set");
                     } else {
                         // Debug.Log("no hit");
                     }
