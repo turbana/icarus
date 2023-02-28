@@ -44,6 +44,8 @@ namespace Icarus.UI {
             
             // [BurstCompile]
             public void Execute(Entity entity, ref Interaction interaction, in InteractionControl control) {
+                var root = control.Control;
+                var value = ControlValueLookup[root];
                 // UnityEngine.Debug.Log("update control");
                 var direction = 0;
 
@@ -54,21 +56,24 @@ namespace Icarus.UI {
                 } else if (interaction.ScrollDown || (interaction.LeftClick && control.Type == InteractionControlType.Decrease)) {
                     direction = -1;
                     // UnityEngine.Debug.Log("direction decrease");
+                } else if (interaction.LeftClick && control.Type == InteractionControlType.Toggle) {
+                    direction = value.PreviousValue - value.Value;
+                    // UnityEngine.Debug.Log($"direction toggled to {direction}");
                 }
 
                 // are we updating?
                 if (direction != 0) {
-                    var root = control.Control;
-                    var value = ControlValueLookup[root];
                     var settings = ControlSettingsLookup[root];
                     var next = value.Value + direction;
                     // is the next value in range?
                     if (0 <= next && next < settings.Stops) {
                         // UnityEngine.Debug.Log($"next in range {next} ({settings.Stops})");
-                        var rotate = quaternion.RotateX(settings.RotateAngle * direction);
+                        var rotate = quaternion.RotateX(settings.Rotation * direction);
+                        var translate = settings.Movement * direction;
                         // update main entity rotation
                         var rlt = LocalTransformLookup[root];
                         rlt.Rotation = math.mul(rlt.Rotation, rotate);
+                        rlt.Position = rlt.Position + translate;
                         LocalTransformLookup[root] = rlt;
                         // update with new control value
                         ControlValueLookup[root] = new ControlValue {

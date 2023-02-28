@@ -1,8 +1,9 @@
 using UnityEngine;
 using Unity.Entities;
+using Unity.Mathematics;
 
 namespace Icarus.UI {
-    public class MultiWayControlAuthoring : MonoBehaviour {
+    public class MultiWayControlAuthoring : BaseControlAuthoring {
         [Tooltip("Number of stops this switch supports")]
         public int Stops = 2;
         [Tooltip("Total degrees of travel this switch moves")]
@@ -13,7 +14,8 @@ namespace Icarus.UI {
                 AddComponent<ControlValue>();
                 AddComponent<ControlSettings>(new ControlSettings {
                         Stops = auth.Stops,
-                        RotateAngle = (auth.RotateAngle * Mathf.Deg2Rad) / (auth.Stops - 1),
+                        Rotation = (auth.RotateAngle * Mathf.Deg2Rad) / (auth.Stops - 1),
+                        Movement = float3.zero,
                     });
             }
         }

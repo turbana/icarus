@@ -1,4 +1,6 @@
+using UnityEngine;
 using Unity.Entities;
+using Unity.Mathematics;
 
 namespace Icarus.UI {
     /* An Interaction represents the user pressing a key */
@@ -14,7 +16,7 @@ namespace Icarus.UI {
 
     /* InteractionControlType is used to signify a desired increase or decrease
      * in a control value. */
-    public enum InteractionControlType { Increase, Decrease };
+    public enum InteractionControlType { Increase, Decrease, Toggle };
 
     /* An InteractionControl is attached to a physics collider and is used to
      * configure the desired interaction. */
@@ -31,10 +33,15 @@ namespace Icarus.UI {
 
     /* ControlSettings contain various setting for a control. */
     public partial struct ControlSettings : IComponentData {
-        public int Stops;         // number of "stops" on the dial/switch
-        public float RotateAngle; // travel of each stop on the switch (in radians)
+        public int Stops;       // number of "stops" on the dial/switch
+        public float Rotation;  // amount of rotation for each stop (in radians)
+        public float3 Movement; // amount of movement for each stop
     }
 
     /* UpdateInteractionSystemGroup is where Interactions are performed */
     public partial class UpdateInteractionSystemGroup : ComponentSystemGroup {}
+
+    /* All Control*Authoring classes should inherit from this. Makes selecting
+     * GameObjects from the editor easier. */
+    public class BaseControlAuthoring : MonoBehaviour { }
 }
