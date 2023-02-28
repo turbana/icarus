@@ -8,10 +8,9 @@ using Unity.Transforms;
  * that should move/rotate with their parent entity. This system will run once
  * and re-add the parent/child relationship. */
 
-namespace Icarus.UI {
+namespace Icarus.Misc {
     [BurstCompile]
-    [UpdateInGroup(typeof(UpdateInteractionSystemGroup))]
-    public partial class ReParentCollidersSystem : SystemBase {
+    public partial class ReParentSystem : SystemBase {
         [ReadOnly]
         private ComponentLookup<LocalToWorld> LTWLookup;
         
@@ -26,7 +25,7 @@ namespace Icarus.UI {
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
 
             new ReParentJob {
-                LTW = LTWLookup,
+                LTWLookup = LTWLookup,
                 ecb = ecb,
             }.Schedule();
             
@@ -40,27 +39,23 @@ namespace Icarus.UI {
         [BurstCompile]
         private partial struct ReParentJob : IJobEntity {
             [ReadOnly]
-            public ComponentLookup<LocalToWorld> LTW;
+            public ComponentLookup<LocalToWorld> LTWLookup;
             public EntityCommandBuffer ecb;
 
             [BurstCompile]
-            public void Execute(Entity child, in InteractionControl control) {
-                var parent = control.Control;
-                var pltw = LTW[parent].Value;
-                var cltw = LTW[child].Value;
+            public void Execute(Entity child, in ReParent reparent) {
+                var parent = reparent.Value;
+                var pltw = LTWLookup[parent].Value;
+                var cltw = LTWLookup[child].Value;
                 var pwt = WorldTransform.FromMatrix(pltw);
                 var cwt = WorldTransform.FromMatrix(cltw);
-                var plt = LocalTransform.FromMatrix(pltw);
                 var clt = (LocalTransform)pwt.InverseTransformTransform(cwt);
-                    
-                // update child
+                
+                // update child entity
                 ecb.AddComponent<Parent>(child, new Parent { Value = parent });
-                ecb.RemoveComponent<Static>(child);
                 ecb.AddComponent<LocalTransform>(child, clt);
-
-                // update parent
-                ecb.RemoveComponent<Static>(parent);
-                ecb.AddComponent<LocalTransform>(parent, plt);
+                ecb.RemoveComponent<Static>(child);
+                ecb.RemoveComponent<ReParent>(child);
             }
         }
     }

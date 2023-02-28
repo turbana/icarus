@@ -58,26 +58,27 @@ namespace Icarus.UI {
 
                 // are we updating?
                 if (direction != 0) {
-                    var parent = control.Control;
-                    var value = ControlValueLookup[parent];
-                    var settings = ControlSettingsLookup[parent];
+                    var root = control.Control;
+                    var value = ControlValueLookup[root];
+                    var settings = ControlSettingsLookup[root];
                     var next = value.Value + direction;
                     // is the next value in range?
                     if (0 <= next && next < settings.Stops) {
                         // UnityEngine.Debug.Log($"next in range {next} ({settings.Stops})");
                         var rotate = quaternion.RotateX(settings.RotateAngle * direction);
                         // update main entity rotation
-                        var plt = LocalTransformLookup[parent];
-                        plt.Rotation = math.mul(plt.Rotation, rotate);
-                        LocalTransformLookup[parent] = plt;
+                        var rlt = LocalTransformLookup[root];
+                        rlt.Rotation = math.mul(rlt.Rotation, rotate);
+                        LocalTransformLookup[root] = rlt;
                         // update with new control value
-                        ControlValueLookup[parent] = new ControlValue {
+                        ControlValueLookup[root] = new ControlValue {
                             Value = next,
                             PreviousValue = value.Value,
                         };
                     }
+                    
                     // clear collider
-                    interaction = new Interaction();
+                    interaction = default;
                 }
             }
         }
