@@ -10,64 +10,91 @@ using Unity.Transforms;
 namespace Icarus.UI {
     [BurstCompile]
     public partial class QueryUserInputSystem : SystemBase {
-        private ComponentLookup<LocalToWorld> LTWLookup;
+        [ReadOnly]
+        private ComponentLookup<ControlValue> ControlValueLookup;
+        [ReadOnly]
+        private ComponentLookup<ControlSettings> ControlSettingsLookup;
         private ComponentLookup<Interaction> InteractionLookup;
+        [ReadOnly]
+        private ComponentLookup<InteractionControl> InteractionControlLookup;
         private Camera MainCamera;
 
         [BurstCompile]
         protected override void OnCreate() {
-            LTWLookup = GetComponentLookup<LocalToWorld>(true);
+            ControlValueLookup = GetComponentLookup<ControlValue>(true);
+            ControlSettingsLookup = GetComponentLookup<ControlSettings>(true);
             InteractionLookup = GetComponentLookup<Interaction>(false);
+            InteractionControlLookup = GetComponentLookup<InteractionControl>(true);
             MainCamera = Camera.main;
         }
         
         protected override void OnUpdate() {
-            LTWLookup.Update(this);
+            ControlValueLookup.Update(this);
+            ControlSettingsLookup.Update(this);
             InteractionLookup.Update(this);
+            InteractionControlLookup.Update(this);
             
             // read user input
             var inputs = Interaction.FromUserInput();
             
+            var pworld = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
+            var crosshair = SystemAPI.ManagedAPI.GetSingleton<Crosshair>();
+            var next_crosshair = new NativeList<CrosshairType>(1, Allocator.TempJob);
+            next_crosshair.Add(CrosshairType.Normal);
             float3 rstart = MainCamera.transform.position;
             float3 rend = rstart + (float3)(MainCamera.transform.forward * Constants.INTERACT_DISTANCE);
             // Debug.Log($"ray casting from {rstart} to {rend} mask={INTERACTION_LAYER_MASK}");
-            var pworld = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
-            var _InteractionLookup = InteractionLookup;
-            var output = new NativeList<CrosshairType>(1, Allocator.TempJob);
-            output.Add(CrosshairType.Normal);
+            var CVL = ControlValueLookup;
+            var CSL = ControlSettingsLookup;
+            var IL = InteractionLookup;
+            var ICL = InteractionControlLookup;
             
-            Job.WithCode(() => {
+            Job
+                .WithReadOnly(CVL)
+                .WithReadOnly(CSL)
+                .WithReadOnly(ICL)
+                .WithCode(() => {
                 Entity entity;
                 Raycast(out entity, pworld, rstart, rend);
                 // did we hit a collider?
                 if (entity != Entity.Null) {
                     // Debug.Log("hit");
                     // Debug.Log($"hit entity={EntityManager.GetName(entity)}");
+                    var collider = IL[entity];
                     // do we have any input?
                     if (inputs.AnyInteraction) {
                         // does this collider consume the input?
-                        var collider = _InteractionLookup[entity];
                         if (collider.CanConsume(inputs)) {
                             // assign the user input
                             collider.Value = inputs.Value;
-                            _InteractionLookup[entity] = collider;
+                            IL[entity] = collider;
                             // Debug.Log($"interaction set");
                         }
                     }
                     // update crosshair
-                    output[0] = CrosshairType.Toggle;
+                    var icontrol = ICL[entity];
+                    var control = icontrol.Control;
+                    var value = CVL[control].Value;
+                    var stops = CSL[control].Stops;
+                    if (icontrol.Type == InteractionControlType.Increase && (value + 1 < stops)) {
+                        next_crosshair[0] = CrosshairType.Increase;
+                    } else if (icontrol.Type == InteractionControlType.Decrease && (0 <= value - 1)) {
+                        next_crosshair[0] = CrosshairType.Decrease;
+                    } else if (icontrol.Type == InteractionControlType.Toggle) {
+                        next_crosshair[0] = CrosshairType.Toggle;
+                    } else {
+                        next_crosshair[0] = CrosshairType.Normal;
+                    }
                 } else {
                     // Debug.Log("no hit");
+                    next_crosshair[0] = CrosshairType.Normal;
                 }
             }).Schedule();
                 
-            this.Dependency.Complete();
-            
             // update crosshair
-            var xhair = SystemAPI.ManagedAPI.GetSingleton<Crosshair>();
-            xhair.Value = output[0];
-            // UnityEngine.Debug.Log($"crosshair = {output[0]}");
-            output.Dispose();
+            this.Dependency.Complete();
+            crosshair.Value = next_crosshair[0];
+            next_crosshair.Dispose();
         }
         
         [BurstCompile]
