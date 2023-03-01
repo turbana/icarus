@@ -8,8 +8,7 @@ namespace Icarus.UI {
         public class CrosshairAuthoringBaker : Baker<CrosshairAuthoring> {
             public override void Bake(CrosshairAuthoring auth) {
                 var go = GameObject
-                    .Find("MainCamera").transform
-                    .Find("Canvas")
+                    .Find("Screen Canvas").transform
                     .Find("Crosshair")
                     .gameObject;
                 DependsOn(go);
