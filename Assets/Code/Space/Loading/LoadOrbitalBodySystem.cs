@@ -16,7 +16,7 @@ namespace Icarus.Loading {
     }
     
     [RequireMatchingQueriesForUpdate]
-    [UpdateInGroup(typeof(LoadingSystemGroup))]
+    [UpdateInGroup(typeof(IcarusLoadingSystemGroup))]
     public partial class LoadOrbitalBodySystem : SystemBase {
         private static FixedString64Bytes DEFAULT_PREFAB = "Planet Prefab";
         

@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
+using Icarus.Loading;
+
 namespace Icarus.Space {
     public struct StarData {
         public string name;
@@ -20,7 +22,7 @@ namespace Icarus.Space {
     }
 
     [RequireMatchingQueriesForUpdate]
-    [UpdateInGroup(typeof(InitializationSystemGroup))]
+    [UpdateInGroup(typeof(IcarusLoadingSystemGroup))]
     public partial class StarfieldInitializationSystem : SystemBase {
         private const float DEGREES_PER_HOUR = 360f / 24f;
         

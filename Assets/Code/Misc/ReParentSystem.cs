@@ -3,6 +3,8 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Transforms;
 
+using Icarus.Loading;
+
 /* Physics entities such as colliders are un-parented and set as Static during
  * the baking process. This is not desired as we have interaction colliders
  * that should move/rotate with their parent entity. This system will run once
@@ -10,6 +12,7 @@ using Unity.Transforms;
 
 namespace Icarus.Misc {
     [BurstCompile]
+    [UpdateInGroup(typeof(IcarusLoadingSystemGroup))]
     public partial class ReParentSystem : SystemBase {
         [ReadOnly]
         private ComponentLookup<LocalToWorld> LTWLookup;

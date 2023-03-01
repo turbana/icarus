@@ -7,7 +7,7 @@ using Unity.Transforms;
 namespace Icarus.UI {
     [BurstCompile]
     [RequireMatchingQueriesForUpdate]
-    [UpdateInGroup(typeof(UpdateInteractionSystemGroup))]
+    [UpdateInGroup(typeof(IcarusInteractionSystemGroup))]
     public partial class MultiWayControlSystem : SystemBase {
         private enum ControlType { None, Increase, Decrease };
         public ComponentLookup<ControlValue> ControlValueLookup;
@@ -34,7 +34,7 @@ namespace Icarus.UI {
             }.Schedule();
         }
 
-        // [BurstCompile]
+        [BurstCompile]
         [WithChangeFilter(typeof(Interaction))]
         protected partial struct MultiWayControlJob : IJobEntity {
             public ComponentLookup<ControlValue> ControlValueLookup;

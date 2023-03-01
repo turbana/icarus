@@ -6,6 +6,8 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 
+using Icarus.UI;
+
 namespace Icarus.Graphics {
     public enum TextUpdateFormat {
         Number12_0,
@@ -91,6 +93,7 @@ namespace Icarus.Graphics {
     }
 
     [BurstCompile]
+    [UpdateInGroup(typeof(IcarusInteractionSystemGroup))]
     public partial class TextUpdateSystem : SystemBase {
         protected NativeHashMap<FixedString64Bytes, FixedString64Bytes> TextValues;
         protected NativeHashMap<FixedString64Bytes, UnsafeList<Entity>> Listeners;

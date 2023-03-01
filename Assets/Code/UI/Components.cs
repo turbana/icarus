@@ -82,9 +82,6 @@ namespace Icarus.UI {
         public float3 Movement; // amount of movement for each stop
     }
 
-    /* UpdateInteractionSystemGroup is where Interactions are performed */
-    public partial class UpdateInteractionSystemGroup : ComponentSystemGroup {}
-
     /* All Control*Authoring classes should inherit from this. Makes selecting
      * GameObjects from the editor easier. */
     public class BaseControlAuthoring : MonoBehaviour { }

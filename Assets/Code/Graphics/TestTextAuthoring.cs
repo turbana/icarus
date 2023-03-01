@@ -8,6 +8,8 @@ using Unity.Entities;
 using Unity.Transforms;
 using TMPro;
 
+using Icarus.UI;
+
 namespace Icarus.Graphics {
     public enum TextStyle {
         Display1,
@@ -121,6 +123,8 @@ namespace Icarus.Graphics {
         }
     }
 
+    [UpdateInGroup(typeof(IcarusInteractionSystemGroup))]
+    [UpdateAfter(typeof(TextUpdateSystem))]
     public partial class UpdateTextObjectsSystem : SystemBase {
         protected override void OnUpdate() {
             var buffer = SystemAPI.GetSingletonBuffer<ListenerUpdate>();

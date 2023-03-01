@@ -9,6 +9,7 @@ using Unity.Transforms;
 
 namespace Icarus.UI {
     [BurstCompile]
+    [UpdateInGroup(typeof(UserInputSystemGroup))]
     public partial class QueryUserInputSystem : SystemBase {
         [ReadOnly]
         private ComponentLookup<ControlValue> ControlValueLookup;

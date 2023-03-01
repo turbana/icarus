@@ -20,8 +20,7 @@ using Unity.Transforms;
  */
 
 namespace Icarus.Misc {
-    [UpdateAfter(typeof(Icarus.Orbit.UpdateOrbitSystemGroup))]
-    [UpdateAfter(typeof(TransformSystemGroup))]
+    [UpdateInGroup(typeof(LateSimulationSystemGroup))]
     public partial class DynamicLODScalingSystemGroup : ComponentSystemGroup {}
 
     public struct InitialLODRangesComponent : IComponentData {
