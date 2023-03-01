@@ -60,7 +60,7 @@ namespace Icarus.UI {
 
     /* InteractionControlType is used to signify a desired increase or decrease
      * in a control value. */
-    public enum InteractionControlType { Increase, Decrease, Toggle };
+    public enum InteractionControlType { Increase, Decrease, Toggle, Press };
 
     /* An InteractionControl is attached to a physics collider and is used to
      * configure the desired interaction. */

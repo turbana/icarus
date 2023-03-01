@@ -59,6 +59,9 @@ namespace Icarus.UI {
                 } else if (interaction.LeftMouseDown && control.Type == InteractionControlType.Toggle) {
                     direction = value.PreviousValue - value.Value;
                     // UnityEngine.Debug.Log($"direction toggled to {direction}");
+                } else if (control.Type == InteractionControlType.Press) {
+                    direction = (interaction.LeftMouse ? 1 : -1);
+                    // UnityEngine.Debug.Log($"direction pressed to {direction}");
                 }
 
                 // are we updating?

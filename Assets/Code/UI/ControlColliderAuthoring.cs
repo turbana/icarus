@@ -21,6 +21,7 @@ namespace Icarus.UI {
                             InteractionType.ScrollWheelDown);
                             break;
                     case InteractionControlType.Toggle:
+                    case InteractionControlType.Press:
                         interaction = Interaction.FromMask(
                             InteractionType.LeftMouseDown);
                         break;

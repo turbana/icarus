@@ -60,17 +60,10 @@ namespace Icarus.UI {
                 if (entity != Entity.Null) {
                     // Debug.Log("hit");
                     // Debug.Log($"hit entity={EntityManager.GetName(entity)}");
+                    // update collider with inputs
                     var collider = IL[entity];
-                    // do we have any input?
-                    if (inputs.AnyInteraction) {
-                        // does this collider consume the input?
-                        if (collider.CanConsume(inputs)) {
-                            // assign the user input
-                            collider.Value = inputs.Value;
-                            IL[entity] = collider;
-                            // Debug.Log($"interaction set");
-                        }
-                    }
+                    collider.Value = inputs.Value;
+                    IL[entity] = collider;
                     // update crosshair
                     var icontrol = ICL[entity];
                     var control = icontrol.Control;
@@ -80,7 +73,8 @@ namespace Icarus.UI {
                         next_crosshair[0] = CrosshairType.Increase;
                     } else if (icontrol.Type == InteractionControlType.Decrease && (0 <= value - 1)) {
                         next_crosshair[0] = CrosshairType.Decrease;
-                    } else if (icontrol.Type == InteractionControlType.Toggle) {
+                    } else if (icontrol.Type == InteractionControlType.Toggle
+                               || icontrol.Type == InteractionControlType.Press) {
                         next_crosshair[0] = CrosshairType.Toggle;
                     } else {
                         next_crosshair[0] = CrosshairType.Normal;
