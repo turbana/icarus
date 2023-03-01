@@ -44,4 +44,16 @@ namespace Icarus.UI {
     /* All Control*Authoring classes should inherit from this. Makes selecting
      * GameObjects from the editor easier. */
     public class BaseControlAuthoring : MonoBehaviour { }
+
+    /* Cross hair types */
+    public enum CrosshairType : int {
+        Normal = 0, Toggle, Increase, Decrease, Enter
+    }
+
+    /* Crosshair Component */
+    public class Crosshair : IComponentData {
+        public CrosshairType Value;
+        public GameObject GO;
+        public Sprite[] Crosshairs;
+    }
 }
