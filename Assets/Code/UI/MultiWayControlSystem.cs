@@ -50,13 +50,13 @@ namespace Icarus.UI {
                 var direction = 0;
 
                 // check desired interactions
-                if (interaction.ScrollUp || (interaction.LeftClick && control.Type == InteractionControlType.Increase)) {
+                if (interaction.ScrollWheelUp || (interaction.LeftMouseDown && control.Type == InteractionControlType.Increase)) {
                     direction = 1;
                     // UnityEngine.Debug.Log("direction increase");
-                } else if (interaction.ScrollDown || (interaction.LeftClick && control.Type == InteractionControlType.Decrease)) {
+                } else if (interaction.ScrollWheelDown || (interaction.LeftMouseDown && control.Type == InteractionControlType.Decrease)) {
                     direction = -1;
                     // UnityEngine.Debug.Log("direction decrease");
-                } else if (interaction.LeftClick && control.Type == InteractionControlType.Toggle) {
+                } else if (interaction.LeftMouseDown && control.Type == InteractionControlType.Toggle) {
                     direction = value.PreviousValue - value.Value;
                     // UnityEngine.Debug.Log($"direction toggled to {direction}");
                 }
@@ -83,7 +83,7 @@ namespace Icarus.UI {
                     }
                     
                     // clear collider
-                    interaction = default;
+                    interaction.Value = default;
                 }
             }
         }

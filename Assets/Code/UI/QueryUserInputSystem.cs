@@ -13,9 +13,6 @@ namespace Icarus.UI {
         private ComponentLookup<LocalToWorld> LTWLookup;
         private ComponentLookup<Interaction> InteractionLookup;
         private Camera MainCamera;
-        private enum InteractionType {
-            None, LeftClick, LeftClickDown, ScrollUp, ScrollDown, GiveControl
-        };
 
         [BurstCompile]
         protected override void OnCreate() {
@@ -29,15 +26,7 @@ namespace Icarus.UI {
             InteractionLookup.Update(this);
             
             // read user input
-            var scroll = Input.mouseScrollDelta[1];
-            var interaction = new Interaction() {
-                LeftClick = Input.GetMouseButtonDown(0),
-                LeftClickDown = Input.GetMouseButton(0),
-                ScrollUp = (scroll > 0f),
-                ScrollDown = (scroll < 0f),
-                GiveControl = Input.GetKeyDown("e"),
-            };
-            
+            var inputs = Interaction.FromUserInput();
             
             float3 rstart = MainCamera.transform.position;
             float3 rend = rstart + (float3)(MainCamera.transform.forward * Constants.INTERACT_DISTANCE);
@@ -50,13 +39,20 @@ namespace Icarus.UI {
             Job.WithCode(() => {
                 Entity entity;
                 Raycast(out entity, pworld, rstart, rend);
+                // did we hit a collider?
                 if (entity != Entity.Null) {
                     // Debug.Log("hit");
                     // Debug.Log($"hit entity={EntityManager.GetName(entity)}");
                     // do we have any input?
-                    if (interaction.AnyInteraction) {
-                        _InteractionLookup[entity] = interaction;
-                        // Debug.Log($"interaction set");
+                    if (inputs.AnyInteraction) {
+                        // does this collider consume the input?
+                        var collider = _InteractionLookup[entity];
+                        if (collider.CanConsume(inputs)) {
+                            // assign the user input
+                            collider.Value = inputs.Value;
+                            _InteractionLookup[entity] = collider;
+                            // Debug.Log($"interaction set");
+                        }
                     }
                     // update crosshair
                     output[0] = CrosshairType.Toggle;

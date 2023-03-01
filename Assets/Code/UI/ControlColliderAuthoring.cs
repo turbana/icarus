@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.Collections;
 using Unity.Entities;
 
 namespace Icarus.UI {
@@ -10,7 +11,21 @@ namespace Icarus.UI {
         
         public class ControlColliderAuthoringBaker : Baker<ControlColliderAuthoring> {
             public override void Bake(ControlColliderAuthoring auth) {
-                AddComponent<Interaction>();
+                Interaction interaction = default;
+                switch (auth.Type) {
+                    case InteractionControlType.Increase:
+                    case InteractionControlType.Decrease:
+                        interaction = Interaction.FromMask(
+                            InteractionType.LeftMouseDown,
+                            InteractionType.ScrollWheelUp,
+                            InteractionType.ScrollWheelDown);
+                            break;
+                    case InteractionControlType.Toggle:
+                        interaction = Interaction.FromMask(
+                            InteractionType.LeftMouseDown);
+                        break;
+                }
+                AddComponent<Interaction>(interaction);
                 AddComponent<InteractionControl>(new InteractionControl {
                         Control = GetEntity(auth.Control.gameObject),
                         Type = auth.Type,
