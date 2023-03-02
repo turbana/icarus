@@ -40,7 +40,7 @@ namespace Icarus.Graphics {
             // Label1
             new TextStyleConfig {
                 Bounds = new Vector2(0.45f, 0.06f),
-                Size = 0.6f,
+                Size = 0.4f,
                 Style = FontStyles.Normal,
                 Color = new Color(0f, 0f, 0f),
                 HAlign = HorizontalAlignmentOptions.Center,
@@ -49,7 +49,7 @@ namespace Icarus.Graphics {
             // Label1R
             new TextStyleConfig {
                 Bounds = new Vector2(0.45f, 0.06f),
-                Size = 0.6f,
+                Size = 0.4f,
                 Style = FontStyles.Normal,
                 Color = new Color(0f, 0f, 0f),
                 HAlign = HorizontalAlignmentOptions.Right,
@@ -58,7 +58,7 @@ namespace Icarus.Graphics {
             // Label1L
             new TextStyleConfig {
                 Bounds = new Vector2(0.45f, 0.06f),
-                Size = 0.6f,
+                Size = 0.4f,
                 Style = FontStyles.Normal,
                 Color = new Color(0f, 0f, 0f),
                 HAlign = HorizontalAlignmentOptions.Left,
