@@ -12,8 +12,10 @@ namespace Icarus.UI {
                     .Find("Crosshair")
                     .gameObject;
                 DependsOn(go);
-                AddComponentObject<Crosshair>(new Crosshair {
+                AddComponent<Crosshair>(new Crosshair {
                         Value = CrosshairType.Normal,
+                    });
+                AddComponentObject<CrosshairConfig>(new CrosshairConfig {
                         GO = go,
                         Crosshairs = auth.Crosshairs,
                     });

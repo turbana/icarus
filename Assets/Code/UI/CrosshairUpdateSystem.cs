@@ -3,12 +3,18 @@ using UnityEngine.UI;
 using Unity.Entities;
 
 namespace Icarus.UI {
+    [RequireMatchingQueriesForUpdate]
     [UpdateInGroup(typeof(IcarusInteractionSystemGroup))]
     public partial class CrosshairUpdateSystem : SystemBase {
         protected override void OnUpdate() {
-            var crosshair = SystemAPI.ManagedAPI.GetSingleton<Crosshair>();
-            var img = crosshair.GO.GetComponent<Image>();
-            img.sprite = crosshair.Crosshairs[(int)crosshair.Value];
+            Entities
+                .WithChangeFilter<Crosshair>()
+                .ForEach((CrosshairConfig config, in Crosshair crosshair) => {
+                    var img = config.GO.GetComponent<Image>();
+                    img.sprite = config.Crosshairs[(int)crosshair.Value];
+                    })
+                .WithoutBurst()
+                .Run();
         }
     }
 }

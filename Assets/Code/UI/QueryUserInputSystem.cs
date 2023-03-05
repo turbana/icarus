@@ -20,6 +20,7 @@ namespace Icarus.UI {
             MainCamera = Camera.main;
         }
         
+        [BurstCompile]
         protected override void OnUpdate() {
             DatumLookup.Update(this);
             
@@ -27,41 +28,37 @@ namespace Icarus.UI {
             var inputs = Interaction.FromUserInput();
             
             var pworld = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
-            var crosshair = SystemAPI.ManagedAPI.GetSingleton<Crosshair>();
-            var next_crosshair = new NativeList<CrosshairType>(1, Allocator.TempJob);
-            next_crosshair.Add(CrosshairType.Normal);
+            var comp = SystemAPI.GetSingletonRW<Crosshair>();
+            var foo = comp.ValueRW;
             float3 rstart = MainCamera.transform.position;
             float3 rend = rstart + (float3)(MainCamera.transform.forward * Constants.INTERACT_DISTANCE);
             // Debug.Log($"ray casting from {rstart} to {rend} mask={INTERACTION_LAYER_MASK}");
             var DL = DatumLookup;
             
-            Job.WithCode(() => {
-                Raycast(out Entity entity, pworld, rstart, rend);
-                // did we hit a collider?
-                if (entity != Entity.Null) {
-                    // Debug.Log("hit");
-                    var control = SystemAPI.GetAspectRO<ControlAspect>(entity);
-                    var datum = DL[control.Datum];
-                    // find next value
-                    var next = control.NextValue(in datum, in inputs);
-                    // update datum
-                    if (next != datum.Value) {
-                        datum.PreviousValue = datum.Value;
-                        datum.Value = next;
-                        // Debug.Log($"setting datum to {datum.Value} (old {datum.PreviousValue})");
-                        DL[control.Datum] = datum;
+            Entities
+                .ForEach((ref Crosshair crosshair) => {
+                    Raycast(out Entity entity, pworld, rstart, rend);
+                    // did we hit a collider?
+                    if (entity != Entity.Null) {
+                        // Debug.Log("hit");
+                        var control = SystemAPI.GetAspectRO<ControlAspect>(entity);
+                        var datum = DL[control.Datum];
+                        // find next value
+                        var next = control.NextValue(in datum, in inputs);
+                        // update datum
+                        if (next != datum.Value) {
+                            datum.PreviousValue = datum.Value;
+                            datum.Value = next;
+                            // Debug.Log($"setting datum to {datum.Value} (old {datum.PreviousValue})");
+                            DL[control.Datum] = datum;
+                        }
+                        // set crosshair
+                        crosshair.Value = control.Crosshair(in datum);
+                    } else {
+                        // Debug.Log("no hit");
+                        crosshair.Value = CrosshairType.Normal;
                     }
-                    // set crosshair
-                    next_crosshair[0] = control.Crosshair(in datum);
-                } else {
-                    // Debug.Log("no hit");
-                    next_crosshair[0] = CrosshairType.Normal;
-                }
-            }).Schedule();
-            // update crosshair
-            this.Dependency.Complete();
-            crosshair.Value = next_crosshair[0];
-            next_crosshair.Dispose();
+                }).Schedule();
         }
         
         [BurstCompile]

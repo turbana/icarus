@@ -81,8 +81,12 @@ namespace Icarus.UI {
     }
 
     /* Crosshair Component */
-    public class Crosshair : IComponentData {
+    public partial struct Crosshair : IComponentData {
         public CrosshairType Value;
+    }
+
+    /* Crosshair GameObject Component */
+    public class CrosshairConfig : IComponentData {
         public GameObject GO;
         public Sprite[] Crosshairs;
     }
