@@ -1,7 +1,10 @@
 using UnityEngine;
+using Unity.Burst;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Transforms;
 
 namespace Icarus.UI {
     /* InteractionType is an index into the bit field Interaction.Mask */
@@ -62,29 +65,15 @@ namespace Icarus.UI {
      * in a control value. */
     public enum InteractionControlType { Increase, Decrease, Toggle, Press };
 
-    /* An InteractionControl is attached to a physics collider and is used to
-     * configure the desired interaction. */
-    public partial struct InteractionControl : IComponentData {
-        public Entity Control;
-        public InteractionControlType Type;
-    }
-
-    /* A ControlValue is the state of a control (switch, dial, etc) */
-    public partial struct ControlValue : IComponentData {
-        public int Value;
-        public int PreviousValue;
-    }
-
     /* ControlSettings contain various setting for a control. */
     public partial struct ControlSettings : IComponentData {
         public int Stops;       // number of "stops" on the dial/switch
         public float Rotation;  // amount of rotation for each stop (in radians)
         public float3 Movement; // amount of movement for each stop
+        public InteractionControlType Type; // type of control
+        public Entity Root;                 // the base entity of this control
+        public LocalTransform InitialTransform; // the initial position of the control
     }
-
-    /* All Control*Authoring classes should inherit from this. Makes selecting
-     * GameObjects from the editor easier. */
-    public class BaseControlAuthoring : MonoBehaviour { }
 
     /* Cross hair types */
     public enum CrosshairType : int {
@@ -96,5 +85,102 @@ namespace Icarus.UI {
         public CrosshairType Value;
         public GameObject GO;
         public Sprite[] Crosshairs;
+    }
+
+    /* A Datum is considered a single piece of data. All Datum are shared
+     * between client and server. Clients will write to Datums through
+     * interactions (buttons, switches, etc); the server will process updates
+     * to them (keypads, keyboards, other higher level controls); the client
+     * will render any changes to them through control outputs (displays,
+     * gauges, leds, etc).
+     *
+     * A Datum can be of various types depending on need (float, int,
+     * FixedStringXBytes, etc). Each value type needs it's own component. To
+     * reference a Datum a DatumRef is required. It will contain both an Entity
+     * reference and a type describing what Datum type is attached to the
+     * Entity.
+     */
+
+    /* DatumType describes what type of Datum is attached to an Entity. */
+    public enum DatumType : byte {
+        Int = 0, Float, Double, Bool, Byte, String32
+    }
+
+    /* A DatumRef holds a reference to a Datum. This consists of an DatumType
+     * that the Datum is and and Entity that holds the Datum. */
+    public partial struct DatumRef : IComponentData {
+        public Entity Entity;
+        public DatumType Type;
+    }
+
+    /* An UninitializedDatumRef is a DatumRef that has yet to be connected to a
+     * live Entity. This should be inserted at Bake time, and resolved at Load
+     * time. */
+    public partial struct UninitializedDatumRef : IComponentData {
+        public FixedString64Bytes ID;
+        public DatumType Type;
+    }
+
+    /* A DatumBackRef holds an Entity reference to the Entity that references
+     * the Datum. */
+    public partial struct DatumBackRef : IBufferElementData {
+        public Entity Value;
+    }
+
+    /* All Datums must implement Datum. This helps to find all Datums. */
+    public partial interface IDatum : IComponentData {}
+    
+    /*** The Datums definitions ***/
+    public partial struct DatumInt : IDatum { public int Value; public int PreviousValue; }
+    public partial struct DatumFloat : IDatum { public float Value; public float PreviousValue; }
+    public partial struct DatumDouble : IDatum { public double Value; public double PreviousValue; }
+    public partial struct DatumBool : IDatum { public bool Value; public bool PreviousValue; }
+    public partial struct DatumByte : IDatum { public byte Value; public byte PreviousValue;}
+    public partial struct DatumString32 : IDatum { public FixedString32Bytes Value; public FixedString32Bytes PreviousValue; }
+
+    /* The DatumRegistry holds a mapping from IDs -> Entity for all Datum
+     * types. */
+    public partial struct DatumRegistry : IComponentData {
+        public UnsafeHashMap<FixedString64Bytes, Entity> Map;
+        public UnsafeHashMap<Entity, DynamicBuffer<DatumBackRef>> BackMap;
+
+        [BurstCompile]
+        public Entity Lookup(in FixedString64Bytes ID, bool errorCheck=true) {
+            if (!Map.TryGetValue(ID, out Entity entity)) {
+                if (errorCheck) {
+                    throw new System.ArgumentException($"Datum not created for id={ID}");
+                }
+                entity = Entity.Null;
+            }
+            return entity;
+        }
+
+        [BurstCompile]
+        public Entity Lookup(ref EntityCommandBuffer ecb, in UninitializedDatumRef datum) {
+            var entity = Lookup(in datum.ID, false);
+            if (entity == Entity.Null) {
+                entity = ecb.CreateEntity();
+                switch (datum.Type) {
+                    case DatumType.Int: ecb.AddComponent<DatumInt>(entity); break;
+                    case DatumType.Float: ecb.AddComponent<DatumFloat>(entity); break;
+                    case DatumType.Double: ecb.AddComponent<DatumDouble>(entity); break;
+                    case DatumType.Bool: ecb.AddComponent<DatumBool>(entity); break;
+                    case DatumType.Byte: ecb.AddComponent<DatumByte>(entity); break;
+                    case DatumType.String32: ecb.AddComponent<DatumString32>(entity); break;
+                }
+                Map[datum.ID] = entity;
+            }
+            return entity;
+        }
+
+        [BurstCompile]
+        public void AddBackRef(ref EntityCommandBuffer ecb, in FixedString64Bytes ID, in Entity entity) {
+            var dentity = Lookup(in ID);
+            if (!BackMap.TryGetValue(dentity, out DynamicBuffer<DatumBackRef> buffer)) {
+                buffer = ecb.AddBuffer<DatumBackRef>(dentity);
+                BackMap[dentity] = buffer;
+            }
+            buffer.Add(new DatumBackRef { Value = entity });
+        }
     }
 }

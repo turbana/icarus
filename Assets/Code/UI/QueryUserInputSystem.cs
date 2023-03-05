@@ -11,29 +11,17 @@ namespace Icarus.UI {
     [BurstCompile]
     [UpdateInGroup(typeof(UserInputSystemGroup))]
     public partial class QueryUserInputSystem : SystemBase {
-        [ReadOnly]
-        private ComponentLookup<ControlValue> ControlValueLookup;
-        [ReadOnly]
-        private ComponentLookup<ControlSettings> ControlSettingsLookup;
-        private ComponentLookup<Interaction> InteractionLookup;
-        [ReadOnly]
-        private ComponentLookup<InteractionControl> InteractionControlLookup;
+        private ComponentLookup<DatumByte> DatumLookup;
         private Camera MainCamera;
 
         [BurstCompile]
         protected override void OnCreate() {
-            ControlValueLookup = GetComponentLookup<ControlValue>(true);
-            ControlSettingsLookup = GetComponentLookup<ControlSettings>(true);
-            InteractionLookup = GetComponentLookup<Interaction>(false);
-            InteractionControlLookup = GetComponentLookup<InteractionControl>(true);
+            DatumLookup = GetComponentLookup<DatumByte>(false);
             MainCamera = Camera.main;
         }
         
         protected override void OnUpdate() {
-            ControlValueLookup.Update(this);
-            ControlSettingsLookup.Update(this);
-            InteractionLookup.Update(this);
-            InteractionControlLookup.Update(this);
+            DatumLookup.Update(this);
             
             // read user input
             var inputs = Interaction.FromUserInput();
@@ -45,47 +33,31 @@ namespace Icarus.UI {
             float3 rstart = MainCamera.transform.position;
             float3 rend = rstart + (float3)(MainCamera.transform.forward * Constants.INTERACT_DISTANCE);
             // Debug.Log($"ray casting from {rstart} to {rend} mask={INTERACTION_LAYER_MASK}");
-            var CVL = ControlValueLookup;
-            var CSL = ControlSettingsLookup;
-            var IL = InteractionLookup;
-            var ICL = InteractionControlLookup;
+            var DL = DatumLookup;
             
-            Job
-                .WithReadOnly(CVL)
-                .WithReadOnly(CSL)
-                .WithReadOnly(ICL)
-                .WithCode(() => {
-                Entity entity;
-                Raycast(out entity, pworld, rstart, rend);
+            Job.WithCode(() => {
+                Raycast(out Entity entity, pworld, rstart, rend);
                 // did we hit a collider?
                 if (entity != Entity.Null) {
                     // Debug.Log("hit");
-                    // Debug.Log($"hit entity={EntityManager.GetName(entity)}");
-                    // update collider with inputs
-                    var collider = IL[entity];
-                    collider.Value = inputs.Value;
-                    IL[entity] = collider;
-                    // update crosshair
-                    var icontrol = ICL[entity];
-                    var control = icontrol.Control;
-                    var value = CVL[control].Value;
-                    var stops = CSL[control].Stops;
-                    if (icontrol.Type == InteractionControlType.Increase && (value + 1 < stops)) {
-                        next_crosshair[0] = CrosshairType.Increase;
-                    } else if (icontrol.Type == InteractionControlType.Decrease && (0 <= value - 1)) {
-                        next_crosshair[0] = CrosshairType.Decrease;
-                    } else if (icontrol.Type == InteractionControlType.Toggle
-                               || icontrol.Type == InteractionControlType.Press) {
-                        next_crosshair[0] = CrosshairType.Toggle;
-                    } else {
-                        next_crosshair[0] = CrosshairType.Normal;
+                    var control = SystemAPI.GetAspectRO<ControlAspect>(entity);
+                    var datum = DL[control.Datum];
+                    // find next value
+                    var next = control.NextValue(in datum, in inputs);
+                    // update datum
+                    if (next != datum.Value) {
+                        datum.PreviousValue = datum.Value;
+                        datum.Value = next;
+                        // Debug.Log($"setting datum to {datum.Value} (old {datum.PreviousValue})");
+                        DL[control.Datum] = datum;
                     }
+                    // set crosshair
+                    next_crosshair[0] = control.Crosshair(in datum);
                 } else {
                     // Debug.Log("no hit");
                     next_crosshair[0] = CrosshairType.Normal;
                 }
             }).Schedule();
-                
             // update crosshair
             this.Dependency.Complete();
             crosshair.Value = next_crosshair[0];
