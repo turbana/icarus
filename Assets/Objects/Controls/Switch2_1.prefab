@@ -28,7 +28,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1581431213177738085}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.025, z: -0.05}
+  m_LocalPosition: {x: 0, y: 0.03, z: -0.025}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -53,9 +53,9 @@ MonoBehaviour:
     y: 0
     z: 0
   m_PrimitiveSize:
-    x: 0.1
-    y: 0.05
-    z: 0.1
+    x: 0.05
+    y: 0.025
+    z: 0.05
   m_PrimitiveOrientation:
     Value:
       x: 0
@@ -63,15 +63,15 @@ MonoBehaviour:
       z: 0
     RotationOrder: 4
   m_Capsule:
-    Height: 0.1
-    Radius: 0.05
+    Height: 0.05
+    Radius: 0.025
     Axis: 2
   m_Cylinder:
-    Height: 0.05
-    Radius: 0.05
+    Height: 0.025
+    Radius: 0.025
     Axis: 1
   m_CylinderSideCount: 20
-  m_SphereRadius: 0.05
+  m_SphereRadius: 0.025
   m_MinimumSkinnedVertexWeight: 0.1
   m_ConvexHullGenerationParameters:
     m_SimplificationTolerance: 0.015
@@ -253,7 +253,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 993f060ef5f539d458ccc4bf0878f1ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Control: {fileID: 3874516001095614203}
   Type: 1
 --- !u!1 &2503564041678915929
 GameObject:
@@ -871,6 +870,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d51d4849839b964a960d995ef386b6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DatumID: 
   Stops: 2
   RotateAngle: 80
 --- !u!1 &9105983115559457097
@@ -901,7 +901,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9105983115559457097}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.025, z: 0.05}
+  m_LocalPosition: {x: 0, y: 0.03, z: 0.025}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -926,9 +926,9 @@ MonoBehaviour:
     y: 0
     z: 0
   m_PrimitiveSize:
-    x: 0.1
-    y: 0.05
-    z: 0.1
+    x: 0.05
+    y: 0.025
+    z: 0.05
   m_PrimitiveOrientation:
     Value:
       x: 0
@@ -936,15 +936,15 @@ MonoBehaviour:
       z: 0
     RotationOrder: 4
   m_Capsule:
-    Height: 0.1
-    Radius: 0.05
+    Height: 0.05
+    Radius: 0.025
     Axis: 2
   m_Cylinder:
-    Height: 0.05
-    Radius: 0.05
+    Height: 0.025
+    Radius: 0.025
     Axis: 1
   m_CylinderSideCount: 20
-  m_SphereRadius: 0.05
+  m_SphereRadius: 0.025
   m_MinimumSkinnedVertexWeight: 0.1
   m_ConvexHullGenerationParameters:
     m_SimplificationTolerance: 0.015
@@ -1126,5 +1126,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 993f060ef5f539d458ccc4bf0878f1ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Control: {fileID: 3874516001095614203}
   Type: 0
