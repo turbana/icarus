@@ -34,25 +34,29 @@ namespace Icarus.UI {
                 .ForEach((in ControlAspect control, in DatumRef dref) => {
                     var datum = DDL[dref.Entity];
                     LTL[control.Root] = control.GetLocalTransform(in datum);
-                    })
+                })
                 .Schedule();
 
-            // update controls
+            // update dynamic text
             Entities
                 .WithReadOnly(DDL)
                 .ForEach((ManagedTextComponent text, in DatumRef dref, in TransformAspect pos) => {
                     var datum = DDL[dref.Entity];
-                    // Debug.Log($"updating from datum: {datum.Value} ({text.Format})");
-                    if (text.GO is null) text.CreateGameObject();
-                    var tmp = text.TextMeshPro;
-                    var rt = text.RectTransform;
-                    // update text
-                    tmp.text = String.Format(text.Format, datum.Value);
-                    // update position / rotation / scale
-                    rt.position = pos.WorldPosition;
-                    rt.rotation = (Quaternion)pos.WorldRotation * Quaternion.Euler(0f, -90f, 0f);
-                    rt.localScale = new Vector3(pos.WorldScale, pos.WorldScale, pos.WorldScale);
-                    })
+                    text.UpdateText(datum.Value);
+                    text.UpdatePosition(in pos);
+                })
+                .WithoutBurst()
+                .Run();
+
+            // update static text
+            Entities
+                .WithNone<DatumRef>()
+                // XXX why can't we use a change filter here?
+                // .WithChangeFilter<ManagedTextComponent>()
+                .ForEach((ManagedTextComponent text, in TransformAspect pos) => {
+                    text.UpdateText(System.Double.MaxValue);
+                    text.UpdatePosition(in pos);
+                })
                 .WithoutBurst()
                 .Run();
         }

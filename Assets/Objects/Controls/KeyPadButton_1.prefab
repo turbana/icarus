@@ -253,7 +253,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 993f060ef5f539d458ccc4bf0878f1ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Control: {fileID: 2275427334971431257}
   Type: 3
 --- !u!1 &710983825660593363
 GameObject:
@@ -626,7 +625,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4221668755995749200}
-  - component: {fileID: 6133766053904937252}
+  - component: {fileID: 307717402810772020}
   m_Layer: 0
   m_Name: Text
   m_TagString: Untagged
@@ -649,7 +648,7 @@ Transform:
   m_Father: {fileID: 3069320600631338695}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 90}
---- !u!114 &6133766053904937252
+--- !u!114 &307717402810772020
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -658,11 +657,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 6676757712621825940}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c4078a25cf3c454691f29e6aefb8d8a, type: 3}
+  m_Script: {fileID: 11500000, guid: 459e602fc6427c24da6fa032857a0cbe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  key: '?'
-  dynamic: 0
+  datumKey: 
+  datumType: 0
+  format: '?'
   style: 4
   font: {fileID: 11400000, guid: dfff8dd707ad01f4f943d46be68a5b88, type: 2}
 --- !u!1 &7498760326331286717
@@ -1142,5 +1142,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2944707d918c9c478647d29cc51ac99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DatumID: 
   IsToggle: 0
   Movement: {x: 0, y: -0.007, z: 0}

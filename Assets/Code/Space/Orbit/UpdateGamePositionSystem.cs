@@ -7,7 +7,6 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
 
-using Icarus.Graphics;
 using Icarus.Mathematics;
 using Icarus.Misc;
 

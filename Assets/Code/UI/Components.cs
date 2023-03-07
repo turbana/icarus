@@ -165,7 +165,6 @@ namespace Icarus.UI {
         public GameObject GO;
         public TMP_FontAsset Font;
         public TextStyle Style;
-        // public FixedString32Bytes Format;
         public string Format;
 
         public TextMeshPro TextMeshPro => this.GO.GetComponent<TextMeshPro>();
@@ -190,24 +189,44 @@ namespace Icarus.UI {
 
         public void CreateGameObject() {
             if (this.GO is null) {
-                this.GO = new GameObject($"DisplayText", typeof(RectTransform), typeof(MeshRenderer), typeof(TextMeshPro));
-                var tmp = this.TextMeshPro;
-                var rt = this.RectTransform;
-                var rend = this.GO.GetComponent<MeshRenderer>();
-                var config = TextStyleConfig.CONFIG[(int)Style];
-                // set common font settings
-                rend.shadowCastingMode = ShadowCastingMode.Off;
-                tmp.enableAutoSizing = false;
-                tmp.textWrappingMode = TextWrappingModes.Normal;
-                tmp.overflowMode = TextOverflowModes.Overflow;
-                // set custom font settings
-                rt.sizeDelta = config.Bounds;
-                tmp.color = config.Color;
-                tmp.fontSize = config.Size;
-                tmp.fontStyle = config.Style;
-                tmp.horizontalAlignment = config.HAlign;
-                tmp.verticalAlignment = config.VAlign;
+                this.GO = new GameObject("[Text]", typeof(RectTransform), typeof(MeshRenderer), typeof(TextMeshPro));
             }
+            Init();
+        }
+
+        public void Init() {
+            var tmp = this.TextMeshPro;
+            var rt = this.RectTransform;
+            var rend = this.GO.GetComponent<MeshRenderer>();
+            var config = TextStyleConfig.CONFIG[(int)Style];
+            // set common font settings
+            rend.shadowCastingMode = ShadowCastingMode.Off;
+            tmp.enableAutoSizing = false;
+            tmp.textWrappingMode = TextWrappingModes.Normal;
+            tmp.overflowMode = TextOverflowModes.Overflow;
+            // set custom font settings
+            rt.sizeDelta = config.Bounds;
+            tmp.color = config.Color;
+            tmp.fontSize = config.Size;
+            tmp.fontStyle = config.Style;
+            tmp.horizontalAlignment = config.HAlign;
+            tmp.verticalAlignment = config.VAlign;
+        }
+
+        public void UpdateText(double value) {
+            if (this.GO is null) this.CreateGameObject();
+            this.TextMeshPro.text = String.Format(this.Format, value);
+        }
+
+        public void UpdatePosition(in TransformAspect pos) =>
+            UpdatePosition(pos.WorldPosition, pos.WorldRotation, new float3(pos.WorldScale));
+        
+        public void UpdatePosition(Vector3 pos, Quaternion rot, Vector3 scale) {
+            if (this.GO is null) this.CreateGameObject();
+            var rt = this.RectTransform;
+            rt.position = pos;
+            rt.rotation = rot * Quaternion.Euler(0f, -90f, 0f);
+            rt.localScale = scale;
         }
     }
 }
