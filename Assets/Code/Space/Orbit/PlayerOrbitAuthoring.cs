@@ -61,8 +61,30 @@ namespace Icarus.Orbit {
                 AddComponent<AddOrbitalParent>(new AddOrbitalParent {
                         Value = parent.Name
                     });
+                var keys = new string[] {
+                    "Player.Orbit.MeanMotion",
+                    "Player.Orbit.MeanAnomaly",
+                    "Player.Orbit.EccentricAnomaly",
+                    "Player.Orbit.Beta",
+                    "Player.Orbit.ElapsedTime",
+                    "Player.Orbit.Theta",
+                    "Player.Orbit.Altitude",
+                    "Player.Orbit.Period",
+                    "Player.Orbit.Eccentricity",
+                    "Player.Orbit.SemiMajorAxis",
+                    "Player.Orbit.Inclination",
+                    "Player.Orbit.AscendingNode",
+                    "Player.Orbit.Periapsis",
+                    "Player.Orbit.Apoapsis",
+                };
                 var buffer = AddBuffer<UninitializedDatumRefBuffer>();
-                buffer.Add(new UninitializedDatumRefBuffer { ID="Player.Orbit.ElapsedTime", Type=DatumType.Double });
+                buffer.Length = keys.Length;
+                for (int i=0; i<keys.Length; i++) {
+                    buffer[i] = new UninitializedDatumRefBuffer {
+                        ID=keys[i],
+                        Type=DatumType.Double
+                    };
+                }
             }
         }
     }

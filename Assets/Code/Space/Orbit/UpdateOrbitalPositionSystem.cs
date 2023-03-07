@@ -107,34 +107,36 @@ namespace Icarus.Orbit {
 
                 if (entity == Player) {
                     var buffer = DatumRefLookup[entity];
-                    var datum = DatumDoubleLookup[buffer[0].Entity];
-                    datum.Value = elapsed;
-                    DatumDoubleLookup[buffer[0].Entity] = datum;
-                    // DatumRegistry.SetDouble("Player.Orbit.ElapsedTime", elapsed);
-                    // UnityEngine.Debug.Log($"a={DatumRegistry.DoubleMap.Count()}");
-
+                    // NOTE: buffer indexes must match order defined in
+                    // PlayerOrbitAuthoring.
                     // orbital position
-                    // Text(index, "Player.Orbit.MeanMotion", n, TextUpdateFormat.Number1_10);
-                    // Text(index, "Player.Orbit.MeanAnomaly", M, TextUpdateFormat.Number1_10);
-                    // Text(index, "Player.Orbit.EccentricAnomaly", E, TextUpdateFormat.Number1_10);
-                    // Text(index, "Player.Orbit.Beta", beta, TextUpdateFormat.Number1_10);
-                    // Text(index, "Player.Orbit.ElapsedTime", elapsed, TextUpdateFormat.Number9_2);
-                    // Text(index, "Player.Orbit.Theta", theta, TextUpdateFormat.Number1_10);
-                    // Text(index, "Player.Orbit.Altitude", altitude, TextUpdateFormat.Number12_0);
-                    // // orbital parameters
-                    // Text(index, "Player.Orbit.Period", parms.Period, TextUpdateFormat.Number9_2);
-                    // Text(index, "Player.Orbit.Eccentricity", parms.Eccentricity, TextUpdateFormat.Number6_5);
-                    // Text(index, "Player.Orbit.SemiMajorAxis", parms.SemiMajorAxis, TextUpdateFormat.Number9_2);
-                    // Text(index, "Player.Orbit.Inclination", parms.Inclination, TextUpdateFormat.Number6_5);
-                    // Text(index, "Player.Orbit.AscendingNode", parms.AscendingNode, TextUpdateFormat.Number6_5);
+                    SetDatum(buffer[0], n);
+                    SetDatum(buffer[1], M);
+                    SetDatum(buffer[2], E);
+                    SetDatum(buffer[3], beta);
+                    SetDatum(buffer[4], elapsed);
+                    SetDatum(buffer[5], theta);
+                    SetDatum(buffer[6], altitude);
+                    // orbit parameters
+                    SetDatum(buffer[7], parms.Period);
+                    SetDatum(buffer[8], parms.Eccentricity);
+                    SetDatum(buffer[9], parms.SemiMajorAxis);
+                    SetDatum(buffer[10], parms.Inclination);
+                    SetDatum(buffer[11], parms.AscendingNode);
                     // timings
                     // TODO rising/falling nodes
-                    // double per = parms.Period - elapsed;
-                    // double apo = parms.Period/2 - elapsed;
-                    // if (apo < 0) apo += parms.Period;
-                    // Text(index, "Player.Orbit.Time.Periapsis", per, TextUpdateFormat.Number9_2);
-                    // Text(index, "Player.Orbit.Time.Apoapsis", apo, TextUpdateFormat.Number9_2);
+                    double per = parms.Period - elapsed;
+                    double apo = parms.Period/2 - elapsed;
+                    if (apo < 0) apo += parms.Period;
+                    SetDatum(buffer[12], per);
+                    SetDatum(buffer[13], apo);
                 }
+            }
+
+            private void SetDatum(DatumRefBuffer dref, double value) {
+                var datum = DatumDoubleLookup[dref.Entity];
+                datum.Value = value;
+                DatumDoubleLookup[dref.Entity] = datum;
             }
         }
         
