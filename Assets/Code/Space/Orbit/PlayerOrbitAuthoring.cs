@@ -6,6 +6,7 @@ using Unity.Transforms;
 
 using Icarus.Mathematics;
 using Icarus.Loading;
+using Icarus.UI;
 
 namespace Icarus.Orbit {
     [AddComponentMenu("Icarus/Loading/Player Orbit Component")]
@@ -60,6 +61,8 @@ namespace Icarus.Orbit {
                 AddComponent<AddOrbitalParent>(new AddOrbitalParent {
                         Value = parent.Name
                     });
+                var buffer = AddBuffer<UninitializedDatumRefBuffer>();
+                buffer.Add(new UninitializedDatumRefBuffer { ID="Player.Orbit.ElapsedTime", Type=DatumType.Double });
             }
         }
     }

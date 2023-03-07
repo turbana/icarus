@@ -45,7 +45,7 @@ namespace Icarus.UI {
                 AddComponent<ControlSettings>(settings);
                 AddComponent<UninitializedDatumRef>(new UninitializedDatumRef {
                         ID = control.DatumID,
-                        Type = DatumType.Byte,
+                        Type = DatumType.Double,
                     });
                 if (control.DatumID == "") {
                     Debug.LogWarning($"found an empty DatumID on game object: {control.gameObject}", control.gameObject);

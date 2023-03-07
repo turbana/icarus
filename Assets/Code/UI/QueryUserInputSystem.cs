@@ -11,12 +11,12 @@ namespace Icarus.UI {
     [BurstCompile]
     [UpdateInGroup(typeof(UserInputSystemGroup))]
     public partial class QueryUserInputSystem : SystemBase {
-        private ComponentLookup<DatumByte> DatumLookup;
+        private ComponentLookup<DatumDouble> DatumLookup;
         private Camera MainCamera;
 
         [BurstCompile]
         protected override void OnCreate() {
-            DatumLookup = GetComponentLookup<DatumByte>(false);
+            DatumLookup = GetComponentLookup<DatumDouble>(false);
             MainCamera = Camera.main;
         }
         
@@ -29,7 +29,6 @@ namespace Icarus.UI {
             
             var pworld = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
             var comp = SystemAPI.GetSingletonRW<Crosshair>();
-            var foo = comp.ValueRW;
             float3 rstart = MainCamera.transform.position;
             float3 rend = rstart + (float3)(MainCamera.transform.forward * Constants.INTERACT_DISTANCE);
             // Debug.Log($"ray casting from {rstart} to {rend} mask={INTERACTION_LAYER_MASK}");

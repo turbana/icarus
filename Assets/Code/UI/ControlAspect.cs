@@ -12,8 +12,10 @@ namespace Icarus.UI {
         public int StopCount => Settings.ValueRO.Stops;
         public Entity Root => Settings.ValueRO.Root;
 
-        public byte NextValue(in DatumByte datum, in Interaction inputs) {
+        public double NextValue(in DatumDouble datum, in Interaction inputs) {
             int direction = 0;
+            int value = (int)datum.Value;
+            int pvalue = (int)datum.PreviousValue;
 
             // check desired interactions
             if (inputs.ScrollWheelUp || (inputs.LeftMouseDown && ControlType == InteractionControlType.Increase)) {
@@ -23,11 +25,11 @@ namespace Icarus.UI {
                 direction = -1;
                 // UnityEngine.Debug.Log("direction decrease");
             } else if (inputs.LeftMouseDown && ControlType == InteractionControlType.Toggle) {
-                direction = datum.PreviousValue - datum.Value;
+                direction = pvalue - value;
                 if (direction == 0) {
-                    if (datum.Value == 0) {
+                    if (value == 0) {
                         direction = 1;
-                    } else if (0 < datum.Value) {
+                    } else if (0 < value) {
                         direction = -1;
                     } else {
                         UnityEngine.Debug.LogError($"datum value cannot be negative: {datum.Value}");
@@ -40,16 +42,16 @@ namespace Icarus.UI {
             }
 
             if (direction != 0) {
-                var next = datum.Value + direction;
+                var next = value + direction;
                 if (0 <= next && next < StopCount) {
-                    return (byte)next;
+                    return next;
                 }
             }
 
             return datum.Value;
         }
 
-        public CrosshairType Crosshair(in DatumByte datum) {
+        public CrosshairType Crosshair(in DatumDouble datum) {
             switch (ControlType) {
                 case InteractionControlType.Increase:
                     return CrosshairType.Increase;
@@ -62,9 +64,9 @@ namespace Icarus.UI {
             return CrosshairType.Normal;
         }
 
-        public LocalTransform GetLocalTransform(in DatumByte datum) {
-            var translation = Settings.ValueRO.Movement * datum.Value;
-            var rotation = quaternion.RotateX(Settings.ValueRO.Rotation * datum.Value);
+        public LocalTransform GetLocalTransform(in DatumDouble datum) {
+            var translation = Settings.ValueRO.Movement * (float)datum.Value;
+            var rotation = quaternion.RotateX(Settings.ValueRO.Rotation * (float)datum.Value);
             var transform = Settings.ValueRO.InitialTransform;
             transform.Position = transform.Position + translation;
             transform.Rotation = math.mul(transform.Rotation, rotation);

@@ -127,12 +127,14 @@ namespace Icarus.Graphics {
     [UpdateAfter(typeof(TextUpdateSystem))]
     public partial class UpdateTextObjectsSystem : SystemBase {
         protected override void OnUpdate() {
+            this.Enabled = false;
+            return;
             var buffer = SystemAPI.GetSingletonBuffer<ListenerUpdate>();
             Entities
                 // BUG in entities 1.0-pre44: this should be uncommented
                 // .WithChangeFilter<DisplayText>()
                 .ForEach((Entity entity, ManagedTextComponent comp, in DisplayText text, in TransformAspect pos) => {
-                    // UnityEngine.Debug.Log($"update [{text.Key}]");
+                    UnityEngine.Debug.Log($"update [{text.Key}]");
                     TextMeshPro tmp;
                     RectTransform rt;
                     if (comp.GO is null) {

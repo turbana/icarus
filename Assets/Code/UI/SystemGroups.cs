@@ -11,4 +11,10 @@ namespace Icarus.UI {
      * are performed */
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     public partial class IcarusInteractionSystemGroup : ComponentSystemGroup {}
+
+    /* IcarusPresentationSystemGroup is where we update any objects or meshes
+     * to match what the Simulation systems updated. */
+    [UpdateInGroup(typeof(PresentationSystemGroup))]
+    [UpdateBefore(typeof(Unity.Rendering.EntitiesGraphicsSystem))]
+    public partial class IcarusPresentationSystemGroup : ComponentSystemGroup {}
 }

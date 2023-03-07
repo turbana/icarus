@@ -1,10 +1,17 @@
+using System;
+
 using UnityEngine;
+using UnityEngine.Rendering;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using TMPro;
+
+// [assembly:RegisterGenericComponentType(typeof(Icarus.UI.DatumByte))]
+// [assembly:RegisterGenericComponentType(typeof(Icarus.UI.Datum<byte>))]
 
 namespace Icarus.UI {
     /* InteractionType is an index into the bit field Interaction.Mask */
@@ -107,12 +114,19 @@ namespace Icarus.UI {
 
     /* DatumType describes what type of Datum is attached to an Entity. */
     public enum DatumType : byte {
-        Int = 0, Float, Double, Bool, Byte, String32
+        Double = 0, String64
     }
 
     /* A DatumRef holds a reference to a Datum. This consists of an DatumType
      * that the Datum is and and Entity that holds the Datum. */
     public partial struct DatumRef : IComponentData {
+        public Entity Entity;
+        public DatumType Type;
+    }
+
+    /* A DatumRefBuffer can be used as a DynamicList<> for a list of Datum
+     * references.*/
+    public partial struct DatumRefBuffer : IBufferElementData {
         public Entity Entity;
         public DatumType Type;
     }
@@ -125,66 +139,75 @@ namespace Icarus.UI {
         public DatumType Type;
     }
 
-    /* A DatumBackRef holds an Entity reference to the Entity that references
-     * the Datum. */
-    public partial struct DatumBackRef : IBufferElementData {
-        public Entity Value;
+    /* An UninitializedDatumRefBuffer can be used as a DynamicList<> for a list
+     * of uninitialized Datum references. */
+    public partial struct UninitializedDatumRefBuffer : IBufferElementData {
+        public FixedString64Bytes ID;
+        public DatumType Type;
+    }
+    
+    // /*** The Datums definitions ***/
+    public partial struct DatumDouble : IComponentData {
+        public FixedString64Bytes ID;
+        public double Value;
+        public double PreviousValue;
+    }
+    
+    public partial struct DatumString64 : IComponentData {
+        public FixedString64Bytes ID;
+        public FixedString64Bytes Value;
+        public FixedString64Bytes PreviousValue;
     }
 
-    /* All Datums must implement Datum. This helps to find all Datums. */
-    public partial interface IDatum : IComponentData {}
-    
-    /*** The Datums definitions ***/
-    public partial struct DatumInt : IDatum { public int Value; public int PreviousValue; }
-    public partial struct DatumFloat : IDatum { public float Value; public float PreviousValue; }
-    public partial struct DatumDouble : IDatum { public double Value; public double PreviousValue; }
-    public partial struct DatumBool : IDatum { public bool Value; public bool PreviousValue; }
-    public partial struct DatumByte : IDatum { public byte Value; public byte PreviousValue;}
-    public partial struct DatumString32 : IDatum { public FixedString32Bytes Value; public FixedString32Bytes PreviousValue; }
+    /* A ManagedTextComponent holds a reference to a GameObject that contains a
+     * TextMeshPro component. */
+    public class ManagedTextComponent : IComponentData, IDisposable, ICloneable {
+        public GameObject GO;
+        public TMP_FontAsset Font;
+        public TextStyle Style;
+        // public FixedString32Bytes Format;
+        public string Format;
 
-    /* The DatumRegistry holds a mapping from IDs -> Entity for all Datum
-     * types. */
-    public partial struct DatumRegistry : IComponentData {
-        public UnsafeHashMap<FixedString64Bytes, Entity> Map;
-        public UnsafeHashMap<Entity, DynamicBuffer<DatumBackRef>> BackMap;
+        public TextMeshPro TextMeshPro => this.GO.GetComponent<TextMeshPro>();
+        public RectTransform RectTransform => this.GO.GetComponent<RectTransform>();
 
-        [BurstCompile]
-        public Entity Lookup(in FixedString64Bytes ID, bool errorCheck=true) {
-            if (!Map.TryGetValue(ID, out Entity entity)) {
-                if (errorCheck) {
-                    throw new System.ArgumentException($"Datum not created for id={ID}");
-                }
-                entity = Entity.Null;
-            }
-            return entity;
+        public void Dispose() {
+            #if UNITY_EDITOR
+            UnityEngine.Object.DestroyImmediate(GO);
+            #else
+            UnityEngine.Object.Destroy(GO);
+            #endif
         }
 
-        [BurstCompile]
-        public Entity Lookup(ref EntityCommandBuffer ecb, in UninitializedDatumRef datum) {
-            var entity = Lookup(in datum.ID, false);
-            if (entity == Entity.Null) {
-                entity = ecb.CreateEntity();
-                switch (datum.Type) {
-                    case DatumType.Int: ecb.AddComponent<DatumInt>(entity); break;
-                    case DatumType.Float: ecb.AddComponent<DatumFloat>(entity); break;
-                    case DatumType.Double: ecb.AddComponent<DatumDouble>(entity); break;
-                    case DatumType.Bool: ecb.AddComponent<DatumBool>(entity); break;
-                    case DatumType.Byte: ecb.AddComponent<DatumByte>(entity); break;
-                    case DatumType.String32: ecb.AddComponent<DatumString32>(entity); break;
-                }
-                Map[datum.ID] = entity;
-            }
-            return entity;
+        public object Clone() {
+            return new ManagedTextComponent {
+                GO = (this.GO is null) ? null : UnityEngine.Object.Instantiate(this.GO),
+                Font = this.Font,
+                Style = this.Style,
+                Format = this.Format,
+            };
         }
 
-        [BurstCompile]
-        public void AddBackRef(ref EntityCommandBuffer ecb, in FixedString64Bytes ID, in Entity entity) {
-            var dentity = Lookup(in ID);
-            if (!BackMap.TryGetValue(dentity, out DynamicBuffer<DatumBackRef> buffer)) {
-                buffer = ecb.AddBuffer<DatumBackRef>(dentity);
-                BackMap[dentity] = buffer;
+        public void CreateGameObject() {
+            if (this.GO is null) {
+                this.GO = new GameObject($"DisplayText", typeof(RectTransform), typeof(MeshRenderer), typeof(TextMeshPro));
+                var tmp = this.TextMeshPro;
+                var rt = this.RectTransform;
+                var rend = this.GO.GetComponent<MeshRenderer>();
+                var config = TextStyleConfig.CONFIG[(int)Style];
+                // set common font settings
+                rend.shadowCastingMode = ShadowCastingMode.Off;
+                tmp.enableAutoSizing = false;
+                tmp.textWrappingMode = TextWrappingModes.Normal;
+                tmp.overflowMode = TextOverflowModes.Overflow;
+                // set custom font settings
+                rt.sizeDelta = config.Bounds;
+                tmp.color = config.Color;
+                tmp.fontSize = config.Size;
+                tmp.fontStyle = config.Style;
+                tmp.horizontalAlignment = config.HAlign;
+                tmp.verticalAlignment = config.VAlign;
             }
-            buffer.Add(new DatumBackRef { Value = entity });
         }
     }
 }

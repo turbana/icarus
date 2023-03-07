@@ -9,6 +9,7 @@ using Unity.Transforms;
 
 using Icarus.Graphics;
 using Icarus.Mathematics;
+using Icarus.UI;
 
 namespace Icarus.Orbit {
     [RequireMatchingQueriesForUpdate]
@@ -19,8 +20,9 @@ namespace Icarus.Orbit {
             float dt = SystemAPI.Time.DeltaTime * opts.TimeScale;
             var OrbitalParentTypeHandle = GetSharedComponentTypeHandle<OrbitalParent>();
             var RotationalParametersLookup = GetComponentLookup<RotationalParameters>(true);
+            var DatumDoubleLookup = GetComponentLookup<DatumDouble>(false);
+            var DatumRefLookup = GetBufferLookup<DatumRefBuffer>(true);
             var player = SystemAPI.GetSingletonEntity<PlayerOrbitTag>();
-            var buffer = SystemAPI.GetSingletonEntity<TextUpdate>();
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
 
             new UpdateOrbitalPositionJob {
@@ -29,7 +31,8 @@ namespace Icarus.Orbit {
                 DeltaTime = dt,
                 OrbitalParentTypeHandle = OrbitalParentTypeHandle,
                 RotationalParametersLookup = RotationalParametersLookup,
-                TextUpdateEntity = buffer
+                DatumDoubleLookup = DatumDoubleLookup,
+                DatumRefLookup = DatumRefLookup,
             }.ScheduleParallel();
 
             this.Dependency.Complete();
@@ -48,8 +51,10 @@ namespace Icarus.Orbit {
             public SharedComponentTypeHandle<OrbitalParent> OrbitalParentTypeHandle;
             [ReadOnly]
             public ComponentLookup<RotationalParameters> RotationalParametersLookup;
+            [NativeDisableParallelForRestriction]
+            public ComponentLookup<DatumDouble> DatumDoubleLookup;
             [ReadOnly]
-            public Entity TextUpdateEntity;
+            public BufferLookup<DatumRefBuffer> DatumRefLookup;
 
             private dquaternion ParentTilt;
 
@@ -63,7 +68,7 @@ namespace Icarus.Orbit {
             [BurstCompile]
             public void OnChunkEnd(in ArchetypeChunk chunk, int index, bool useMask, in v128 mask, bool wasExecuted) {}
 
-            // [BurstCompile]
+            [BurstCompile]
             public void Execute([ChunkIndexInQuery] int index, Entity entity,
                                 in OrbitalPosition pos, in OrbitalParentPosition ppos,
                                 in OrbitalParameters parms)
@@ -101,32 +106,35 @@ namespace Icarus.Orbit {
                     });
 
                 if (entity == Player) {
+                    var buffer = DatumRefLookup[entity];
+                    var datum = DatumDoubleLookup[buffer[0].Entity];
+                    datum.Value = elapsed;
+                    DatumDoubleLookup[buffer[0].Entity] = datum;
+                    // DatumRegistry.SetDouble("Player.Orbit.ElapsedTime", elapsed);
+                    // UnityEngine.Debug.Log($"a={DatumRegistry.DoubleMap.Count()}");
+
                     // orbital position
-                    Text(index, "Player.Orbit.MeanMotion", n, TextUpdateFormat.Number1_10);
-                    Text(index, "Player.Orbit.MeanAnomaly", M, TextUpdateFormat.Number1_10);
-                    Text(index, "Player.Orbit.EccentricAnomaly", E, TextUpdateFormat.Number1_10);
-                    Text(index, "Player.Orbit.Beta", beta, TextUpdateFormat.Number1_10);
-                    Text(index, "Player.Orbit.ElapsedTime", elapsed, TextUpdateFormat.Number9_2);
-                    Text(index, "Player.Orbit.Theta", theta, TextUpdateFormat.Number1_10);
-                    Text(index, "Player.Orbit.Altitude", altitude, TextUpdateFormat.Number12_0);
-                    // orbital parameters
-                    Text(index, "Player.Orbit.Period", parms.Period, TextUpdateFormat.Number9_2);
-                    Text(index, "Player.Orbit.Eccentricity", parms.Eccentricity, TextUpdateFormat.Number6_5);
-                    Text(index, "Player.Orbit.SemiMajorAxis", parms.SemiMajorAxis, TextUpdateFormat.Number9_2);
-                    Text(index, "Player.Orbit.Inclination", parms.Inclination, TextUpdateFormat.Number6_5);
-                    Text(index, "Player.Orbit.AscendingNode", parms.AscendingNode, TextUpdateFormat.Number6_5);
+                    // Text(index, "Player.Orbit.MeanMotion", n, TextUpdateFormat.Number1_10);
+                    // Text(index, "Player.Orbit.MeanAnomaly", M, TextUpdateFormat.Number1_10);
+                    // Text(index, "Player.Orbit.EccentricAnomaly", E, TextUpdateFormat.Number1_10);
+                    // Text(index, "Player.Orbit.Beta", beta, TextUpdateFormat.Number1_10);
+                    // Text(index, "Player.Orbit.ElapsedTime", elapsed, TextUpdateFormat.Number9_2);
+                    // Text(index, "Player.Orbit.Theta", theta, TextUpdateFormat.Number1_10);
+                    // Text(index, "Player.Orbit.Altitude", altitude, TextUpdateFormat.Number12_0);
+                    // // orbital parameters
+                    // Text(index, "Player.Orbit.Period", parms.Period, TextUpdateFormat.Number9_2);
+                    // Text(index, "Player.Orbit.Eccentricity", parms.Eccentricity, TextUpdateFormat.Number6_5);
+                    // Text(index, "Player.Orbit.SemiMajorAxis", parms.SemiMajorAxis, TextUpdateFormat.Number9_2);
+                    // Text(index, "Player.Orbit.Inclination", parms.Inclination, TextUpdateFormat.Number6_5);
+                    // Text(index, "Player.Orbit.AscendingNode", parms.AscendingNode, TextUpdateFormat.Number6_5);
                     // timings
                     // TODO rising/falling nodes
-                    double per = parms.Period - elapsed;
-                    double apo = parms.Period/2 - elapsed;
-                    if (apo < 0) apo += parms.Period;
-                    Text(index, "Player.Orbit.Time.Periapsis", per, TextUpdateFormat.Number9_2);
-                    Text(index, "Player.Orbit.Time.Apoapsis", apo, TextUpdateFormat.Number9_2);
+                    // double per = parms.Period - elapsed;
+                    // double apo = parms.Period/2 - elapsed;
+                    // if (apo < 0) apo += parms.Period;
+                    // Text(index, "Player.Orbit.Time.Periapsis", per, TextUpdateFormat.Number9_2);
+                    // Text(index, "Player.Orbit.Time.Apoapsis", apo, TextUpdateFormat.Number9_2);
                 }
-            }
-
-            private void Text(int index, FixedString64Bytes key, double value, TextUpdateFormat fmt) {
-                ecb.AppendToBuffer<TextUpdate>(index, TextUpdateEntity, new TextUpdate(key, value, fmt));
             }
         }
         
