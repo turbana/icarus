@@ -4,6 +4,7 @@ using Unity.Entities;
 namespace Icarus.Controls {
     public enum ControlSystemType {
         BridgeJumpTargetKeypad,
+        BridgeJumpTargetLoad,
     }
     
     public class ControlSystemAuthoring : MonoBehaviour {
@@ -14,6 +15,8 @@ namespace Icarus.Controls {
                 switch (auth.ControlSystem) {
                     case ControlSystemType.BridgeJumpTargetKeypad:
                         AddComponent<BridgeJumpTargetKeypadTag>(); break;
+                    case ControlSystemType.BridgeJumpTargetLoad:
+                        AddComponent<BridgeJumpTargetLoadTag>(); break;
                 }
             }
         }
