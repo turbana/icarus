@@ -151,6 +151,7 @@ namespace Icarus.UI {
      * *Collection from the *Collector. */
     public partial struct DatumRefBufferCollector : IComponentData {
         public UnsafeList<Entity> Children;
+        public UnsafeList<UninitializedDatumRefBuffer> ExtraBuffers;
     }
 
     /* A DatumRefBufferCollection holds ID/index information on the sibling

@@ -5,15 +5,34 @@ using Unity.Entities;
 
 namespace Icarus.UI {
     public class DatumRefBufferCollectionAuthoring : MonoBehaviour {
+        public string[] ExtraDatums;
+        public DatumType[] ExtraDatumTypes;
+        
         public class DatumRefBufferCollectionAuthoringBaker
             : Baker<DatumRefBufferCollectionAuthoring> {
             public override void Bake(DatumRefBufferCollectionAuthoring auth) {
+                var dcount = (auth.ExtraDatums is null) ? -1 : auth.ExtraDatums.Length;
+                var tcount = (auth.ExtraDatumTypes is null) ? -1 : auth.ExtraDatumTypes.Length;
+                if (dcount != tcount) {
+                    Debug.LogError($"The count of ExtraDatums must match ExtraDatumTypes");
+                    return;
+                }
+                var buffers = new UnsafeList<UninitializedDatumRefBuffer>
+                    (dcount, Allocator.Persistent);
+                buffers.Length = dcount;
+                for (int i=0; i<dcount; i++) {
+                    buffers[i] = new UninitializedDatumRefBuffer {
+                        ID = auth.ExtraDatums[i],
+                        Type = auth.ExtraDatumTypes[i]
+                    };
+                }
                 // Debug.Log($"finding children under {auth.gameObject}");
                 var children = new UnsafeList<Entity>(10, Allocator.Persistent);
                 GetChildren(auth.gameObject, ref children);
                 // Debug.Log($"found {children.Length} children");
                 AddComponent<DatumRefBufferCollector>(new DatumRefBufferCollector {
                         Children = children,
+                        ExtraBuffers = buffers,
                     });
             }
 
@@ -51,6 +70,9 @@ namespace Icarus.UI {
 
             Entities
                 .ForEach((Entity entity, ref DatumRefBufferCollector collector) => {
+                    foreach (var  buffer in collector.ExtraBuffers) {
+                        refs.Add(buffer);
+                    }
                     foreach (var child in collector.Children) {
                         if (DRL.HasComponent(child)) {
                             var datum = DRL[child];
