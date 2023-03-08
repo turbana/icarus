@@ -179,6 +179,25 @@ namespace Icarus.UI {
         public FixedString64Bytes PreviousValue;
         
         public bool Dirty => Value != PreviousValue;
+
+        public double DoubleValue => (double)FloatValue;
+        public float FloatValue {
+            get {
+                int offset = 0;
+                float result = 0f;
+                // find first non-space character
+                for (; offset<Value.Length; offset++) {
+                    if (Value[offset] != ' ') break;
+                }
+                // assume empty string is 0
+                if (offset == Value.Length) return 0f;
+                var error = Value.Parse(ref offset, ref result);
+                if (error != ParseError.None) {
+                    throw new System.Exception($"could not parse string into float: {Value}");
+                }
+                return result;
+            }
+        }
     }
 
     /* A ManagedTextComponent holds a reference to a GameObject that contains a
