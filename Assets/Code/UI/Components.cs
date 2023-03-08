@@ -158,20 +158,27 @@ namespace Icarus.UI {
      * DynamicBuffer<DatumRefBuffer> component. This can be used to lookup
      * specific DatumRefBuffer by it's ID rather than index. */
     public partial struct DatumRefBufferCollection : IComponentData {
-        public NativeHashMap<FixedString64Bytes, int> IndexMap;
+        public UnsafeHashMap<FixedString64Bytes, int> IndexMap;
+
+        public int this[FixedString64Bytes ID] =>
+            IndexMap[ID];
     }
     
-    // /*** The Datums definitions ***/
+    /*** The Datums definitions ***/
     public partial struct DatumDouble : IComponentData {
         public FixedString64Bytes ID;
         public double Value;
         public double PreviousValue;
+
+        public bool Dirty => Value != PreviousValue;
     }
     
     public partial struct DatumString64 : IComponentData {
         public FixedString64Bytes ID;
         public FixedString64Bytes Value;
         public FixedString64Bytes PreviousValue;
+        
+        public bool Dirty => Value != PreviousValue;
     }
 
     /* A ManagedTextComponent holds a reference to a GameObject that contains a
@@ -235,7 +242,7 @@ namespace Icarus.UI {
         
         public void UpdateText(FixedString64Bytes value) {
             if (this.GO is null) this.CreateGameObject();
-            this.TextMeshPro.text = value.ToString();
+            this.TextMeshPro.text = String.Format(this.Format, value);
         }
 
         public void UpdatePosition(in TransformAspect pos) =>

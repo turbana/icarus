@@ -5,6 +5,7 @@ using Unity.Entities;
 
 namespace Icarus.UI {
     public class DatumRefBufferCollectionAuthoring : MonoBehaviour {
+        public string SystemTag;
         public string[] ExtraDatums;
         public DatumType[] ExtraDatumTypes;
         
@@ -91,7 +92,7 @@ namespace Icarus.UI {
                     ecb.RemoveComponent<DatumRefBufferCollector>(entity);
                     if (refs.Length > 0) {
                         // add components
-                        var map = new NativeHashMap<FixedString64Bytes, int>(refs.Length, Allocator.Persistent);
+                        var map = new UnsafeHashMap<FixedString64Bytes, int>(refs.Length, Allocator.Persistent);
                         var buffer = ecb.AddBuffer<UninitializedDatumRefBuffer>(entity);
                         for (int i=0; i<refs.Length; i++) {
                             var datum = refs[i];
