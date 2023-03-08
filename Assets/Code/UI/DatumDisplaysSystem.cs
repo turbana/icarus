@@ -14,19 +14,23 @@ namespace Icarus.UI {
     public partial class DatumDisplaysSystem : SystemBase {
         public ComponentLookup<LocalTransform> LocalTransformLookup;
         public ComponentLookup<DatumDouble> DatumDoubleLookup;
+        public ComponentLookup<DatumString64> DatumStringLookup;
 
         [BurstCompile]
         protected override void OnCreate() {
             LocalTransformLookup = GetComponentLookup<LocalTransform>(false);
             DatumDoubleLookup = GetComponentLookup<DatumDouble>(true);
+            DatumStringLookup = GetComponentLookup<DatumString64>(true);
         }
         
         [BurstCompile]
         protected override void OnUpdate() {
             LocalTransformLookup.Update(this);
             DatumDoubleLookup.Update(this);
+            DatumStringLookup.Update(this);
             var LTL = LocalTransformLookup;
             var DDL = DatumDoubleLookup;
+            var DSL = DatumStringLookup;
 
             // update controls
             Entities
@@ -41,9 +45,14 @@ namespace Icarus.UI {
             Entities
                 .WithReadOnly(DDL)
                 .ForEach((ManagedTextComponent text, in DatumRef dref, in TransformAspect pos) => {
-                    var datum = DDL[dref.Entity];
-                    text.UpdateText(datum.Value);
                     text.UpdatePosition(in pos);
+                    if (DDL.HasComponent(dref.Entity)) {
+                        var datum = DDL[dref.Entity];
+                        text.UpdateText(datum.Value);
+                    } else if (DSL.HasComponent(dref.Entity)) {
+                        var datum = DSL[dref.Entity];
+                        text.UpdateText(datum.Value);
+                    }
                 })
                 .WithoutBurst()
                 .Run();

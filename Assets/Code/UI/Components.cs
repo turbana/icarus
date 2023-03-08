@@ -232,6 +232,11 @@ namespace Icarus.UI {
             if (this.GO is null) this.CreateGameObject();
             this.TextMeshPro.text = String.Format(this.Format, value);
         }
+        
+        public void UpdateText(FixedString64Bytes value) {
+            if (this.GO is null) this.CreateGameObject();
+            this.TextMeshPro.text = value.ToString();
+        }
 
         public void UpdatePosition(in TransformAspect pos) =>
             UpdatePosition(pos.WorldPosition, pos.WorldRotation, new float3(pos.WorldScale));
