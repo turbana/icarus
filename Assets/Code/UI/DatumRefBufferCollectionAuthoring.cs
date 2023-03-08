@@ -5,7 +5,6 @@ using Unity.Entities;
 
 namespace Icarus.UI {
     public class DatumRefBufferCollectionAuthoring : MonoBehaviour {
-        public string SystemTag;
         public string[] ExtraDatums;
         public DatumType[] ExtraDatumTypes;
         
