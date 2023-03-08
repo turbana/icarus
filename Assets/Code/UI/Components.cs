@@ -145,6 +145,20 @@ namespace Icarus.UI {
         public FixedString64Bytes ID;
         public DatumType Type;
     }
+
+    /* A DatumRefBufferCollector is applied during baking to an Entity that
+     * wants a DatumRefBufferCollection. A baking system runs to populate the
+     * *Collection from the *Collector. */
+    public partial struct DatumRefBufferCollector : IComponentData {
+        public UnsafeList<Entity> Children;
+    }
+
+    /* A DatumRefBufferCollection holds ID/index information on the sibling
+     * DynamicBuffer<DatumRefBuffer> component. This can be used to lookup
+     * specific DatumRefBuffer by it's ID rather than index. */
+    public partial struct DatumRefBufferCollection : IComponentData {
+        public NativeHashMap<FixedString64Bytes, int> IndexMap;
+    }
     
     // /*** The Datums definitions ***/
     public partial struct DatumDouble : IComponentData {
