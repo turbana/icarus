@@ -35,7 +35,7 @@ namespace Icarus.Controls {
                 .WithReadOnly(DDL)
                 .WithAll<BridgeJumpTargetKeypadTag>()
                 .ForEach((in DatumRefBufferCollection index, in DynamicBuffer<DatumRefBuffer> buffers) => {
-                    var oentity = buffers[index["Bridge.JumpTarget.Value"]].Entity;
+                    var oentity = buffers[index["Bridge.JumpTarget.RegisterValue"]].Entity;
                     var output = DSL[oentity];
 
                     // ensure we're always working with a string of length 12
@@ -49,13 +49,13 @@ namespace Icarus.Controls {
                         var cut = id.LastIndexOf(DECIMAL_RUNE);
                         if (cut < 0) continue;
                         var prefix = id.Substring(0, cut);
-                        if (prefix == "Bridge.JumpTarget.KeyPad") {
+                        if (prefix == "Bridge.JumpTarget.Keypad") {
                             var entity = buffers[idx].Entity;
                             var datum = DDL[entity];
                             if (datum.Dirty && datum.Value == 1) {
                                 var suffix = id.Substring(cut + 1);
                                 // UnityEngine.Debug.Log($"pressed {suffix}");
-                                if (suffix == "Back") {
+                                if (suffix == "<") {
                                     for (int i=KEYPAD_LENGTH-1; i>0; i--) {
                                         output.Value[i] = output.Value[i-1];
                                     }

@@ -47,7 +47,7 @@ namespace Icarus.Controls {
                         // ignore first dial position
                         if (position > 0) {
                             var key = TARGET_IDS[position];
-                            var keypad = buffers[index["Bridge.JumpTarget.Value"]].Entity;
+                            var keypad = buffers[index["Bridge.JumpTarget.RegisterValue"]].Entity;
                             var entity = buffers[index[key]].Entity;
                             var output = DDL[entity];
                             output.Value = DSL[keypad].DoubleValue;

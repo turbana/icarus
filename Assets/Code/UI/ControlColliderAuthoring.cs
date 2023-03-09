@@ -19,6 +19,12 @@ namespace Icarus.UI {
                 var go = control.gameObject;
                 DependsOn(control);
                 DependsOn(go);
+                // we search the GameObject hierarchy for the datum id, so mark
+                // them as dependencies.
+                var pcomp = GetComponentInParent<ControlDatumPrefixAuthoring>();
+                if (pcomp != null) DependsOn(pcomp);
+                var scomp = GetComponentInChildren<ControlLabelAuthoring>();
+                if (scomp != null) DependsOn(scomp);
                 var pos = go.transform.localPosition;
                 var rot = go.transform.localRotation;
                 var scale = go.transform.localScale;
