@@ -66,7 +66,7 @@ namespace Icarus.UI {
             var DRL = DatumRefLookup;
             var DRBL = DatumRefBufferLookup;
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
-            var refs = new UnsafeList<UninitializedDatumRefBuffer>(10, Allocator.TempJob);
+            var refs = new NativeList<UninitializedDatumRefBuffer>(10, Allocator.TempJob);
 
             Entities
                 .ForEach((Entity entity, ref DatumRefBufferCollector collector) => {
