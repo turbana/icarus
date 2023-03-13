@@ -35,8 +35,11 @@ namespace Icarus.Orbit {
         protected override void OnUpdate() {
             var entity = SystemAPI.GetSingletonEntity<SunLightComponent>();
             var ltw = SystemAPI.GetComponent<LocalToWorld>(entity);
-            LightObject.transform.position = ltw.Position;
-            LightObject.transform.LookAt(Vector3.zero);
+            var isNaN = ltw.Position.x is float.NaN || ltw.Position.y is float.NaN || ltw.Position.z is float.NaN;
+            if (!isNaN) {
+                LightObject.transform.position = ltw.Position;
+                LightObject.transform.LookAt(Vector3.zero);
+            }
         }
     }
 }
