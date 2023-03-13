@@ -145,6 +145,8 @@ namespace Icarus.Orbit {
 
     [AddComponentMenu("Icarus/Orbit/Orbital Database")]
     public class OrbitalDatabaseAuthoring : MonoBehaviour {
+        [Tooltip("Display a statistics log message on baking")]
+        public bool LogStatistics = false;
         [Tooltip("The seed used to generate any random parameters (asteroid mass, composition, etc)")]
         public uint RandomSeed = 1;
         [Tooltip("The root path for prefab assets")]
@@ -209,7 +211,9 @@ namespace Icarus.Orbit {
 
                 auth.LoadDatabase(dmap);
                 SetPrefabs(pmap, auth.PrefabPath);
-                ShowStatistics(dmap, pmap);
+                if (auth.LogStatistics) {
+                    ShowStatistics(dmap, pmap);
+                }
 
                 var comp = new OrbitalDatabaseComponent(dmap);
                 AddComponent<OrbitalDatabaseComponent>(comp);
