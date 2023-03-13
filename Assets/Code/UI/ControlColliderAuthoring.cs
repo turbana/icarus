@@ -53,7 +53,7 @@ namespace Icarus.UI {
                         ID = control.DatumID,
                         Type = DatumType.Double,
                     });
-                if (control.DatumID == "") {
+                if (control.DatumID == "" || control.DatumID == ".") {
                     Debug.LogWarning($"found an empty DatumID on game object: {control.gameObject}", control.gameObject);
                 }
             }
