@@ -756,8 +756,7 @@ MonoBehaviour:
   datumKey: 
   datumType: 0
   format: '{0,12:F2}'
-  style: 0
-  font: {fileID: 11400000, guid: dfff8dd707ad01f4f943d46be68a5b88, type: 2}
+  style: Display1
 --- !u!1 &4561083343878001146
 GameObject:
   m_ObjectHideFlags: 0

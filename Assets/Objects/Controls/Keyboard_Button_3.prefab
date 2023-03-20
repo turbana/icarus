@@ -330,8 +330,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40777c8246b5fb342a177aee7a95d8f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Style: 4
-  Font: {fileID: 11400000, guid: dfff8dd707ad01f4f943d46be68a5b88, type: 2}
+  FontStyle: Keypad1
   Ancestors: 2
 --- !u!1 &7498760326331286717
 GameObject:

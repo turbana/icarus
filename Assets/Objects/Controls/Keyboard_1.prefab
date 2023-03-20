@@ -1167,8 +1167,7 @@ MonoBehaviour:
   datumKey: 
   datumType: 0
   format: 
-  style: 4
-  font: {fileID: 11400000, guid: dfff8dd707ad01f4f943d46be68a5b88, type: 2}
+  style: Label1
 --- !u!1001 &430519314138159997
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3465,8 +3464,7 @@ MonoBehaviour:
   datumKey: 
   datumType: 0
   format: 
-  style: 0
-  font: {fileID: 11400000, guid: dfff8dd707ad01f4f943d46be68a5b88, type: 2}
+  style: Label1
 --- !u!4 &1164358499263289930 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4770735965329728514, guid: 91398a267a8cd0442b9a344dbefbde1e, type: 3}
@@ -3749,8 +3747,7 @@ MonoBehaviour:
   datumKey: 
   datumType: 0
   format: 
-  style: 4
-  font: {fileID: 11400000, guid: dfff8dd707ad01f4f943d46be68a5b88, type: 2}
+  style: Label1
 --- !u!4 &2269228387863857258 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4770735965329728514, guid: ba9384411e424384fbfae068b2611026, type: 3}
@@ -4080,8 +4077,7 @@ MonoBehaviour:
   datumKey: 
   datumType: 0
   format: 
-  style: 4
-  font: {fileID: 11400000, guid: dfff8dd707ad01f4f943d46be68a5b88, type: 2}
+  style: Label1
 --- !u!1001 &7113944781641737556
 PrefabInstance:
   m_ObjectHideFlags: 0

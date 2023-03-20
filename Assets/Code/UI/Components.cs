@@ -204,7 +204,6 @@ namespace Icarus.UI {
      * TextMeshPro component. */
     public class ManagedTextComponent : IComponentData, IDisposable, ICloneable {
         public GameObject GO;
-        public TMP_FontAsset Font;
         public TextStyle Style;
         public string Format;
 
@@ -222,7 +221,6 @@ namespace Icarus.UI {
         public object Clone() {
             return new ManagedTextComponent {
                 GO = (this.GO is null) ? null : UnityEngine.Object.Instantiate(this.GO),
-                Font = this.Font,
                 Style = this.Style,
                 Format = this.Format,
             };
@@ -239,19 +237,20 @@ namespace Icarus.UI {
             var tmp = this.TextMeshPro;
             var rt = this.RectTransform;
             var rend = this.GO.GetComponent<MeshRenderer>();
-            var config = TextStyleConfig.CONFIG[(int)Style];
             // set common font settings
             rend.shadowCastingMode = ShadowCastingMode.Off;
             tmp.enableAutoSizing = false;
             tmp.textWrappingMode = TextWrappingModes.Normal;
             tmp.overflowMode = TextOverflowModes.Overflow;
             // set custom font settings
-            rt.sizeDelta = config.Bounds;
-            tmp.color = config.Color;
-            tmp.fontSize = config.Size;
-            tmp.fontStyle = config.Style;
-            tmp.horizontalAlignment = config.HAlign;
-            tmp.verticalAlignment = config.VAlign;
+            rt.sizeDelta = Style.Bounds;
+            tmp.color = Style.FontColor;
+            tmp.fontSize = Style.FontSize;
+            tmp.fontStyle = Style.FontStyle;
+            tmp.horizontalAlignment = Style.HAlign;
+            tmp.verticalAlignment = Style.VAlign;
+            tmp.font = Style.FontAsset;
+            tmp.fontMaterial = Style.FontMaterial;
         }
 
         public void UpdateText(double value) {
