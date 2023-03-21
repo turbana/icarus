@@ -1619,13 +1619,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   datumKey: 
   datumType: 2
-  format: '123456789012345678901234567890
+  format: '12345678|012345678901234567890
 
     2
 
     3
 
-    4 Sample Text Goes Here
+    4 <u>Sample Text Goes
+    Here</u>
 
     5
 
