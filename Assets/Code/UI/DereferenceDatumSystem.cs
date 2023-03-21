@@ -14,7 +14,8 @@ namespace Icarus.UI {
     [UpdateInGroup(typeof(IcarusLoadingSystemGroup))]
     public partial class DereferenceDatumSystem : SystemBase {
         private NativeParallelHashMap<FixedString64Bytes, Entity> Doubles;
-        private NativeParallelHashMap<FixedString64Bytes, Entity> Strings;
+        private NativeParallelHashMap<FixedString64Bytes, Entity> String64s;
+        private NativeParallelHashMap<FixedString512Bytes, Entity> String512s;
         private EntityQuery DatumRefQuery;
         private EntityQuery DatumRefBufferQuery;
 
@@ -22,7 +23,8 @@ namespace Icarus.UI {
         protected override void OnCreate() {
             var N = 1000;
             this.Doubles = new NativeParallelHashMap<FixedString64Bytes, Entity>(N, Allocator.Persistent);
-            this.Strings = new NativeParallelHashMap<FixedString64Bytes, Entity>(N, Allocator.Persistent);
+            this.String64s = new NativeParallelHashMap<FixedString64Bytes, Entity>(N, Allocator.Persistent);
+            this.String512s = new NativeParallelHashMap<FixedString512Bytes, Entity>(N, Allocator.Persistent);
             RequireForUpdate(DatumRefQuery);
             RequireForUpdate(DatumRefBufferQuery);
         }
@@ -30,9 +32,11 @@ namespace Icarus.UI {
         [BurstCompile]
         protected override void OnUpdate() {
             var new_doubles = new NativeHashSet<FixedString64Bytes>(64, Allocator.TempJob);
-            var new_strings = new NativeHashSet<FixedString64Bytes>(64, Allocator.TempJob);
+            var new_string64s = new NativeHashSet<FixedString64Bytes>(64, Allocator.TempJob);
+            var new_string512s = new NativeHashSet<FixedString64Bytes>(64, Allocator.TempJob);
             var doubles = this.Doubles;
-            var strings = this.Strings;
+            var string64s = this.String64s;
+            var string512s = this.String512s;
 
             // load new DatumDoubles
             var job_doubles = Entities
@@ -43,10 +47,18 @@ namespace Icarus.UI {
                 .Schedule(this.Dependency);
 
             // load new DatumString64s
-            var job_strings = Entities
+            var job_string64s = Entities
                 .WithChangeFilter<DatumString64>()
                 .ForEach((Entity entity, in DatumString64 datum) => {
-                    strings[datum.ID] = entity;
+                    string64s[datum.ID] = entity;
+                })
+                .Schedule(this.Dependency);
+
+            // load new DatumString512s
+            var job_string512s = Entities
+                .WithChangeFilter<DatumString512>()
+                .ForEach((Entity entity, in DatumString512 datum) => {
+                    string512s[datum.ID] = entity;
                 })
                 .Schedule(this.Dependency);
 
@@ -58,14 +70,16 @@ namespace Icarus.UI {
                         case DatumType.Double:
                             new_doubles.Add(datum.ID); break;
                         case DatumType.String64:
-                            new_strings.Add(datum.ID); break;
+                            new_string64s.Add(datum.ID); break;
+                        case DatumType.String512:
+                            new_string512s.Add(datum.ID); break;
                         default:
                             throw new System.Exception($"unknown DatumType: {datum.Type}");
                     }
                 })
                 .Schedule(this.Dependency);
             
-            // find UninitializedDatumRefBufferss
+            // find UninitializedDatumRefBuffers
             var job_finds = Entities
                 .WithStoreEntityQueryInField(ref DatumRefBufferQuery)
                 .ForEach((in DynamicBuffer<UninitializedDatumRefBuffer> buffer) => {
@@ -75,7 +89,9 @@ namespace Icarus.UI {
                             case DatumType.Double:
                                 new_doubles.Add(datum.ID); break;
                             case DatumType.String64:
-                                new_strings.Add(datum.ID); break;
+                                new_string64s.Add(datum.ID); break;
+                            case DatumType.String512:
+                                new_string512s.Add(datum.ID); break;
                             default:
                                 throw new System.Exception($"unknown DatumType: {datum.Type}");
                         }
@@ -83,20 +99,30 @@ namespace Icarus.UI {
                 })
                 .Schedule(job_find_datumrefs);
 
+            var job_strings = JobHandle.CombineDependencies(job_string64s, job_string512s);
             var job_loads = JobHandle.CombineDependencies(job_doubles, job_strings);
             this.Dependency = JobHandle.CombineDependencies(job_loads, job_finds);
             this.Dependency.Complete();
 
-            // create new Datum entities
+            // create new DatumDouble entities
             foreach (var ID in new_doubles) {
                 var entity = EntityManager.CreateEntity();
                 EntityManager.AddComponentData<DatumDouble>(entity, new DatumDouble { ID=ID });
                 doubles[ID] = entity;
             }
-            foreach (var ID in new_strings) {
+
+            // create new DatumString64 entities
+            foreach (var ID in new_string64s) {
                 var entity = EntityManager.CreateEntity();
                 EntityManager.AddComponentData<DatumString64>(entity, new DatumString64 { ID=ID });
-                strings[ID] = entity;
+                string64s[ID] = entity;
+            }
+
+            // create new DatumString512 entities
+            foreach (var ID in new_string512s) {
+                var entity = EntityManager.CreateEntity();
+                EntityManager.AddComponentData<DatumString512>(entity, new DatumString512 { ID=ID });
+                string512s[ID] = entity;
             }
 
             // rest will use an ecb
@@ -105,7 +131,13 @@ namespace Icarus.UI {
             // realize DatumRefs
             Entities
                 .ForEach((Entity entity, in UninitializedDatumRef datum) => {
-                    var dentity = (datum.Type == DatumType.Double) ? doubles[datum.ID] : strings[datum.ID];
+                    var dentity = datum.Type switch {
+                        DatumType.Double => doubles[datum.ID],
+                        DatumType.String64 => string64s[datum.ID],
+                        DatumType.String512 => string512s[datum.ID],
+                        _ => throw new System.Exception($"unknown DatumType: {datum.Type}"),
+
+                    };
                     ecb.AddComponent<DatumRef>(entity, new DatumRef {
                             Entity = dentity,
                             Type = datum.Type,
@@ -120,7 +152,12 @@ namespace Icarus.UI {
                     var nbuffer = ecb.AddBuffer<DatumRefBuffer>(entity);
                     for (int i=0; i<buffer.Length; i++) {
                         var datum = buffer[i];
-                        var dentity = (datum.Type == DatumType.Double) ? doubles[datum.ID] : strings[datum.ID];
+                        var dentity = datum.Type switch {
+                            DatumType.Double => doubles[datum.ID],
+                            DatumType.String64 => string64s[datum.ID],
+                            DatumType.String512 => string512s[datum.ID],
+                            _ => throw new System.Exception($"unknown DatumType: {datum.Type}"),
+                        };
                         nbuffer.Add(new DatumRefBuffer {
                                 Entity = dentity,
                                 Type = datum.Type,
@@ -135,7 +172,8 @@ namespace Icarus.UI {
             ecb.Playback(this.EntityManager);
             ecb.Dispose();
             new_doubles.Dispose();
-            new_strings.Dispose();
+            new_string64s.Dispose();
+            new_string512s.Dispose();
         }
     }
 }

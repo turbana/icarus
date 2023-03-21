@@ -114,7 +114,9 @@ namespace Icarus.UI {
 
     /* DatumType describes what type of Datum is attached to an Entity. */
     public enum DatumType : byte {
-        Double = 0, String64
+        Double = 0,
+        String64,
+        String512,
     }
 
     /* A DatumRef holds a reference to a Datum. This consists of an DatumType
@@ -200,6 +202,14 @@ namespace Icarus.UI {
         }
     }
 
+    public partial struct DatumString512 : IComponentData {
+        public FixedString64Bytes ID;
+        public FixedString512Bytes Value;
+        public FixedString512Bytes PreviousValue;
+        
+        public bool Dirty => Value != PreviousValue;
+    }
+
     /* A ManagedTextComponent holds a reference to a GameObject that contains a
      * TextMeshPro component. */
     public class ManagedTextComponent : IComponentData, IDisposable, ICloneable {
@@ -259,6 +269,11 @@ namespace Icarus.UI {
         }
         
         public void UpdateText(FixedString64Bytes value) {
+            if (this.GO is null) this.CreateGameObject();
+            this.TextMeshPro.text = String.Format(this.Format, value);
+        }
+
+        public void UpdateText(FixedString512Bytes value) {
             if (this.GO is null) this.CreateGameObject();
             this.TextMeshPro.text = String.Format(this.Format, value);
         }

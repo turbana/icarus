@@ -14,23 +14,28 @@ namespace Icarus.UI {
     public partial class DatumDisplaysSystem : SystemBase {
         public ComponentLookup<LocalTransform> LocalTransformLookup;
         public ComponentLookup<DatumDouble> DatumDoubleLookup;
-        public ComponentLookup<DatumString64> DatumStringLookup;
+        public ComponentLookup<DatumString64> DatumString64Lookup;
+        public ComponentLookup<DatumString512> DatumString512Lookup;
 
         [BurstCompile]
         protected override void OnCreate() {
             LocalTransformLookup = GetComponentLookup<LocalTransform>(false);
             DatumDoubleLookup = GetComponentLookup<DatumDouble>(true);
-            DatumStringLookup = GetComponentLookup<DatumString64>(true);
+            DatumString64Lookup = GetComponentLookup<DatumString64>(true);
+            DatumString512Lookup = GetComponentLookup<DatumString512>(true);
         }
         
         [BurstCompile]
         protected override void OnUpdate() {
             LocalTransformLookup.Update(this);
             DatumDoubleLookup.Update(this);
-            DatumStringLookup.Update(this);
+            DatumString64Lookup.Update(this);
+            DatumString512Lookup.Update(this);
+            
             var LTL = LocalTransformLookup;
             var DDL = DatumDoubleLookup;
-            var DSL = DatumStringLookup;
+            var DS64L = DatumString64Lookup;
+            var DS512L = DatumString512Lookup;
 
             // update controls
             Entities
@@ -49,8 +54,11 @@ namespace Icarus.UI {
                     if (DDL.HasComponent(dref.Entity)) {
                         var datum = DDL[dref.Entity];
                         text.UpdateText(datum.Value);
-                    } else if (DSL.HasComponent(dref.Entity)) {
-                        var datum = DSL[dref.Entity];
+                    } else if (DS64L.HasComponent(dref.Entity)) {
+                        var datum = DS64L[dref.Entity];
+                        text.UpdateText(datum.Value);
+                    } else if (DS512L.HasComponent(dref.Entity)) {
+                        var datum = DS512L[dref.Entity];
                         text.UpdateText(datum.Value);
                     }
                 })
