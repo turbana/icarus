@@ -17,6 +17,12 @@ namespace Icarus.Controls {
                     case ControlSystemType.BridgeJumpTargetKeypad:
                         AddComponent<BridgeJumpTargetKeypadTag>(); break;
                     case ControlSystemType.BridgeJumpTargetKeyboard:
+                        var buffer = AddBuffer<BridgeJumpTargetValue>();
+                        buffer.Length = 10;
+                        for (int i=0; i<10; i++) {
+                            buffer[i] = new BridgeJumpTargetValue { Value = "" };
+                        }
+                        buffer[0] = new BridgeJumpTargetValue { Value = "foobar" };
                         AddComponent<BridgeJumpTargetKeyboardTag>(); break;
                     case ControlSystemType.BridgeJumpTargetLoad:
                         AddComponent<BridgeJumpTargetLoadTag>(); break;
