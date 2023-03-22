@@ -5,7 +5,9 @@ using System.Text;
 using UnityEditor;
 using UnityEngine;
 
+using Unity.Burst;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -13,8 +15,8 @@ using Unity.Transforms;
 
 namespace Icarus.Orbit {
     using BodyName = FixedString64Bytes;
-    using OrbitalDatabase = NativeHashMap<FixedString64Bytes, OrbitalDatabaseData>;
-    using EntityDatabase = NativeHashMap<FixedString64Bytes, Entity>;
+    using OrbitalDatabase = UnsafeParallelHashMap<FixedString64Bytes, OrbitalDatabaseData>;
+    using EntityDatabase = UnsafeParallelHashMap<FixedString64Bytes, Entity>;
     
     public struct OrbitalDatabaseDataComponent : IBufferElementData {
         public FixedString64Bytes Name;
@@ -30,20 +32,20 @@ namespace Icarus.Orbit {
 
         public OrbitalDatabaseComponent(OrbitalDatabase dmap) {
             this.DataMap = dmap;
-            this.EntityMap = new NativeHashMap<FixedString64Bytes, Entity>(0, Allocator.Persistent);
-            this.PrefabMap = new NativeHashMap<FixedString64Bytes, Entity>(0, Allocator.Persistent);
+            this.EntityMap = new UnsafeParallelHashMap<FixedString64Bytes, Entity>(0, Allocator.Persistent);
+            this.PrefabMap = new UnsafeParallelHashMap<FixedString64Bytes, Entity>(0, Allocator.Persistent);
         }
 
         public int DataCount {
-            get => DataMap.Count;
+            get => DataMap.Count();
         }
 
         public int EntityCount {
-            get => EntityMap.Count;
+            get => EntityMap.Count();
         }
 
         public int PrefabCount {
-            get => PrefabMap.Count;
+            get => PrefabMap.Count();
         }
 
         public int EntityCapacity {
@@ -83,6 +85,35 @@ namespace Icarus.Orbit {
 
         public NativeArray<BodyName> GetPrefabKeys(AllocatorManager.AllocatorHandle allocator) {
             return PrefabMap.GetKeyArray(allocator);
+        }
+
+        [BurstCompile]
+        public UnsafeList<BodyName> Search(BodyName term, int maxCount, AllocatorManager.AllocatorHandle allocator) {
+            var list = new UnsafeList<BodyName>(maxCount, allocator);
+            // ugh. I know.
+            foreach (var pair in DataMap) {
+                var name = pair.Value.Name;
+                if (StringEqualIgnoreCase(term, name.Substring(0, term.Length))) {
+                    list.Add(name);
+                }
+                if (list.Length == maxCount) break;
+            }
+            return list;
+        }
+
+        // NOTE: only works on ascii strings
+        [BurstCompile]
+        private bool StringEqualIgnoreCase(FixedString64Bytes s1, FixedString64Bytes s2) {
+            if (s1.Length != s2.Length) return false;
+            const int delta = (int)('a' - 'A');
+            for (int i=0; i<s1.Length; i++) {
+                var c1 = (char)s1[i];
+                var c2 = (char)s2[i];
+                if ('a' <= c1 && c1 <= 'z') c1 = (char)(c1 - delta);
+                if ('a' <= c2 && c2 <= 'z') c2 = (char)(c2 - delta);
+                if (c1 != c2) return false;
+            }
+            return true;
         }
     }
 
@@ -242,7 +273,7 @@ namespace Icarus.Orbit {
             int dwarfplanets = 0;
             int ships = 0;
             int players = 0;
-            int prefabs = pmap.Count;
+            int prefabs = pmap.Count();
             
             foreach (var body in bodies) {
                 if (body.Type == "Planet") planets += 1;

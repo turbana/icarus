@@ -2,6 +2,7 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 
+using Icarus.Orbit;
 using Icarus.UI;
 
 namespace Icarus.Controls {
@@ -15,10 +16,12 @@ namespace Icarus.Controls {
     public partial class BridgeJumpTargetKeyboard : SystemBase {
         public ComponentLookup<DatumDouble> DatumDoubleLookup;
         public ComponentLookup<DatumString512> DatumStringLookup;
+        public ComponentLookup<OrbitalDatabaseComponent> DatabaseLookup;
 
         // line width is 30 characters minus 2 for the prefix character and space
         private const int INPUT_LENGTH = 28;
         private const int LINE_WIDTH = 28;
+        private const int RESULT_LINES = 9;
         
         private const byte SPACE = (byte)' ';
         private const byte DECIMAL = (byte)'.';
@@ -30,19 +33,24 @@ namespace Icarus.Controls {
         protected override void OnCreate() {
             DatumDoubleLookup = GetComponentLookup<DatumDouble>(true);
             DatumStringLookup = GetComponentLookup<DatumString512>(false);
+            DatabaseLookup = GetComponentLookup<OrbitalDatabaseComponent>(true);
         }
         
         [BurstCompile]
         protected override void OnUpdate() {
             DatumDoubleLookup.Update(this);
             DatumStringLookup.Update(this);
+            DatabaseLookup.Update(this);
             var DDL = DatumDoubleLookup;
             var DSL = DatumStringLookup;
+            var DBL = DatabaseLookup;
             var cursor = (int)World.Time.ElapsedTime % 2 == 0;
             var prevCursor = (int)(World.Time.ElapsedTime - World.Time.DeltaTime) % 2 == 0;
+            var dbEntity = SystemAPI.GetSingletonEntity<OrbitalDatabaseComponent>();
             
             Entities
                 .WithReadOnly(DDL)
+                .WithReadOnly(DBL)
                 .WithAll<BridgeJumpTargetKeyboardTag>()
                 .ForEach((ref DynamicBuffer<BridgeJumpTargetValue> values,
                           in DatumRefBufferCollection index,
@@ -75,7 +83,17 @@ namespace Icarus.Controls {
                                     var tmp = values[0];
                                     tmp.Value = search;
                                     values[0] = tmp;
-                                    // TODO perform search
+                                    // perform search
+                                    var db = DBL[dbEntity];
+                                    var results = db.Search(search, RESULT_LINES, Allocator.TempJob);
+                                    // UnityEngine.Debug.Log($"got {results.Length} results for {search}");
+                                    for (int i=0; i<RESULT_LINES; i++) {
+                                        var result = (i < results.Length && search != "") ? results[i] : "";
+                                        tmp = values[i + 1];
+                                        tmp.Value = new FixedString32Bytes(result.Substring(0, 29));
+                                        values[i + 1] = tmp;
+                                    }
+                                    results.Dispose();
                                 }
                             }
                         }
@@ -101,7 +119,7 @@ namespace Icarus.Controls {
                 var value = buffer[i].Value;
                 if (value.IsEmpty) continue;
                 if (value.Length > LINE_WIDTH) value = value.Substring(0, LINE_WIDTH);
-                UnityEngine.Debug.Log($"({value})");
+                // UnityEngine.Debug.Log($"{i} = ({value})");
                 char c = (char)('a' + (i-1));
                 output = string.Format("{0}\n<u>{1}</u> {2}", output, c, value);
             }

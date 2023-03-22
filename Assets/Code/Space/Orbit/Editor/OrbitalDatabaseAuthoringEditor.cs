@@ -5,6 +5,7 @@ using Random = Unity.Mathematics.Random;
 using UnityEditor;
 using UnityEngine;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 
 using Icarus.Mathematics;
@@ -12,8 +13,8 @@ using Icarus.Orbit;
 
 namespace Icarus.Orbit.Editor {
     using BodyName = FixedString64Bytes;
-    using OrbitalDatabase = NativeHashMap<FixedString64Bytes, OrbitalDatabaseData>;
-    using EntityDatabase = NativeHashMap<FixedString64Bytes, Entity>;
+    using OrbitalDatabase = UnsafeParallelHashMap<FixedString64Bytes, OrbitalDatabaseData>;
+    using EntityDatabase = UnsafeParallelHashMap<FixedString64Bytes, Entity>;
 
     [CustomEditor(typeof(OrbitalDatabaseAuthoring))]
     public class OrbitalDatabaseAuthoringEditor : UnityEditor.Editor {
