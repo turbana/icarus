@@ -20,6 +20,7 @@ namespace Icarus.Orbit {
             var OrbitalParentTypeHandle = GetSharedComponentTypeHandle<OrbitalParent>();
             var RotationalParametersLookup = GetComponentLookup<RotationalParameters>(true);
             var DatumDoubleLookup = GetComponentLookup<DatumDouble>(false);
+            var DatumStringLookup = GetComponentLookup<DatumString64>(false);
             var DatumRefLookup = GetBufferLookup<DatumRefBuffer>(true);
             var player = SystemAPI.GetSingletonEntity<PlayerOrbitTag>();
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
@@ -31,6 +32,7 @@ namespace Icarus.Orbit {
                 OrbitalParentTypeHandle = OrbitalParentTypeHandle,
                 RotationalParametersLookup = RotationalParametersLookup,
                 DatumDoubleLookup = DatumDoubleLookup,
+                DatumStringLookup = DatumStringLookup,
                 DatumRefLookup = DatumRefLookup,
             }.ScheduleParallel();
 
@@ -52,15 +54,19 @@ namespace Icarus.Orbit {
             public ComponentLookup<RotationalParameters> RotationalParametersLookup;
             [NativeDisableParallelForRestriction]
             public ComponentLookup<DatumDouble> DatumDoubleLookup;
+            [NativeDisableParallelForRestriction]
+            public ComponentLookup<DatumString64> DatumStringLookup;
             [ReadOnly]
             public BufferLookup<DatumRefBuffer> DatumRefLookup;
 
             private dquaternion ParentTilt;
+            private FixedString64Bytes ParentName;
 
             [BurstCompile]
             public bool OnChunkBegin(in ArchetypeChunk chunk, int index, bool useMask, in v128 mask) {
                 var parent = chunk.GetSharedComponent<OrbitalParent>(OrbitalParentTypeHandle);
                 ParentTilt = RotationalParametersLookup[parent.Value].AxialTilt;
+                ParentName = parent.Name;
                 return true;
             }
 
@@ -129,6 +135,10 @@ namespace Icarus.Orbit {
                     if (apo < 0) apo += parms.Period;
                     SetDatum(buffer[12], per);
                     SetDatum(buffer[13], apo);
+                    // set parent name datum
+                    var datum = DatumStringLookup[buffer[14].Entity];
+                    datum.Value = ParentName;
+                    DatumStringLookup[buffer[14].Entity] = datum;
                 }
             }
 

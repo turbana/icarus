@@ -112,7 +112,8 @@ namespace Icarus.Loading {
             
             public void Execute(Entity entity, ref AddOrbitalParent parent) {
                 ecb.AddSharedComponent<OrbitalParent>(entity, new OrbitalParent {
-                        Value = database.LookupEntity(parent.Value)
+                        Value = database.LookupEntity(parent.Value),
+                        Name = parent.Value,
                     });
                 ecb.AddComponent<OrbitalParentPosition>(entity, new OrbitalParentPosition {
                         Value = double3.zero
@@ -129,7 +130,8 @@ namespace Icarus.Loading {
             // Debug.Log($"looking up {name} ({entity}) -> {data.Parent} == ({database.EntityMap[data.Parent]})");
 
             ecb.AddSharedComponent<OrbitalParent>(entity, new OrbitalParent {
-                    Value = database.LookupEntity(data.Parent)
+                    Value = database.LookupEntity(data.Parent),
+                    Name = data.Parent,
                 });
             ecb.AddComponent<OrbitalParentPosition>(entity, new OrbitalParentPosition {
                     Value = double3.zero

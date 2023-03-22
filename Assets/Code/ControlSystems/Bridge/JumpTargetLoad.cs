@@ -15,7 +15,7 @@ namespace Icarus.Controls {
         private readonly static FixedString64Bytes[] TARGET_IDS = new FixedString64Bytes[] {
             "<ignore>",
             "Planned.Orbit.SemiMajorAxis",
-            "Planned.Orbit.Period",
+            // "Planned.Orbit.Period",
             "Planned.Orbit.Inclination",
             "Planned.Orbit.Eccentricity",
             "Planned.Orbit.AscendingNode",

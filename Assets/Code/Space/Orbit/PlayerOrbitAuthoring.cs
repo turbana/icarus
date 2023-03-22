@@ -78,13 +78,17 @@ namespace Icarus.Orbit {
                     "Player.Orbit.Apoapsis",
                 };
                 var buffer = AddBuffer<UninitializedDatumRefBuffer>();
-                buffer.Length = keys.Length;
+                buffer.Length = keys.Length + 1;
                 for (int i=0; i<keys.Length; i++) {
                     buffer[i] = new UninitializedDatumRefBuffer {
                         ID=keys[i],
                         Type=DatumType.Double
                     };
                 }
+                buffer[keys.Length] = new UninitializedDatumRefBuffer {
+                    ID = "Player.Orbit.Parent",
+                    Type = DatumType.String64,
+                };
             }
         }
     }

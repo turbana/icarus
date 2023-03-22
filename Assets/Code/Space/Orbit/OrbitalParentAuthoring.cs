@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -6,6 +7,7 @@ using Unity.Transforms;
 namespace Icarus.Orbit {
     public struct OrbitalParent : ISharedComponentData {
         public Entity Value;
+        public FixedString64Bytes Name;
     }
 
     public struct OrbitalParentPosition : IComponentData {

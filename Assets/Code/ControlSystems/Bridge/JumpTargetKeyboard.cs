@@ -16,6 +16,7 @@ namespace Icarus.Controls {
     public partial class BridgeJumpTargetKeyboard : SystemBase {
         public ComponentLookup<DatumDouble> DatumDoubleLookup;
         public ComponentLookup<DatumString512> DatumStringLookup;
+        public ComponentLookup<DatumString64> DatumString64Lookup;
         public ComponentLookup<OrbitalDatabaseComponent> DatabaseLookup;
 
         // line width is 30 characters minus 2 for the prefix character and space
@@ -33,6 +34,7 @@ namespace Icarus.Controls {
         protected override void OnCreate() {
             DatumDoubleLookup = GetComponentLookup<DatumDouble>(true);
             DatumStringLookup = GetComponentLookup<DatumString512>(false);
+            DatumString64Lookup = GetComponentLookup<DatumString64>(false);
             DatabaseLookup = GetComponentLookup<OrbitalDatabaseComponent>(true);
         }
         
@@ -40,9 +42,11 @@ namespace Icarus.Controls {
         protected override void OnUpdate() {
             DatumDoubleLookup.Update(this);
             DatumStringLookup.Update(this);
+            DatumString64Lookup.Update(this);
             DatabaseLookup.Update(this);
             var DDL = DatumDoubleLookup;
             var DSL = DatumStringLookup;
+            var DS64L = DatumString64Lookup;
             var DBL = DatabaseLookup;
             var cursor = (int)World.Time.ElapsedTime % 2 == 0;
             var prevCursor = (int)(World.Time.ElapsedTime - World.Time.DeltaTime) % 2 == 0;
@@ -74,7 +78,13 @@ namespace Icarus.Controls {
                                 var suffix = id.Substring(cut + 1);
                                 var search = values[0].Value;
                                 // UnityEngine.Debug.Log($"pressed {suffix}");
-                                HandleInput(ref search, suffix);
+                                var chosen = HandleInput(ref search, suffix);
+                                if (0 < chosen && values[chosen].Value != "") {
+                                    var target = buffers[index["Planned.Orbit.Target"]].Entity;
+                                    var tmp = DS64L[target];
+                                    tmp.Value = values[chosen].Value;
+                                    DS64L[target] = tmp;
+                                }
 
                                 // did we change the search value?
                                 if (search != values[0].Value) {
@@ -126,7 +136,7 @@ namespace Icarus.Controls {
         }
 
         [BurstCompile]
-        private static void HandleInput(ref FixedString32Bytes search, in FixedString64Bytes suffix) {
+        private static int HandleInput(ref FixedString32Bytes search, in FixedString64Bytes suffix) {
             // backspace
             if (suffix == "BKS") {
                 if (search.Length > 0) {
@@ -134,17 +144,15 @@ namespace Icarus.Controls {
                 }
             }
             // selection keys
-            else if (suffix == "a" ||
-                     suffix == "b" ||
-                     suffix == "c" ||
-                     suffix == "d" ||
-                     suffix == "e" ||
-                     suffix == "f" ||
-                     suffix == "g" ||
-                     suffix == "h" ||
-                     suffix == "i") {
-                UnityEngine.Debug.Log("selection key");
-            }
+            else if (suffix == "a") return 1;
+            else if (suffix == "b") return 2;
+            else if (suffix == "c") return 3;
+            else if (suffix == "d") return 4;
+            else if (suffix == "e") return 5;
+            else if (suffix == "f") return 6;
+            else if (suffix == "g") return 7;
+            else if (suffix == "h") return 8;
+            else if (suffix == "i") return 9;
             // space key
             else if (suffix == "Space") {
                 if (search.Length < INPUT_LENGTH) {
@@ -169,6 +177,8 @@ namespace Icarus.Controls {
                     search.Append(suffix);
                 }
             }
+
+            return 0;
         }
     }
 }

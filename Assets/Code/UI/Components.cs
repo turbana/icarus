@@ -250,8 +250,8 @@ namespace Icarus.UI {
             // set common font settings
             rend.shadowCastingMode = ShadowCastingMode.Off;
             tmp.enableAutoSizing = false;
-            tmp.textWrappingMode = TextWrappingModes.Normal;
-            tmp.overflowMode = TextOverflowModes.Overflow;
+            tmp.textWrappingMode = TextWrappingModes.NoWrap;
+            tmp.overflowMode = TextOverflowModes.Ellipsis;
             // set custom font settings
             rt.sizeDelta = Style.Bounds;
             tmp.color = Style.FontColor;
