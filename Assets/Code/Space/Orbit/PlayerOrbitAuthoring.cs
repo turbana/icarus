@@ -38,7 +38,8 @@ namespace Icarus.Orbit {
                 // find orbital period from semi-major axis and (total) mass
                 // see: https://en.wikipedia.org/wiki/Kepler%27s_laws_of_planetary_motion#Third_law
                 // T^2 = r^3 * (4PI^2 / GM)
-                double period = System.Math.Sqrt(System.Math.Pow((double)sma * 1000, 3) * ((4 * dmath.PI * dmath.PI) / (dmath.G * (parent.Mass + auth.Mass))));
+                // double period = System.Math.Sqrt(System.Math.Pow((double)sma * 1000, 3) * ((4 * dmath.PI * dmath.PI) / (dmath.G * (parent.Mass + auth.Mass))));
+                var period = dmath.Period((double)sma, parent.Mass, auth.Mass);
                 // Debug.Log($"orbiting {parent.Name} at {sma}km with period {period} ({parent.Mass} / {auth.Mass})");
                 AddComponent<PlayerOrbitTag>();
                 AddComponent<ShipTag>();
