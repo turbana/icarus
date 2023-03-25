@@ -4,6 +4,9 @@ using Unity.Mathematics;
 using Unity.Rendering;
 using Unity.Transforms;
 
+/* NOTE: this system isn't working when teleporting between bodies, so it's
+ * disabled for now. */
+
 /*
  * LOD scaling in ECS is based on the distance from the camera to the distances
  * set in MeshLODGroupComponent (LODDistances0/1). Those distances are set
@@ -31,6 +34,10 @@ namespace Icarus.Misc {
     [RequireMatchingQueriesForUpdate]
     [UpdateInGroup(typeof(DynamicLODScalingSystemGroup))]
     public partial class SaveInitialLODRangesSystem : SystemBase {
+        protected override void OnCreate() {
+            this.Enabled = false;
+        }
+        
         protected override void OnUpdate() {
             EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
             Entities
@@ -54,6 +61,10 @@ namespace Icarus.Misc {
     [UpdateInGroup(typeof(DynamicLODScalingSystemGroup))]
     [UpdateAfter(typeof(SaveInitialLODRangesSystem))]
     public partial class DynamicLODScalingSystem : SystemBase {
+        protected override void OnCreate() {
+            this.Enabled = false;
+        }
+        
         protected override void OnUpdate() {
             Entities
                 .WithNone<DisableRendering>()
