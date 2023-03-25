@@ -104,24 +104,41 @@ namespace Icarus.UI {
             this.Dependency = JobHandle.CombineDependencies(job_loads, job_finds);
             this.Dependency.Complete();
 
+            // NOTE: create datums so that .Dirty is true on the first frame.
+
             // create new DatumDouble entities
             foreach (var ID in new_doubles) {
                 var entity = EntityManager.CreateEntity();
-                EntityManager.AddComponentData<DatumDouble>(entity, new DatumDouble { ID=ID });
+                var datum = new DatumDouble {
+                    ID = ID,
+                    Value = 0.0,
+                    PreviousValue = double.NegativeInfinity,
+                };
+                EntityManager.AddComponentData<DatumDouble>(entity, datum);
                 doubles[ID] = entity;
             }
 
             // create new DatumString64 entities
             foreach (var ID in new_string64s) {
                 var entity = EntityManager.CreateEntity();
-                EntityManager.AddComponentData<DatumString64>(entity, new DatumString64 { ID=ID });
+                var datum = new DatumString64 {
+                    ID = ID,
+                    Value = "",
+                    PreviousValue = " ",
+                };
+                EntityManager.AddComponentData<DatumString64>(entity, datum);
                 string64s[ID] = entity;
             }
 
             // create new DatumString512 entities
             foreach (var ID in new_string512s) {
                 var entity = EntityManager.CreateEntity();
-                EntityManager.AddComponentData<DatumString512>(entity, new DatumString512 { ID=ID });
+                var datum = new DatumString512 {
+                    ID = ID,
+                    Value = "",
+                    PreviousValue = " ",
+                };
+                EntityManager.AddComponentData<DatumString512>(entity, datum);
                 string512s[ID] = entity;
             }
 
