@@ -24,14 +24,13 @@ namespace Icarus.Orbit {
         protected override void OnCreate() {
             SiblingQuery = new EntityQueryBuilder(Allocator.TempJob)
                 .WithAll<PlayerSiblingOrbitTag, OrbitRenderingEnabled>()
-                .WithNone<PlanetTag>()
                 .WithAllRW<LocalTransform>()
                 .WithAll<OrbitalPosition, OrbitalParameters, OrbitalScale>()
                 .WithAll<RotationalParameters, OrbitalParent>()
                 .Build(this);
             PlanetQuery = new EntityQueryBuilder(Allocator.TempJob)
                 .WithAll<PlanetTag, OrbitRenderingEnabled>()
-                .WithNone<PlayerParentOrbitTag>()
+                .WithNone<PlayerSiblingOrbitTag, PlayerParentOrbitTag>()
                 .WithAllRW<LocalTransform>()
                 .WithAll<OrbitalPosition, OrbitalParameters, OrbitalScale>()
                 .WithAll<RotationalParameters, OrbitalParent>()

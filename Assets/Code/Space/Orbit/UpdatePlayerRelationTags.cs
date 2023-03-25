@@ -63,7 +63,6 @@ namespace Icarus.Orbit {
 
     [WithAll(typeof(OrbitalParent))]
     [WithNone(typeof(PlayerOrbitTag))]
-    [WithChangeFilter(typeof(OrbitalParent))]
     [BurstCompile]
     public partial struct UpdateSiblingRelationJob : IJobEntity, IJobEntityChunkBeginEnd {
         public EntityCommandBuffer.ParallelWriter pecb;
@@ -93,7 +92,7 @@ namespace Icarus.Orbit {
             var planet = PlanetTags.HasComponent(entity);
             var sibling = PlayerSiblings.HasComponent(entity);
             
-            if (parent == PlayerParent || planet) {
+            if (parent == PlayerParent) {
                 // set sibling
                 if (!sibling) {
                     // UnityEngine.Debug.Log($"adding sibling tag to {entity.Index}");
