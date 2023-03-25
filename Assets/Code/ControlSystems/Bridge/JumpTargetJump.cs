@@ -11,6 +11,7 @@ namespace Icarus.Controls {
     public partial struct BridgeJumpTargetJumpTag : IComponentData {}
 
     [BurstCompile]
+    [UpdateInGroup(typeof(IcarusInteractionSystemGroup))]
     public partial class BridgeJumpTargetJump : SystemBase {
         public ComponentLookup<DatumDouble> DatumDoubleLookup;
         public ComponentLookup<DatumString64> DatumString64Lookup;

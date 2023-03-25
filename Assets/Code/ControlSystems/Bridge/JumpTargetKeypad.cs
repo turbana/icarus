@@ -8,6 +8,7 @@ namespace Icarus.Controls {
     public partial struct BridgeJumpTargetKeypadTag : IComponentData {}
     
     [BurstCompile]
+    [UpdateInGroup(typeof(IcarusInteractionSystemGroup))]
     public partial class BridgeJumpTargetKeypad : SystemBase {
         public ComponentLookup<DatumDouble> DatumDoubleLookup;
         public ComponentLookup<DatumString64> DatumStringLookup;

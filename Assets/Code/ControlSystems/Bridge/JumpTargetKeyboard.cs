@@ -13,6 +13,7 @@ namespace Icarus.Controls {
     }
     
     [BurstCompile]
+    [UpdateInGroup(typeof(IcarusInteractionSystemGroup))]
     public partial class BridgeJumpTargetKeyboard : SystemBase {
         public ComponentLookup<DatumDouble> DatumDoubleLookup;
         public ComponentLookup<DatumString512> DatumStringLookup;
