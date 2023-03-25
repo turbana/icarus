@@ -6,6 +6,7 @@ namespace Icarus.Controls {
         BridgeJumpTargetKeypad,
         BridgeJumpTargetKeyboard,
         BridgeJumpTargetLoad,
+        BridgeJumpTargetJump,
     }
     
     public class ControlSystemAuthoring : MonoBehaviour {
@@ -25,6 +26,8 @@ namespace Icarus.Controls {
                         AddComponent<BridgeJumpTargetKeyboardTag>(); break;
                     case ControlSystemType.BridgeJumpTargetLoad:
                         AddComponent<BridgeJumpTargetLoadTag>(); break;
+                    case ControlSystemType.BridgeJumpTargetJump:
+                        AddComponent<BridgeJumpTargetJumpTag>(); break;
                 }
             }
         }

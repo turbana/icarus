@@ -37,8 +37,10 @@ namespace Icarus.Orbit {
             // update parent
             if (cparent != parent) {
                 if (found) {
+                    // UnityEngine.Debug.Log($"removing parent tag from {cparent.Index}");
                     ecb.RemoveComponent<PlayerParentOrbitTag>(cparent);
                 }
+                // UnityEngine.Debug.Log($"adding parent tag to {parent.Index}");
                 ecb.AddComponent<PlayerParentOrbitTag>(parent);
                 ecb.AddComponent<OrbitRenderingEnabled>(parent);
                 ecb.RemoveComponent<OrbitRenderingDisabled>(parent);
@@ -94,6 +96,7 @@ namespace Icarus.Orbit {
             if (parent == PlayerParent || planet) {
                 // set sibling
                 if (!sibling) {
+                    // UnityEngine.Debug.Log($"adding sibling tag to {entity.Index}");
                     pecb.AddComponent<PlayerSiblingOrbitTag>(index, entity);
                     pecb.RemoveComponent<OrbitRenderingDisabled>(index, entity);
                     pecb.AddComponent<OrbitRenderingEnabled>(index, entity);
@@ -101,6 +104,7 @@ namespace Icarus.Orbit {
             } else {
                 // clear sibling
                 if (sibling) {
+                    // UnityEngine.Debug.Log($"removing sibling tag from {entity.Index}");
                     pecb.RemoveComponent<PlayerSiblingOrbitTag>(index, entity);
                     // disable rendering for non-planet, non-siblings
                     if (!planet) {
