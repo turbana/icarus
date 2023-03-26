@@ -8,6 +8,7 @@ namespace Icarus.Controls {
         BridgeJumpTargetLoad,
         BridgeJumpTargetJump,
         DebugTimeControls,
+        DebugSpawnObjects,
     }
     
     public class ControlSystemAuthoring : MonoBehaviour {
@@ -31,6 +32,8 @@ namespace Icarus.Controls {
                         AddComponent<BridgeJumpTargetJumpTag>(); break;
                     case ControlSystemType.DebugTimeControls:
                         AddComponent<DebugTimeControlsTag>(); break;
+                    case ControlSystemType.DebugSpawnObjects:
+                        AddComponent<DebugSpawnObjectsTag>(); break;
                 }
             }
         }
