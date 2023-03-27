@@ -73,13 +73,14 @@ namespace Icarus.Space {
                 .FromPositionRotationScale(pos, rot, scale);
             this.EntityManager.AddComponentData<LocalTransform>(entity, transform);
             // find star color
+            // SpriteRenderer sprite = this.EntityManager
+            //     .GetComponentObject<SpriteRenderer>(entity);
+            var sprite = SystemAPI.ManagedAPI.GetComponent<SpriteRenderer>(entity);
             // scale the temperature closer to "white"
             float temp = star.temp + (5800f - star.temp) / 3f;
             Color color = Mathf.CorrelatedColorTemperatureToRGB(temp);
             color.a = amag;
             // update sprite
-            SpriteRenderer sprite = this.EntityManager
-                .GetComponentObject<SpriteRenderer>(entity);
             sprite.color = color;
         }
 

@@ -35,7 +35,7 @@ namespace Icarus.Controls {
             OrbitalPosition pos = SystemAPI.GetComponent<OrbitalPosition>(player);
             OrbitalParent parent = this.EntityManager.GetSharedComponent<OrbitalParent>(player);
             OrbitalParentPosition ppos = SystemAPI.GetComponent<OrbitalParentPosition>(player);
-            Entity prefab = SystemAPI.GetSingleton<SpawnSatellitesComponent>().Prefab;
+            Entity prefab = SystemAPI.GetSingleton<DebugSatellites>().Prefab;
             
             NativeList<Entity> entitiesList = new NativeList<Entity>(10, Allocator.TempJob);
             EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
