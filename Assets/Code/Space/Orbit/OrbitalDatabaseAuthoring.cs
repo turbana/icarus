@@ -174,6 +174,7 @@ namespace Icarus.Orbit {
         }
     }
 
+#if UNITY_EDITOR
     [AddComponentMenu("Icarus/Orbit/Orbital Database")]
     public class OrbitalDatabaseAuthoring : MonoBehaviour {
         [Tooltip("Display a statistics log message on baking")]
@@ -289,4 +290,5 @@ namespace Icarus.Orbit {
             bodies.Dispose();
         }
     }
+#endif
 }

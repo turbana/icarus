@@ -1,10 +1,12 @@
-using UnityEditor;
-using System;
-
 using UnityEngine;
 using Unity.Entities;
 using Unity.Entities.Hybrid.Baking;
 using TMPro;
+
+#if UNITY_EDITOR
+using UnityEditor;
+using System;
+#endif
 
 namespace Icarus.UI {
     public class TextComponentAuthoring : MonoBehaviour {
@@ -38,7 +40,8 @@ namespace Icarus.UI {
             }
         }
     }
-
+    
+#if UNITY_EDITOR
     [CustomEditor(typeof(TextComponentAuthoring))]
     [CanEditMultipleObjects]
     public class TextComponentAuthoringEditor : Editor {
@@ -64,4 +67,5 @@ namespace Icarus.UI {
             serializedObject.ApplyModifiedProperties();
         }
     }
+#endif
 }

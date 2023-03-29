@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 using Unity.Collections;
 using Unity.Entities;
@@ -94,3 +95,4 @@ namespace Icarus.Orbit {
         }
     }
 }
+#endif

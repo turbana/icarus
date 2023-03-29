@@ -1,9 +1,11 @@
-using UnityEditor;
-using System;
-
 using UnityEngine;
 using Unity.Entities;
 using TMPro;
+
+#if UNITY_EDITOR
+using UnityEditor;
+using System;
+#endif
 
 namespace Icarus.UI {
     public class ControlLabelAuthoring : MonoBehaviour {
@@ -36,6 +38,7 @@ namespace Icarus.UI {
         }
     }
 
+#if UNITY_EDITOR
     [CustomEditor(typeof(ControlLabelAuthoring))]
     [CanEditMultipleObjects]
     public class ControlLabelAuthoringEditor : Editor {
@@ -57,4 +60,5 @@ namespace Icarus.UI {
             serializedObject.ApplyModifiedProperties();
         }
     }
+#endif
 }

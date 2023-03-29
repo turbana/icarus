@@ -1,0 +1,1 @@
+build\Icarus.exe -logFile build\log.txt

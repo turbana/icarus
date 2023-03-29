@@ -1,5 +1,7 @@
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 using Unity.Collections;
 using Unity.Entities;
@@ -11,6 +13,7 @@ namespace Icarus.Space {
         public Entity Prefab;
     }
 
+#if UNITY_EDITOR
     [AddComponentMenu("Icarus/Space/Starfield")]
     public class StarfieldAuthoring : MonoBehaviour {
         public float Distance;
@@ -27,4 +30,5 @@ namespace Icarus.Space {
             }
         }
     }
+#endif
 }

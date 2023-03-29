@@ -12,6 +12,6 @@ EditorBuildSettings:
     path: Assets/Scenes/Sub Scenes/Space Sub Scene/Space Sub Scene.unity
     guid: 028e223d9e2ce96409d3062978fd9624
   - enabled: 1
-    path: Assets/Scenes/Sub Scenes/Debug Ship Sub Scene/Debug Ship Sub Scene.unity
-    guid: 34272f9f0e55c4f449822b6a075cc0aa
+    path: Assets/Scenes/Sub Scenes/Player Ship Subscene/Player Ship Sub Scene.unity
+    guid: dec3a98b111cd0b48902f792c9b5c179
   m_configObjects: {}
