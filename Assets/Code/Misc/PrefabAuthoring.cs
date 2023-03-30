@@ -8,9 +8,10 @@ namespace Icarus.Misc {
     public class PrefabAuthoring : MonoBehaviour {
         public class PrefabAuthoringBaker : Baker<PrefabAuthoring> {
             public override void Bake(PrefabAuthoring auth) {
+                var entity = GetEntity(TransformUsageFlags.Dynamic);
                 DependsOn(auth.gameObject);
                 RegisterPrefabForBaking(auth.gameObject);
-                AddComponent<Prefab>();
+                AddComponent<Prefab>(entity);
             }
         }
     }

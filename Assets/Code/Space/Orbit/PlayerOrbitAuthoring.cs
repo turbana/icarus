@@ -25,6 +25,7 @@ namespace Icarus.Orbit {
         
         public class PlayerOrbitAuthoringBaker : Baker<PlayerOrbitAuthoring> {
             public override void Bake(PlayerOrbitAuthoring auth) {
+                var entity = GetEntity(TransformUsageFlags.Dynamic);
                 var db = Object.FindObjectOfType(typeof(OrbitalDatabaseAuthoring)) as OrbitalDatabaseAuthoring;
                 OrbitalDatabaseData parent;
                 try {
@@ -42,9 +43,9 @@ namespace Icarus.Orbit {
                 // double period = System.Math.Sqrt(System.Math.Pow((double)sma * 1000, 3) * ((4 * dmath.PI * dmath.PI) / (dmath.G * (parent.Mass + auth.Mass))));
                 var period = dmath.Period((double)sma, parent.Mass, auth.Mass);
                 // Debug.Log($"orbiting {parent.Name} at {sma}km with period {period} ({parent.Mass} / {auth.Mass})");
-                AddComponent<PlayerOrbitTag>();
-                AddComponent<ShipTag>();
-                AddComponent<OrbitalParameters>(new OrbitalParameters {
+                AddComponent<PlayerOrbitTag>(entity);
+                AddComponent<ShipTag>(entity);
+                AddComponent<OrbitalParameters>(entity, new OrbitalParameters {
                         Period = period,
                         Eccentricity = auth.Eccentricity,
                         SemiMajorAxis = sma,
@@ -55,12 +56,12 @@ namespace Icarus.Orbit {
                                                              math.radians(auth.AscendingNode),
                                                              0)
                     });
-                AddComponent<OrbitalPosition>(new OrbitalPosition {
+                AddComponent<OrbitalPosition>(entity, new OrbitalPosition {
                         ElapsedTime = auth.ElapsedTime,
                         LocalToParent = double3.zero,
                         LocalToWorld = double3.zero
                     });
-                AddComponent<AddOrbitalParent>(new AddOrbitalParent {
+                AddComponent<AddOrbitalParent>(entity, new AddOrbitalParent {
                         Value = parent.Name
                     });
             }

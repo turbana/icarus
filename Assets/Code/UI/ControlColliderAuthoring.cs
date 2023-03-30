@@ -11,6 +11,7 @@ namespace Icarus.UI {
 
         public class ControlColliderAuthoringBaker : Baker<ControlColliderAuthoring> {
             public override void Bake(ControlColliderAuthoring auth) {
+                var entity = GetEntity(TransformUsageFlags.Dynamic);
                 var control = auth.gameObject.GetComponentInParent<BaseControlAuthoring>();
                 if (control == null) {
                     Debug.LogError($"no BaseControlAuthoring found on any parent of game object: {auth.gameObject}", auth.gameObject);
@@ -37,7 +38,7 @@ namespace Icarus.UI {
                     Rotation = 0f,
                     Movement = float3.zero,
                     Type = auth.Type,
-                    Root = GetEntity(go),
+                    Root = GetEntity(go, TransformUsageFlags.Dynamic),
                     InitialTransform = LocalTransform.FromPositionRotationScale(pos, rot, scale.x),
                 };
                 if (control is MultiWayControlAuthoring) {
@@ -48,8 +49,8 @@ namespace Icarus.UI {
                     var bcontrol = control as SimpleButtonAuthoring;
                     settings.Movement = bcontrol.Movement;
                 }
-                AddComponent<ControlSettings>(settings);
-                AddComponent<DatumRef>(new DatumRef {
+                AddComponent<ControlSettings>(entity, settings);
+                AddComponent<DatumRef>(entity, new DatumRef {
                         Name = control.DatumID,
                         Type = DatumType.Double,
                     });

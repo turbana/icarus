@@ -12,7 +12,8 @@ namespace Icarus.Orbit {
         
         public class Baker : Unity.Entities.Baker<OrbitalScaleAuthoring> {
             public override void Bake(OrbitalScaleAuthoring parms) {
-                AddComponent(new OrbitalScale {
+                var entity = GetEntity(TransformUsageFlags.Dynamic);
+                AddComponent(entity, new OrbitalScale {
                         Radius = parms.Radius
                     });
             }

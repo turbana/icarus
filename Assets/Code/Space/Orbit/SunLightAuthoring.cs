@@ -12,7 +12,8 @@ namespace Icarus.Orbit {
     public class SunLightAuthoring : MonoBehaviour {
         public class SunLightAuthoringBaker : Baker<SunLightAuthoring> {
             public override void Bake(SunLightAuthoring auth) {
-                AddComponent(new SunLightComponent());
+                var entity = GetEntity(TransformUsageFlags.Dynamic);
+                AddComponent(entity, new SunLightComponent());
             }
         }
     }

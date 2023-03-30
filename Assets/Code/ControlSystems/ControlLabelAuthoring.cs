@@ -23,13 +23,14 @@ namespace Icarus.UI {
 
         public class ControlLabelAuthoringBaker : Baker<ControlLabelAuthoring> {
             public override void Bake(ControlLabelAuthoring auth) {
+                var entity = GetEntity(TransformUsageFlags.Dynamic);
                 var config = TextStylesConfig.Singleton;
                 var style = config.LookupStyle(auth.FontStyle);
                 if (style is null) {
                     Debug.LogWarning($"Could not find TextStyle: {auth.FontStyle}", auth);
                     return;
                 }
-                AddComponentObject<ManagedTextComponent>(new ManagedTextComponent {
+                AddComponentObject<ManagedTextComponent>(entity, new ManagedTextComponent {
                         GO = null,
                         Style = style,
                         Format = auth.DatumID,

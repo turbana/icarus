@@ -15,6 +15,7 @@ namespace Icarus.UI {
         
         public class DatumCollectionAuthoringBaker : Baker<DatumCollectionAuthoring> {
             public override void Bake(DatumCollectionAuthoring auth) {
+                var entity = GetEntity(TransformUsageFlags.Dynamic);
                 DependsOn(auth.DatumDouble);
                 DependsOn(auth.DatumString64);
                 DependsOn(auth.DatumString512);
@@ -28,7 +29,7 @@ namespace Icarus.UI {
                 foreach (var (name, value) in ParseFile(auth.DatumString512)) {
                     datums.SetString512(name, value);
                 }
-                AddComponent(datums);
+                AddComponent(entity, datums);
             }
 
             public IEnumerable<Tuple<string, string>> ParseFile(UnityEngine.Object datafile) {

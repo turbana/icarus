@@ -61,21 +61,22 @@ namespace Icarus.Orbit {
 
         public class Baker : Unity.Entities.Baker<OrbitalParametersAuthoring> {
             public override void Bake(OrbitalParametersAuthoring parms) {
+                var entity = GetEntity(TransformUsageFlags.Dynamic);
                 if (parms.IsPlayer) {
-                    AddComponent(new PlayerOrbitTag());
+                    AddComponent(entity, new PlayerOrbitTag());
                 }
                 switch(parms.OrbitType) {
                     case OrbitTypeEnum.Planet:
-                        AddComponent(new PlanetTag());
+                        AddComponent(entity, new PlanetTag());
                         break;
                     case OrbitTypeEnum.Moon:
-                        AddComponent(new MoonTag());
+                        AddComponent(entity, new MoonTag());
                         break;
                     case OrbitTypeEnum.Ship:
-                        AddComponent(new ShipTag());
+                        AddComponent(entity, new ShipTag());
                         break;
                 }
-                AddComponent(new OrbitalParameters {
+                AddComponent(entity, new OrbitalParameters {
                         Period = parms.Period,
                         Eccentricity = parms.Eccentricity,
                         SemiMajorAxis = parms.SemiMajorAxis,
@@ -86,7 +87,7 @@ namespace Icarus.Orbit {
                             math.radians(parms.AscendingNode),
                             0f)
                     });
-                AddComponent(new OrbitalPosition {
+                AddComponent(entity, new OrbitalPosition {
                         ElapsedTime = parms.ElapsedTime,
                         LocalToParent = double3.zero,
                         LocalToWorld = double3.zero

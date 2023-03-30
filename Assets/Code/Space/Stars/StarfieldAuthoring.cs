@@ -22,10 +22,11 @@ namespace Icarus.Space {
         
         public class StarfieldAuthoringBaker : Baker<StarfieldAuthoring> {
             public override void Bake(StarfieldAuthoring auth) {
-                AddComponent(new StarfieldComponent {
+                var entity = GetEntity(TransformUsageFlags.Dynamic);
+                AddComponent(entity, new StarfieldComponent {
                         Distance = auth.Distance,
                         Catalog = AssetDatabase.GetAssetPath(auth.Catalog),
-                        Prefab = GetEntity(auth.Prefab)
+                        Prefab = GetEntity(auth.Prefab, TransformUsageFlags.Dynamic)
                     });
             }
         }

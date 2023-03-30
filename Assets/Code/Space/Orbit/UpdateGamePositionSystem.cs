@@ -26,20 +26,20 @@ namespace Icarus.Orbit {
                 .WithAll<PlayerSiblingOrbitTag, OrbitRenderingEnabled>()
                 .WithAllRW<LocalTransform>()
                 .WithAll<OrbitalPosition, OrbitalParameters, OrbitalScale>()
-                .WithAll<RotationalParameters, OrbitalParent>()
+                .WithAll<RotationalParameters, OrbitalParentPosition>()
                 .Build(this);
             PlanetQuery = new EntityQueryBuilder(Allocator.TempJob)
                 .WithAll<PlanetTag, OrbitRenderingEnabled>()
                 .WithNone<PlayerSiblingOrbitTag, PlayerParentOrbitTag>()
                 .WithAllRW<LocalTransform>()
                 .WithAll<OrbitalPosition, OrbitalParameters, OrbitalScale>()
-                .WithAll<RotationalParameters, OrbitalParent>()
+                .WithAll<RotationalParameters, OrbitalParentPosition>()
                 .Build(this);
             ParentQuery = new EntityQueryBuilder(Allocator.TempJob)
                 .WithAll<PlayerParentOrbitTag, OrbitRenderingEnabled>()
                 .WithAllRW<LocalTransform>()
                 .WithAll<OrbitalPosition, OrbitalParameters, OrbitalScale>()
-                .WithAll<RotationalParameters, OrbitalParent>()
+                .WithAll<RotationalParameters, OrbitalParentPosition>()
                 .Build(this);
         }
 

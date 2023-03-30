@@ -23,10 +23,11 @@ namespace Icarus.Orbit {
 
         public class Baker : Unity.Entities.Baker<RotationalParametersAuthoring> {
             public override void Bake(RotationalParametersAuthoring parms) {
+                var entity = GetEntity(TransformUsageFlags.Dynamic);
                 dquaternion tilt = dmath
                     .mul(dquaternion.RotateX(-math.radians(parms.AxialTilt)),
                          dquaternion.RotateY(-math.radians(parms.NorthPoleRA)));
-                AddComponent(new RotationalParameters {
+                AddComponent(entity, new RotationalParameters {
                         Tilt = parms.AxialTilt,
                         NorthPoleRA = parms.NorthPoleRA,
                         Period = parms.SiderealRotationPeriod,

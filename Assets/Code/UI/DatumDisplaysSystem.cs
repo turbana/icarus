@@ -38,7 +38,7 @@ namespace Icarus.UI {
             
             // update dynamic text
             Entities
-                .ForEach((ManagedTextComponent text, in DatumRef dref, in TransformAspect pos) => {
+                .ForEach((ManagedTextComponent text, in DatumRef dref, in LocalTransform pos) => {
                     // skip datums that have yet to be set
                     if (!datums.HasDatum(dref.Name)) return;
                     // UnityEngine.Debug.Log($"looking up {dref.Name}");
@@ -63,7 +63,7 @@ namespace Icarus.UI {
                 .WithNone<DatumRef>()
                 // XXX why can't we use a change filter here?
                 // .WithChangeFilter<ManagedTextComponent>()
-                .ForEach((ManagedTextComponent text, in TransformAspect pos) => {
+                .ForEach((ManagedTextComponent text, in LocalTransform pos) => {
                     text.UpdateText(System.Double.MaxValue);
                     text.UpdatePosition(in pos);
                 })

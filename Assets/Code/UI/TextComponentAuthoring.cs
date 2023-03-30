@@ -18,6 +18,7 @@ namespace Icarus.UI {
         
         public class TextComponentAuthoringBaker : Baker<TextComponentAuthoring> {
             public override void Bake(TextComponentAuthoring auth) {
+                var entity = GetEntity(TransformUsageFlags.Dynamic);
                 var config = TextStylesConfig.Singleton;
                 var style = config.LookupStyle(auth.style);
                 if (style is null) {
@@ -27,12 +28,12 @@ namespace Icarus.UI {
                 DependsOn(config);
                 DependsOn(style);
                 if (auth.datumKey != "") {
-                    AddComponent<DatumRef>(new DatumRef {
+                    AddComponent<DatumRef>(entity, new DatumRef {
                             Name = auth.datumKey,
                             Type = auth.datumType,
                         });
                 }
-                AddComponentObject<ManagedTextComponent>(new ManagedTextComponent {
+                AddComponentObject<ManagedTextComponent>(entity, new ManagedTextComponent {
                         GO = null,
                         Style = style,
                         Format = auth.format,

@@ -22,13 +22,9 @@ namespace Icarus.Orbit {
             
             Entities
                 .WithAll<StarfieldTag>()
-                .ForEach((ref TransformAspect transform) => {
-                    // var ltw = transform.LocalToWorld;
-                    // ltw.Position = PlayerObject.transform.position;
-                    // ltw.Rotation = math.inverse(playerRot);
-                    // transform.LocalToWorld = ltw;
-                    transform.LocalPosition = PlayerObject.transform.position;
-                    transform.LocalRotation = math.inverse(playerRot);
+                .ForEach((ref LocalTransform transform) => {
+                    transform.Position = PlayerObject.transform.position;
+                    transform.Rotation = math.inverse(playerRot);
                 })
                 .WithoutBurst()
                 .Run();

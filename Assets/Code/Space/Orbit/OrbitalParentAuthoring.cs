@@ -20,10 +20,11 @@ namespace Icarus.Orbit {
 
         public class Baker : Unity.Entities.Baker<OrbitalParentAuthoring> {
             public override void Bake(OrbitalParentAuthoring obj) {
-                AddSharedComponent(new OrbitalParent {
-                        Value = GetEntity(obj.ParentBody.gameObject)
+                var entity = GetEntity(TransformUsageFlags.Dynamic);
+                AddSharedComponent(entity, new OrbitalParent {
+                        Value = GetEntity(obj.ParentBody.gameObject, TransformUsageFlags.Dynamic)
                     });
-                AddComponent(new OrbitalParentPosition {
+                AddComponent(entity, new OrbitalParentPosition {
                         Value = double3.zero
                     });
             }

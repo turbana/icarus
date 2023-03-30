@@ -15,7 +15,8 @@ namespace Icarus.Orbit {
         
         public class OrbitalBodyToLoadAuthoringBaker : Baker<OrbitalBodyToLoadAuthoring> {
             public override void Bake(OrbitalBodyToLoadAuthoring auth) {
-                AddComponent(new OrbitalBodyToLoadComponent {
+                var entity = GetEntity(TransformUsageFlags.Dynamic);
+                AddComponent(entity, new OrbitalBodyToLoadComponent {
                         Name = auth.Name
                     });
             }

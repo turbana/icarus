@@ -12,8 +12,9 @@ namespace Icarus.Orbit {
         
         public class Baker : Unity.Entities.Baker<DebugSatellitesAuthoring> {
             public override void Bake(DebugSatellitesAuthoring auth) {
-                AddComponent(new DebugSatellites {
-                        Prefab = GetEntity(auth.prefab)
+                var entity = GetEntity(TransformUsageFlags.Dynamic);
+                AddComponent(entity, new DebugSatellites {
+                        Prefab = GetEntity(auth.prefab, TransformUsageFlags.Dynamic)
                     });
             }
         }

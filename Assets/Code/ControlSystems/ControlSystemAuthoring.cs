@@ -16,24 +16,25 @@ namespace Icarus.Controls {
 
         public class ControlSystemAuthoringBaker : Baker<ControlSystemAuthoring> {
             public override void Bake(ControlSystemAuthoring auth) {
+                var entity = GetEntity(TransformUsageFlags.Dynamic);
                 switch (auth.ControlSystem) {
                     case ControlSystemType.BridgeJumpTargetKeypad:
-                        AddComponent<BridgeJumpTargetKeypadTag>(); break;
+                        AddComponent<BridgeJumpTargetKeypadTag>(entity); break;
                     case ControlSystemType.BridgeJumpTargetKeyboard:
-                        var buffer = AddBuffer<BridgeJumpTargetValue>();
+                        var buffer = AddBuffer<BridgeJumpTargetValue>(entity);
                         buffer.Length = 10;
                         for (int i=0; i<10; i++) {
                             buffer[i] = new BridgeJumpTargetValue { Value = "" };
                         }
-                        AddComponent<BridgeJumpTargetKeyboardTag>(); break;
+                        AddComponent<BridgeJumpTargetKeyboardTag>(entity); break;
                     case ControlSystemType.BridgeJumpTargetLoad:
-                        AddComponent<BridgeJumpTargetLoadTag>(); break;
+                        AddComponent<BridgeJumpTargetLoadTag>(entity); break;
                     case ControlSystemType.BridgeJumpTargetJump:
-                        AddComponent<BridgeJumpTargetJumpTag>(); break;
+                        AddComponent<BridgeJumpTargetJumpTag>(entity); break;
                     case ControlSystemType.DebugTimeControls:
-                        AddComponent<DebugTimeControlsTag>(); break;
+                        AddComponent<DebugTimeControlsTag>(entity); break;
                     case ControlSystemType.DebugSpawnObjects:
-                        AddComponent<DebugSpawnObjectsTag>(); break;
+                        AddComponent<DebugSpawnObjectsTag>(entity); break;
                 }
             }
         }

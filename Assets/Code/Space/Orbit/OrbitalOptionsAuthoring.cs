@@ -16,7 +16,8 @@ namespace Icarus.Orbit {
         
         public class Baker : Unity.Entities.Baker<OrbitalOptionsAuthoring> {
             public override void Bake(OrbitalOptionsAuthoring parms) {
-                AddComponent(new OrbitalOptions {
+                var entity = GetEntity(TransformUsageFlags.Dynamic);
+                AddComponent(entity, new OrbitalOptions {
                         TimeScale = parms.TimeScale
                     });
             }

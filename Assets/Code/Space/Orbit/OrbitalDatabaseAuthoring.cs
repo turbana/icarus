@@ -233,6 +233,7 @@ namespace Icarus.Orbit {
 
         public class OrbitalDatabaseAuthoringBaker : Baker<OrbitalDatabaseAuthoring> {
             public override void Bake(OrbitalDatabaseAuthoring auth) {
+                var entity = GetEntity(TransformUsageFlags.Dynamic);
                 DependsOn(auth.OrbitalDatabase);
 
                 var GuessSize = 100;
@@ -242,26 +243,28 @@ namespace Icarus.Orbit {
                 var pmap = new EntityDatabase(GuessSize, Allocator.Persistent);
 
                 auth.LoadDatabase(dmap);
-                SetPrefabs(pmap, auth.PrefabPath);
+                SetPrefabs(entity, pmap, auth.PrefabPath);
                 if (auth.LogStatistics) {
                     ShowStatistics(dmap, pmap);
                 }
 
                 var comp = new OrbitalDatabaseComponent(dmap);
-                AddComponent<OrbitalDatabaseComponent>(comp);
+                AddComponent<OrbitalDatabaseComponent>(entity, comp);
             }
 
-            private void SetPrefabs(EntityDatabase pmap, Object dir) {
+            private void SetPrefabs(in Entity entity, EntityDatabase pmap, Object dir) {
                 string[] root = new string[] { AssetDatabase.GetAssetPath(dir) };
                 string[] assets = AssetDatabase.FindAssets("t:GameObject", root);
-                var prefabs = AddBuffer<OrbitalDatabaseDataComponent>();
+                var prefabs = AddBuffer<OrbitalDatabaseDataComponent>(entity);
                 for (int i=0; i<assets.Length; i++) {
                     string path = AssetDatabase.GUIDToAssetPath(assets[i]);
                     GameObject prefab = AssetDatabase.LoadMainAssetAtPath(path) as GameObject;
                     var comp = new OrbitalDatabaseDataComponent {
-                        Name = prefab.name, Value = GetEntity(prefab) };
+                        Name = prefab.name,
+                        Value = GetEntity(prefab, TransformUsageFlags.Dynamic)
+                    };
                     prefabs.Add(comp);
-                    pmap[prefab.name] = GetEntity(prefab);
+                    pmap[prefab.name] = GetEntity(prefab, TransformUsageFlags.Dynamic);
                 }
             }
         }

@@ -50,8 +50,8 @@ namespace Icarus.Misc {
                 var parent = reparent.Value;
                 var pltw = LTWLookup[parent].Value;
                 var cltw = LTWLookup[child].Value;
-                var pwt = WorldTransform.FromMatrix(pltw);
-                var cwt = WorldTransform.FromMatrix(cltw);
+                var pwt = LocalTransform.FromMatrix(pltw);
+                var cwt = LocalTransform.FromMatrix(cltw);
                 var clt = (LocalTransform)pwt.InverseTransformTransform(cwt);
                 
                 // update child entity

@@ -12,8 +12,9 @@ namespace Icarus.Misc {
     public class PlayerAuthoring : MonoBehaviour {
         public class PlayerAuthoringBaker : Baker<PlayerAuthoring> {
             public override void Bake(PlayerAuthoring parms) {
-                AddComponent(new PlayerTag());
-                AddComponent(new PlayerRotation {
+                var entity = GetEntity(TransformUsageFlags.Dynamic);
+                AddComponent(entity, new PlayerTag());
+                AddComponent(entity, new PlayerRotation {
                         Value = quaternion.EulerXYZ(0f)
                     });
             }

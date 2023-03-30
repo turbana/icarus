@@ -8,7 +8,8 @@ namespace Icarus.Orbit {
     public class StarfieldAuthoring : MonoBehaviour {
         public class Baker : Unity.Entities.Baker<StarfieldAuthoring> {
             public override void Bake(StarfieldAuthoring parms) {
-                AddComponent(new StarfieldTag());
+                var entity = GetEntity(TransformUsageFlags.Dynamic);
+                AddComponent(entity, new StarfieldTag());
             }
         }
     }
