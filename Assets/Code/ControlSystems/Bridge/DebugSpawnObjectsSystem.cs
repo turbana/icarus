@@ -13,21 +13,17 @@ namespace Icarus.Controls {
     [BurstCompile]
     [UpdateInGroup(typeof(IcarusInteractionSystemGroup))]
     public partial class DebugSpawnObjectsSystem : SystemBase {
-        public ComponentLookup<DatumDouble> DatumDoubleLookup;
         private Random random;
 
         private const double INITIAL_COUNT = 100;
 
         [BurstCompile]
         protected override void OnCreate() {
-            DatumDoubleLookup = GetComponentLookup<DatumDouble>(false);
             random = new Random((uint)System.Diagnostics.Stopwatch.GetTimestamp());
         }
 
         [BurstCompile]
         protected override void OnUpdate() {
-            DatumDoubleLookup.Update(this);
-            var DDL = DatumDoubleLookup;
             var rand = random;
 
             Entity player = SystemAPI.GetSingletonEntity<PlayerOrbitTag>();
@@ -42,19 +38,14 @@ namespace Icarus.Controls {
         
             Entities
                 .WithAll<DebugSpawnObjectsTag>()
-                .ForEach((in DatumRefBufferCollection index,
-                          in DynamicBuffer<DatumRefBuffer> buffers) => {
-                    var increase = DDL[buffers[index["Debug.SpawnObjects.Increase"]].Entity];
-                    var decrease = DDL[buffers[index["Debug.SpawnObjects.Decrease"]].Entity];
-                    var spawn = DDL[buffers[index["Debug.SpawnObjects.Spawn"]].Entity];
-                    var countEntity = buffers[index["Debug.SpawnObjects.Count"]].Entity;
-                    var countDatum = DDL[countEntity];
+                .ForEach((ref DatumCollection datums) => {
+                    var count = datums.GetDouble("Debug.SpawnObjects.Count");
 
-                    if (increase.Dirty && increase.Value == 1) {
-                        countDatum.Value = countDatum.Value * 10;
-                    } else if (decrease.Dirty && decrease.Value == 1) {
-                        countDatum.Value = countDatum.Value / 10;
-                    } else if (spawn.Dirty && spawn.Value == 1) {
+                    if (datums.IsPressed("Debug.SpawnObjects.Increase")) {
+                        count *= 10;
+                    } else if (datums.IsPressed("Debug.SpawnObjects.Decrease")) {
+                        count /= 10;
+                    } else if (datums.IsPressed("Debug.SpawnObjects.Spawn")) {
                         OrbitalScale scale = new OrbitalScale { Radius = 0.001f };
                         RotationalParameters rot = new RotationalParameters {
                             Tilt = 0f,
@@ -65,7 +56,7 @@ namespace Icarus.Controls {
                             AxialRotation = quaternion.EulerXYZ(0f)
                         };
 
-                        entitiesList.Length = (int)countDatum.Value;
+                        entitiesList.Length = (int)count;
                         var entities = entitiesList.AsArray();
                         ecb.Instantiate(prefab, entities);
                         ecb.AddSharedComponent<OrbitalParent>(entities, parent);
@@ -75,7 +66,7 @@ namespace Icarus.Controls {
                         ecb.AddComponent<ShipTag>(entities);
                         ecb.AddComponent<OrbitRenderingEnabled>(entities);
                         ecb.AddComponent<PlayerSiblingOrbitTag>(entities);
-                        for (int i=0; i<countDatum.Value; i++) {
+                        for (int i=0; i<(int)count; i++) {
                             double period = parms.Period + rand.NextDouble(0f, 0f);
                             double elapsed = pos.ElapsedTime + rand.NextDouble(-0.1f, 0.1f);
                             if (elapsed < 0f) elapsed += period;
@@ -100,12 +91,7 @@ namespace Icarus.Controls {
                                 });
                         }
                     }
-                    if (countDatum.Dirty) {
-                        if (countDatum.Value == 0.0) {
-                            countDatum.Value = INITIAL_COUNT;
-                        }
-                        DDL[countEntity] = countDatum;
-                    }
+                    datums.SetDouble("Debug.SpawnObjects.Count", count);
                 })
                 .Schedule();
 

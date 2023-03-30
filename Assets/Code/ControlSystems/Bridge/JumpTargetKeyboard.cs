@@ -15,9 +15,6 @@ namespace Icarus.Controls {
     [BurstCompile]
     [UpdateInGroup(typeof(IcarusInteractionSystemGroup))]
     public partial class BridgeJumpTargetKeyboard : SystemBase {
-        public ComponentLookup<DatumDouble> DatumDoubleLookup;
-        public ComponentLookup<DatumString512> DatumStringLookup;
-        public ComponentLookup<DatumString64> DatumString64Lookup;
         public ComponentLookup<OrbitalDatabaseComponent> DatabaseLookup;
 
         // line width is 30 characters minus 2 for the prefix character and space
@@ -33,90 +30,67 @@ namespace Icarus.Controls {
 
         [BurstCompile]
         protected override void OnCreate() {
-            DatumDoubleLookup = GetComponentLookup<DatumDouble>(true);
-            DatumStringLookup = GetComponentLookup<DatumString512>(false);
-            DatumString64Lookup = GetComponentLookup<DatumString64>(false);
             DatabaseLookup = GetComponentLookup<OrbitalDatabaseComponent>(true);
         }
         
         [BurstCompile]
         protected override void OnUpdate() {
-            DatumDoubleLookup.Update(this);
-            DatumStringLookup.Update(this);
-            DatumString64Lookup.Update(this);
             DatabaseLookup.Update(this);
-            var DDL = DatumDoubleLookup;
-            var DSL = DatumStringLookup;
-            var DS64L = DatumString64Lookup;
             var DBL = DatabaseLookup;
             var cursor = (int)World.Time.ElapsedTime % 2 == 0;
             var prevCursor = (int)(World.Time.ElapsedTime - World.Time.DeltaTime) % 2 == 0;
             var dbEntity = SystemAPI.GetSingletonEntity<OrbitalDatabaseComponent>();
             
             Entities
-                .WithReadOnly(DDL)
                 .WithReadOnly(DBL)
                 .WithAll<BridgeJumpTargetKeyboardTag>()
                 .ForEach((ref DynamicBuffer<BridgeJumpTargetValue> values,
-                          in DatumRefBufferCollection index,
-                          in DynamicBuffer<DatumRefBuffer> buffers
-                         ) => {
-                    var oentity = buffers[index["Bridge.JumpTarget.Computer"]].Entity;
-                    var output = DSL[oentity];
+                          ref DatumCollection datums) => {
+                    var output = datums.GetString512("Bridge.JumpTarget.Computer");
                     var dirty = false;
-                    
-                    foreach (var pair in index.IndexMap) {
-                        var id = pair.Key;
-                        var idx = pair.Value;
-                        var cut = id.LastIndexOf(DECIMAL_RUNE);
-                        if (cut < 0) continue;
-                        var prefix = id.Substring(0, cut);
-                        if (prefix == "Bridge.JumpTarget.Keyboard") {
-                            var entity = buffers[idx].Entity;
-                            if (!DDL.HasComponent(entity)) continue;
-                            var datum = DDL[entity];
-                            if (datum.Dirty && datum.Value == 1) {
-                                var suffix = id.Substring(cut + 1);
-                                var search = values[0].Value;
-                                // UnityEngine.Debug.Log($"pressed {suffix}");
-                                var chosen = HandleInput(ref search, suffix);
-                                if (0 < chosen && values[chosen].Value != "") {
-                                    var target = buffers[index["Planned.Orbit.Target"]].Entity;
-                                    var tmp = DS64L[target];
-                                    tmp.Value = values[chosen].Value;
-                                    DS64L[target] = tmp;
-                                }
 
-                                // did we change the search value?
-                                if (search != values[0].Value) {
-                                    dirty = true;
-                                    // update search value
-                                    var tmp = values[0];
-                                    tmp.Value = search;
-                                    values[0] = tmp;
-                                    // perform search
-                                    var db = DBL[dbEntity];
-                                    var results = db.Search(search, RESULT_LINES, Allocator.TempJob);
-                                    // UnityEngine.Debug.Log($"got {results.Length} results for {search}");
-                                    for (int i=0; i<RESULT_LINES; i++) {
-                                        var result = (i < results.Length && search != "") ? results[i] : "";
-                                        tmp = values[i + 1];
-                                        tmp.Value = new FixedString32Bytes(result.Substring(0, 29));
-                                        values[i + 1] = tmp;
-                                    }
-                                    results.Dispose();
+                    var keys = datums.DoubleStartsWith("Bridge.JumpTarget.Keyboard", Allocator.TempJob);
+                    for (int j=0; j<keys.Length; j++) {
+                        var key = keys[j];
+                        if (datums.IsPressed(key)) {
+                            var cut = key.LastIndexOf(DECIMAL_RUNE);
+                            var suffix = key.Substring(cut + 1);
+                            var search = values[0].Value;
+                            // UnityEngine.Debug.Log($"pressed {suffix}");
+                            var chosen = HandleInput(ref search, suffix);
+                            if (0 < chosen && values[chosen].Value != "") {
+                                datums.SetString64("Planned.Orbit.Target", values[chosen].Value);
+                            }
+
+                            // did we change the search value?
+                            if (search != values[0].Value) {
+                                dirty = true;
+                                // update search value
+                                var tmp = values[0];
+                                tmp.Value = search;
+                                values[0] = tmp;
+                                // perform search
+                                var db = DBL[dbEntity];
+                                var results = db.Search(search, RESULT_LINES, Allocator.TempJob);
+                                // UnityEngine.Debug.Log($"got {results.Length} results for {search}");
+                                for (int i=0; i<RESULT_LINES; i++) {
+                                    var result = (i < results.Length && search != "") ? results[i] : "";
+                                    tmp = values[i + 1];
+                                    tmp.Value = new FixedString32Bytes(result.Substring(0, 29));
+                                    values[i + 1] = tmp;
                                 }
+                                results.Dispose();
                             }
                         }
                     }
-
+                    keys.Dispose();
+                    
                     // refresh the screen when either:
                     // - we've updated the search term
                     // - we need to toggle the cursor visibility
-                    // - or the first time the computer is being displayed
-                    if (dirty || (cursor != prevCursor) || output.Value.Length == 0) {
-                        BuildOutput(ref output.Value, values, cursor);
-                        DSL[oentity] = output;
+                    if (dirty || (cursor != prevCursor)) {
+                        BuildOutput(ref output, values, cursor);
+                        datums.SetString512("Bridge.JumpTarget.Computer", output);
                     }
                 })
                 .Schedule();

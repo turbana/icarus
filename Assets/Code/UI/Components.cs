@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -119,53 +120,12 @@ namespace Icarus.UI {
         String512,
     }
 
-    /* A DatumRef holds a reference to a Datum. This consists of an DatumType
-     * that the Datum is and and Entity that holds the Datum. */
+    /* A DatumRef holds a reference to a Datum (Name and Type) */
     public partial struct DatumRef : IComponentData {
-        public Entity Entity;
+        public FixedString64Bytes Name;
         public DatumType Type;
     }
 
-    /* A DatumRefBuffer can be used as a DynamicList<> for a list of Datum
-     * references.*/
-    public partial struct DatumRefBuffer : IBufferElementData {
-        public Entity Entity;
-        public DatumType Type;
-    }
-
-    /* An UninitializedDatumRef is a DatumRef that has yet to be connected to a
-     * live Entity. This should be inserted at Bake time, and resolved at Load
-     * time. */
-    public partial struct UninitializedDatumRef : IComponentData {
-        public FixedString64Bytes ID;
-        public DatumType Type;
-    }
-
-    /* An UninitializedDatumRefBuffer can be used as a DynamicList<> for a list
-     * of uninitialized Datum references. */
-    public partial struct UninitializedDatumRefBuffer : IBufferElementData {
-        public FixedString64Bytes ID;
-        public DatumType Type;
-    }
-
-    /* A DatumRefBufferCollector is applied during baking to an Entity that
-     * wants a DatumRefBufferCollection. A baking system runs to populate the
-     * *Collection from the *Collector. */
-    public partial struct DatumRefBufferCollector : IComponentData {
-        public UnsafeList<Entity> Children;
-        public UnsafeList<UninitializedDatumRefBuffer> ExtraBuffers;
-    }
-
-    /* A DatumRefBufferCollection holds ID/index information on the sibling
-     * DynamicBuffer<DatumRefBuffer> component. This can be used to lookup
-     * specific DatumRefBuffer by it's ID rather than index. */
-    public partial struct DatumRefBufferCollection : IComponentData {
-        public UnsafeHashMap<FixedString64Bytes, int> IndexMap;
-
-        public int this[FixedString64Bytes ID] =>
-            IndexMap[ID];
-    }
-    
     /*** The Datums definitions ***/
     public partial struct DatumDouble : IComponentData {
         public FixedString64Bytes ID;
@@ -287,6 +247,256 @@ namespace Icarus.UI {
             rt.position = pos;
             rt.rotation = rot * Quaternion.Euler(0f, -90f, 0f);
             rt.localScale = scale;
+        }
+    }
+
+    /* create a shared static counter for use in threading DatumCollection. */
+    public class DatumCollectionLock {
+        public static readonly SharedStatic<int> Lock = SharedStatic<int>
+            .GetOrCreate<DatumCollectionLock, LockKey>();
+        private class LockKey {}
+
+        // static DatumCollectionLock(int start, int end) {
+        //     while (start == Interlocked.Exchange(ref Lock, end));
+        // }
+    }
+
+    [BurstCompile]
+    public unsafe partial struct DatumCollection : IComponentData {
+        public UnsafeHashMap<FixedString64Bytes, DatumDouble> DatumDouble;
+        public UnsafeHashMap<FixedString64Bytes, DatumString64> DatumString64;
+        public UnsafeHashMap<FixedString64Bytes, DatumString512> DatumString512;
+        public UnsafeHashSet<FixedString64Bytes> Dirty;
+        public UnsafeHashSet<FixedString64Bytes> Keys;
+        
+        public DatumCollection(AllocatorManager.AllocatorHandle allocator) {
+            DatumDouble = new UnsafeHashMap<FixedString64Bytes, DatumDouble>(1000, allocator);
+            DatumString64 = new UnsafeHashMap<FixedString64Bytes, DatumString64>(1000, allocator);
+            DatumString512 = new UnsafeHashMap<FixedString64Bytes, DatumString512>(100, allocator);
+            Dirty = new UnsafeHashSet<FixedString64Bytes>(1000, allocator);
+            Keys = new UnsafeHashSet<FixedString64Bytes>(1000, allocator);
+        }
+
+        [BurstCompile]
+        public void Dispose() {
+            DatumDouble.Dispose();
+            DatumString64.Dispose();
+            DatumString512.Dispose();
+            Dirty.Dispose();
+            Keys.Dispose();
+        }
+
+        /* threading */
+
+        [NativeDisableUnsafePtrRestriction]
+        internal static readonly SharedStatic<int> _lock = SharedStatic<int>
+            .GetOrCreate<DatumCollection>();
+        internal ref int _Lock => ref UnsafeUtility
+            .AsRef<int>(UnsafeUtilityExtensions.AddressOf(_lock));
+        
+        [BurstCompile]
+        private void _AquireLock() {
+            while (Interlocked.Exchange(ref _Lock, 1) == 0);
+        }
+
+        [BurstCompile]
+        private void _ReleaseLock() {
+            Interlocked.Exchange(ref _Lock, 0);
+        }
+
+        /* public misc */
+        
+        [BurstCompile]
+        public bool HasDatum(FixedString64Bytes name) {
+            _AquireLock();
+            var result = Keys.Contains(name);
+            _ReleaseLock();
+            return result;
+        }
+
+        [BurstCompile]
+        public bool IsDirty(FixedString64Bytes name) {
+            _AquireLock();
+            _AssertKey(name);
+            var result = Dirty.Contains(name);
+            _ReleaseLock();
+            return result;
+        }
+
+        [BurstCompile]
+        public bool IsPressed(FixedString64Bytes name) {
+            _AquireLock();
+            // don't assert the key
+            var result = Dirty.Contains(name) && DatumDouble[name].Value == 1;
+            _ReleaseLock();
+            return result;
+        }
+
+        [BurstCompile]
+        public void ResetDirty() {
+            _AquireLock();
+            Dirty.Clear();
+            _ReleaseLock();
+        }
+
+        /* private misc (without locking) */
+        
+        [BurstCompile]
+        private bool _HasDatum(FixedString64Bytes name) {
+            return Keys.Contains(name);
+        }
+
+        [BurstCompile]
+        private void _AssertKey(FixedString64Bytes key) {
+            // UnityEngine.Debug.Log($"_AssertKey({key})");
+#if UNITY_EDITOR
+            if (!_HasDatum(key)) {
+                _ReleaseLock();
+                throw new System.ArgumentException($"datum not set: {key}");
+            }
+#endif
+        }
+
+        [BurstCompile]
+        private void _AddKey(FixedString64Bytes name) {
+            // UnityEngine.Debug.Log($"adding key: {name} [{Keys.Count}/{Dirty.Count}] [{DatumDouble.Count}/{DatumString64.Count}/{DatumString512.Count}]");
+            Keys.Add(name);
+            Dirty.Add(name);
+        }
+
+        /* getters */
+
+        [BurstCompile]
+        public double GetDouble(FixedString64Bytes name) {
+            _AquireLock();
+            _AssertKey(name);
+            var result = DatumDouble[name].Value;
+            _ReleaseLock();
+            return result;
+        }
+
+        [BurstCompile]
+        public double GetDouble(FixedString64Bytes name, double defaultValue) {
+            _AquireLock();
+            var result = _HasDatum(name)
+                ? DatumDouble[name].Value
+                : defaultValue;
+            _ReleaseLock();
+            return result;
+        }
+
+        [BurstCompile]
+        public FixedString64Bytes GetString64(FixedString64Bytes name) {
+            _AquireLock();
+            _AssertKey(name);
+            var result = DatumString64[name].Value;
+            _ReleaseLock();
+            return result;
+        }
+
+        [BurstCompile]
+        public FixedString64Bytes GetString64(FixedString64Bytes name, FixedString64Bytes defaultValue) {
+            _AquireLock();
+            var result = _HasDatum(name)
+                ? DatumString64[name].Value
+                : defaultValue;
+            _ReleaseLock();
+            return result;
+        }
+
+        [BurstCompile]
+        public FixedString512Bytes GetString512(FixedString64Bytes name) {
+            _AquireLock();
+            _AssertKey(name);
+            var result = DatumString512[name].Value;
+            _ReleaseLock();
+            return result;
+        }
+
+        [BurstCompile]
+        public FixedString512Bytes GetString512(FixedString64Bytes name, FixedString512Bytes defaultValue) {
+            _AquireLock();
+            var result = _HasDatum(name)
+                ? DatumString512[name].Value
+                : defaultValue;
+            _ReleaseLock();
+            return result;
+        }
+
+        /* setters */
+
+        [BurstCompile]
+        public void SetDouble(FixedString64Bytes name, double value) {
+            _AquireLock();
+            DatumDouble datum;
+            if (DatumDouble.ContainsKey(name)) {
+                datum = DatumDouble[name];
+                datum.Value = value;
+            } else {
+                datum = new DatumDouble { ID = name, Value = value };
+            }
+            _AddKey(name);
+            DatumDouble[name] = datum;
+            _ReleaseLock();
+        }
+
+        [BurstCompile]
+        public void SetString64(FixedString64Bytes name, FixedString64Bytes value) {
+            _AquireLock();
+            DatumString64 datum;
+            if (DatumString64.ContainsKey(name)) {
+                datum = DatumString64[name];
+                datum.Value = value;
+            } else {
+                datum = new DatumString64 { ID = name, Value = value };
+            }
+            _AddKey(name);
+            DatumString64[name] = datum;
+            _ReleaseLock();
+        }
+
+        [BurstCompile]
+        public void SetString512(FixedString64Bytes name, FixedString512Bytes value) {
+            _AquireLock();
+            DatumString512 datum;
+            if (DatumString512.ContainsKey(name)) {
+                datum = DatumString512[name];
+                datum.Value = value;
+            } else {
+                datum = new DatumString512 { ID = name, Value = value };
+            }
+            _AddKey(name);
+            DatumString512[name] = datum;
+            _ReleaseLock();
+        }
+
+        /* searchers */
+
+        [BurstCompile]
+        public UnsafeList<FixedString64Bytes> DoubleStartsWith(in FixedString64Bytes prefix, AllocatorManager.AllocatorHandle allocator) {
+            var results = new UnsafeList<FixedString64Bytes>(10, allocator);
+            _AquireLock();
+            var keys = DatumDouble.GetKeyArray(Allocator.Temp);
+            _ReleaseLock();
+            for (int i=0; i<keys.Length; i++) {
+                var key = keys[i];
+                if (StringStartsWith(key, prefix)) {
+                    results.Add(key);
+                }
+            }
+            keys.Dispose();
+            return results;
+        }
+
+        // this is defined in collections under an extension method, not sure
+        // why I can't seem to use it.
+        // NOTE: prefix must be at least as long as str.
+        [BurstCompile]
+        private static bool StringStartsWith(in FixedString64Bytes str, in FixedString64Bytes prefix) {
+            for (int i=0; i<prefix.Length; i++) {
+                if (str[i] != prefix[i]) return false;
+            }
+            return true;
         }
     }
 }

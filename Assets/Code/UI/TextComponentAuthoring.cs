@@ -27,8 +27,8 @@ namespace Icarus.UI {
                 DependsOn(config);
                 DependsOn(style);
                 if (auth.datumKey != "") {
-                    AddComponent<UninitializedDatumRef>(new UninitializedDatumRef {
-                            ID = auth.datumKey,
+                    AddComponent<DatumRef>(new DatumRef {
+                            Name = auth.datumKey,
                             Type = auth.datumType,
                         });
                 }

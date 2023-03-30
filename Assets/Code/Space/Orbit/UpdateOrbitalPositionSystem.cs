@@ -19,9 +19,6 @@ namespace Icarus.Orbit {
             float dt = SystemAPI.Time.DeltaTime * opts.TimeScale;
             var OrbitalParentTypeHandle = GetSharedComponentTypeHandle<OrbitalParent>();
             var RotationalParametersLookup = GetComponentLookup<RotationalParameters>(true);
-            var DatumDoubleLookup = GetComponentLookup<DatumDouble>(false);
-            var DatumStringLookup = GetComponentLookup<DatumString64>(false);
-            var DatumRefLookup = GetBufferLookup<DatumRefBuffer>(true);
             var player = SystemAPI.GetSingletonEntity<PlayerOrbitTag>();
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
 
@@ -31,9 +28,6 @@ namespace Icarus.Orbit {
                 DeltaTime = dt,
                 OrbitalParentTypeHandle = OrbitalParentTypeHandle,
                 RotationalParametersLookup = RotationalParametersLookup,
-                DatumDoubleLookup = DatumDoubleLookup,
-                DatumStringLookup = DatumStringLookup,
-                DatumRefLookup = DatumRefLookup,
             }.ScheduleParallel();
 
             this.Dependency.Complete();
@@ -52,12 +46,6 @@ namespace Icarus.Orbit {
             public SharedComponentTypeHandle<OrbitalParent> OrbitalParentTypeHandle;
             [ReadOnly]
             public ComponentLookup<RotationalParameters> RotationalParametersLookup;
-            [NativeDisableParallelForRestriction]
-            public ComponentLookup<DatumDouble> DatumDoubleLookup;
-            [NativeDisableParallelForRestriction]
-            public ComponentLookup<DatumString64> DatumStringLookup;
-            [ReadOnly]
-            public BufferLookup<DatumRefBuffer> DatumRefLookup;
 
             private dquaternion ParentTilt;
             private FixedString64Bytes ParentName;
@@ -109,43 +97,6 @@ namespace Icarus.Orbit {
                         LocalToWorld = ppos.Value + ltp,
                         LocalToParent = ltp
                     });
-
-                if (entity == Player) {
-                    var buffer = DatumRefLookup[entity];
-                    // NOTE: buffer indexes must match order defined in
-                    // PlayerOrbitAuthoring.
-                    // orbital position
-                    SetDatum(buffer[0], n);
-                    SetDatum(buffer[1], M);
-                    SetDatum(buffer[2], E);
-                    SetDatum(buffer[3], beta);
-                    SetDatum(buffer[4], elapsed);
-                    SetDatum(buffer[5], theta);
-                    SetDatum(buffer[6], altitude);
-                    // orbit parameters
-                    SetDatum(buffer[7], parms.Period);
-                    SetDatum(buffer[8], parms.Eccentricity);
-                    SetDatum(buffer[9], parms.SemiMajorAxis);
-                    SetDatum(buffer[10], parms.Inclination);
-                    SetDatum(buffer[11], parms.AscendingNode);
-                    // timings
-                    // TODO rising/falling nodes
-                    double per = parms.Period - elapsed;
-                    double apo = parms.Period/2 - elapsed;
-                    if (apo < 0) apo += parms.Period;
-                    SetDatum(buffer[12], per);
-                    SetDatum(buffer[13], apo);
-                    // set parent name datum
-                    var datum = DatumStringLookup[buffer[14].Entity];
-                    datum.Value = ParentName;
-                    DatumStringLookup[buffer[14].Entity] = datum;
-                }
-            }
-
-            private void SetDatum(DatumRefBuffer dref, double value) {
-                var datum = DatumDoubleLookup[dref.Entity];
-                datum.Value = value;
-                DatumDoubleLookup[dref.Entity] = datum;
             }
         }
         

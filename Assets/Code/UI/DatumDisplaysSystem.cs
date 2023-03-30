@@ -13,53 +13,46 @@ namespace Icarus.UI {
     [UpdateInGroup(typeof(IcarusPresentationSystemGroup))]
     public partial class DatumDisplaysSystem : SystemBase {
         public ComponentLookup<LocalTransform> LocalTransformLookup;
-        public ComponentLookup<DatumDouble> DatumDoubleLookup;
-        public ComponentLookup<DatumString64> DatumString64Lookup;
-        public ComponentLookup<DatumString512> DatumString512Lookup;
 
         [BurstCompile]
         protected override void OnCreate() {
             LocalTransformLookup = GetComponentLookup<LocalTransform>(false);
-            DatumDoubleLookup = GetComponentLookup<DatumDouble>(true);
-            DatumString64Lookup = GetComponentLookup<DatumString64>(true);
-            DatumString512Lookup = GetComponentLookup<DatumString512>(true);
         }
         
         [BurstCompile]
         protected override void OnUpdate() {
             LocalTransformLookup.Update(this);
-            DatumDoubleLookup.Update(this);
-            DatumString64Lookup.Update(this);
-            DatumString512Lookup.Update(this);
-            
             var LTL = LocalTransformLookup;
-            var DDL = DatumDoubleLookup;
-            var DS64L = DatumString64Lookup;
-            var DS512L = DatumString512Lookup;
+            var datums = SystemAPI.GetSingleton<DatumCollection>();
 
             // update controls
             Entities
-                .WithReadOnly(DDL)
                 .ForEach((in ControlAspect control, in DatumRef dref) => {
-                    var datum = DDL[dref.Entity];
-                    LTL[control.Root] = control.GetLocalTransform(in datum);
+                    double value = 0;
+                    if (datums.HasDatum(dref.Name)) {
+                        value = datums.GetDouble(dref.Name);
+                    }
+                    LTL[control.Root] = control.GetLocalTransform((float)value);
                 })
                 .Schedule();
-
+            
             // update dynamic text
             Entities
-                .WithReadOnly(DDL)
                 .ForEach((ManagedTextComponent text, in DatumRef dref, in TransformAspect pos) => {
+                    // skip datums that have yet to be set
+                    if (!datums.HasDatum(dref.Name)) return;
+                    // UnityEngine.Debug.Log($"looking up {dref.Name}");
                     text.UpdatePosition(in pos);
-                    if (DDL.HasComponent(dref.Entity)) {
-                        var datum = DDL[dref.Entity];
-                        text.UpdateText(datum.Value);
-                    } else if (DS64L.HasComponent(dref.Entity)) {
-                        var datum = DS64L[dref.Entity];
-                        text.UpdateText(datum.Value);
-                    } else if (DS512L.HasComponent(dref.Entity)) {
-                        var datum = DS512L[dref.Entity];
-                        text.UpdateText(datum.Value);
+                    switch (dref.Type) {
+                        case DatumType.Double:
+                            text.UpdateText(datums.GetDouble(dref.Name));
+                            break;
+                        case DatumType.String64:
+                            text.UpdateText(datums.GetString64(dref.Name));
+                            break;
+                        case DatumType.String512:
+                            text.UpdateText(datums.GetString512(dref.Name));
+                            break;
                     }
                 })
                 .WithoutBurst()

@@ -1,0 +1,3 @@
+World.TimeScale: 1
+Debug.SpawnObjects.Count: 10000
+Player.Orbit.Inclination: 45

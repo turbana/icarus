@@ -49,8 +49,8 @@ namespace Icarus.UI {
                     settings.Movement = bcontrol.Movement;
                 }
                 AddComponent<ControlSettings>(settings);
-                AddComponent<UninitializedDatumRef>(new UninitializedDatumRef {
-                        ID = control.DatumID,
+                AddComponent<DatumRef>(new DatumRef {
+                        Name = control.DatumID,
                         Type = DatumType.Double,
                     });
                 if (control.DatumID == "" || control.DatumID == ".") {

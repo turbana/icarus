@@ -1,3 +1,4 @@
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -7,15 +8,13 @@ namespace Icarus.UI {
         readonly RefRO<ControlSettings> Settings;
         readonly RefRO<DatumRef> DatumRef;
 
-        public Entity Datum => DatumRef.ValueRO.Entity;
+        public FixedString64Bytes Datum => DatumRef.ValueRO.Name;
         public InteractionControlType ControlType => Settings.ValueRO.Type;
         public int StopCount => Settings.ValueRO.Stops;
         public Entity Root => Settings.ValueRO.Root;
 
-        public double NextValue(in DatumDouble datum, in Interaction inputs) {
+        public double NextValue(double value, in Interaction inputs) {
             int direction = 0;
-            int value = (int)datum.Value;
-            int pvalue = (int)datum.PreviousValue;
 
             // check desired interactions
             if (inputs.ScrollWheelUp || (inputs.LeftMouseDown && ControlType == InteractionControlType.Increase)) {
@@ -25,17 +24,22 @@ namespace Icarus.UI {
                 direction = -1;
                 // UnityEngine.Debug.Log("direction decrease");
             } else if (inputs.LeftMouseDown && ControlType == InteractionControlType.Toggle) {
-                direction = pvalue - value;
-                if (direction == 0) {
-                    if (value == 0) {
-                        direction = 1;
-                    } else if (0 < value) {
-                        direction = -1;
-                    } else {
-                        UnityEngine.Debug.LogError($"datum value cannot be negative: {datum.Value}");
-                    }
+                if (value == 0) {
+                    direction = 1;
+                } else {
+                    direction = -1;
                 }
-                // UnityEngine.Debug.Log($"direction toggled to {direction}");
+                // direction = pvalue - value;
+                // if (direction == 0) {
+                //     if (value == 0) {
+                //         direction = 1;
+                //     } else if (0 < value) {
+                //         direction = -1;
+                //     } else {
+                //         UnityEngine.Debug.LogError($"datum value cannot be negative: {datum.Value}");
+                //     }
+                // }
+                // // UnityEngine.Debug.Log($"direction toggled to {direction}");
             } else if (ControlType == InteractionControlType.Press) {
                 direction = (inputs.LeftMouse ? 1 : -1);
                 // UnityEngine.Debug.Log($"direction pressed to {direction}");
@@ -48,10 +52,10 @@ namespace Icarus.UI {
                 }
             }
 
-            return datum.Value;
+            return value;
         }
 
-        public CrosshairType Crosshair(in DatumDouble datum) {
+        public CrosshairType Crosshair() {
             switch (ControlType) {
                 case InteractionControlType.Increase:
                     return CrosshairType.Increase;
@@ -64,9 +68,9 @@ namespace Icarus.UI {
             return CrosshairType.Normal;
         }
 
-        public LocalTransform GetLocalTransform(in DatumDouble datum) {
-            var translation = Settings.ValueRO.Movement * (float)datum.Value;
-            var rotation = quaternion.RotateX(Settings.ValueRO.Rotation * (float)datum.Value);
+        public LocalTransform GetLocalTransform(float step) {
+            var translation = Settings.ValueRO.Movement * step;
+            var rotation = quaternion.RotateX(Settings.ValueRO.Rotation * step);
             var transform = Settings.ValueRO.InitialTransform;
             transform.Position = transform.Position + translation;
             transform.Rotation = math.mul(transform.Rotation, rotation);

@@ -11,53 +11,58 @@ namespace Icarus.UI {
     [BurstCompile]
     [UpdateInGroup(typeof(UserInputSystemGroup))]
     public partial class QueryUserInputSystem : SystemBase {
-        private ComponentLookup<DatumDouble> DatumLookup;
         private Camera MainCamera;
+        ComponentLookup<Crosshair> CrosshairLookup;
 
         [BurstCompile]
         protected override void OnCreate() {
-            DatumLookup = GetComponentLookup<DatumDouble>(false);
             MainCamera = Camera.main;
+            CrosshairLookup = GetComponentLookup<Crosshair>(false);
         }
         
         [BurstCompile]
         protected override void OnUpdate() {
-            DatumLookup.Update(this);
+            CrosshairLookup.Update(this);
+            var CL = CrosshairLookup;
+
+            // crosshair entitiy
+            var centity = SystemAPI.GetSingletonEntity<Crosshair>();
             
             // read user input
             var inputs = Interaction.FromUserInput();
-            
+
+            // setup physics ray caster
             var pworld = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
             var comp = SystemAPI.GetSingletonRW<Crosshair>();
             float3 rstart = MainCamera.transform.position;
             float3 rend = rstart + (float3)(MainCamera.transform.forward * Constants.INTERACT_DISTANCE);
-            // Debug.Log($"ray casting from {rstart} to {rend} mask={INTERACTION_LAYER_MASK}");
-            var DL = DatumLookup;
             
             Entities
-                .ForEach((ref Crosshair crosshair) => {
+                .ForEach((ref DatumCollection datums) => {
                     Raycast(out Entity entity, pworld, rstart, rend);
+                    var crosshair = CrosshairType.Normal;
                     // did we hit a collider?
                     if (entity != Entity.Null) {
-                        // Debug.Log("hit");
-                        var control = SystemAPI.GetAspectRO<ControlAspect>(entity);
-                        var datum = DL[control.Datum];
-                        // find next value
-                        var next = control.NextValue(in datum, in inputs);
-                        // update datum
-                        if (next != datum.Value) {
-                            datum.PreviousValue = datum.Value;
-                            datum.Value = next;
-                            // Debug.Log($"setting datum to {datum.Value} (old {datum.PreviousValue})");
-                            DL[control.Datum] = datum;
+                        var aspect = SystemAPI.HasComponent<ControlSettings>(entity)
+                            && SystemAPI.HasComponent<DatumRef>(entity);
+                        // Debug.Log($"hit {aspect}");
+                        if (aspect) {
+                            var control = SystemAPI.GetAspectRO<ControlAspect>(entity);
+                            if (inputs.AnyInteraction) {
+                                var value = datums.GetDouble(control.Datum, 0);
+                                // find next value
+                                var next = control.NextValue(value, in inputs);
+                                // update datum
+                                if (next != value) {
+                                    datums.SetDouble(control.Datum, next);
+                                }
+                            }
+                            crosshair = control.Crosshair();
                         }
-                        // set crosshair
-                        crosshair.Value = control.Crosshair(in datum);
-                    } else {
-                        // Debug.Log("no hit");
-                        crosshair.Value = CrosshairType.Normal;
                     }
-                }).Schedule();
+                    CL[centity] = new Crosshair { Value = crosshair };
+                })
+                .Schedule();
         }
         
         [BurstCompile]

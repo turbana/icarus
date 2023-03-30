@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 8f73d4e14a0d1b44ca8bee6b6cb38fb7
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - DatumDouble: {fileID: 102900000, guid: c36a1e4c0bc2b424592007780cd1bc07, type: 3}
+  - DatumString64: {fileID: 102900000, guid: 9d2df241824788646bc7a1cbcbb10458, type: 3}
+  - DatumString512: {fileID: 102900000, guid: 23b9d20844f492447adbb56587199b8b, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
