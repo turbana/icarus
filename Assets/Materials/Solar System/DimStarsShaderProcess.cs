@@ -33,7 +33,8 @@ public sealed class DimStarsShaderProcess : CustomPostProcessVolumeComponent, IP
 
         m_Material.SetFloat("_Intensity", intensity.value);
         m_Material.SetTexture("_MainTex", source);
-        HDUtils.DrawFullScreen(cmd, m_Material, destination, shaderPassId: 0);
+        // HDUtils.DrawFullScreen(cmd, m_Material, destination, shaderPassId: 0);
+        HDUtils.DrawFullScreen(cmd, m_Material, destination);
         // Graphics.Blit(source, destination, m_Material, pass: 0);
     }
 
