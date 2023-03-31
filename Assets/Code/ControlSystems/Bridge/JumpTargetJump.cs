@@ -44,7 +44,7 @@ namespace Icarus.Controls {
                         var inc = datums.GetDouble("Planned.Orbit.Inclination");
                         var ecc = datums.GetDouble("Planned.Orbit.Eccentricity");
                         var aan = datums.GetDouble("Planned.Orbit.AscendingNode");
-                        var pr = datums.GetDouble("Planned.TargetJump.SMA");
+                        var pr = datums.GetDouble("Planned.Orbit.SMA");
                         
                         // find parent
                         var parentEntity = database.LookupEntity(parentName);

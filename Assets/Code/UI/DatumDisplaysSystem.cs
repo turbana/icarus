@@ -23,6 +23,7 @@ namespace Icarus.UI {
         protected override void OnUpdate() {
             LocalTransformLookup.Update(this);
             var LTL = LocalTransformLookup;
+            this.Dependency.Complete();
             var datums = SystemAPI.GetSingleton<DatumCollection>();
 
             // update controls
@@ -38,7 +39,7 @@ namespace Icarus.UI {
             
             // update dynamic text
             Entities
-                .ForEach((ManagedTextComponent text, in DatumRef dref, in LocalTransform pos) => {
+                .ForEach((ManagedTextComponent text, in DatumRef dref, in LocalToWorld pos) => {
                     // skip datums that have yet to be set
                     if (!datums.HasDatum(dref.Name)) return;
                     // UnityEngine.Debug.Log($"looking up {dref.Name}");
@@ -63,7 +64,7 @@ namespace Icarus.UI {
                 .WithNone<DatumRef>()
                 // XXX why can't we use a change filter here?
                 // .WithChangeFilter<ManagedTextComponent>()
-                .ForEach((ManagedTextComponent text, in LocalTransform pos) => {
+                .ForEach((ManagedTextComponent text, in LocalToWorld pos) => {
                     text.UpdateText(System.Double.MaxValue);
                     text.UpdatePosition(in pos);
                 })

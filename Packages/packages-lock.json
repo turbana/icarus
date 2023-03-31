@@ -18,6 +18,18 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.unity.charactercontroller": {
+      "version": "1.0.0-exp.4",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.entities": "1.0.0-pre.65",
+        "com.unity.physics": "1.0.0-pre.65",
+        "com.unity.modules.uielements": "1.0.0",
+        "com.unity.modules.physics": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
     "com.unity.cinemachine": {
       "version": "2.9.5",
       "depth": 0,
@@ -48,7 +60,7 @@
     },
     "com.unity.entities": {
       "version": "1.0.0-pre.65",
-      "depth": 1,
+      "depth": 0,
       "source": "registry",
       "dependencies": {
         "com.unity.burst": "1.8.3",

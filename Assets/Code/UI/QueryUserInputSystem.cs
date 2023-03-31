@@ -63,6 +63,13 @@ namespace Icarus.UI {
                     CL[centity] = new Crosshair { Value = crosshair };
                 })
                 .Schedule();
+
+            // NOTE: we need to complete before the character controller
+            // runs. We can either add ourselves as a dependency (or vice
+            // versa), but I don't know a way to do that. So to ensure we don't
+            // clobber each other in the physics world ensure we're complete
+            // before moving on.
+            this.Dependency.Complete();
         }
         
         [BurstCompile]

@@ -1,10 +1,12 @@
+using Unity.CharacterController;
 using Unity.Entities;
+
+using Icarus.Loading;
 
 namespace Icarus.UI {
     /* UserInputSystemGroup is where user input in queried */
-    [UpdateInGroup(typeof(SimulationSystemGroup), OrderFirst=true)]
-    [UpdateBefore(typeof(VariableRateSimulationSystemGroup))]
-    [UpdateBefore(typeof(FixedStepSimulationSystemGroup))]
+    [UpdateInGroup(typeof(InitializationSystemGroup))]
+    [UpdateAfter(typeof(IcarusLoadingSystemGroup))]
     public partial class UserInputSystemGroup : ComponentSystemGroup {}
     
     /* InteractionSystemGroup is where any systems that need to run each frame

@@ -238,8 +238,8 @@ namespace Icarus.UI {
             this.TextMeshPro.text = String.Format(this.Format, value);
         }
 
-        public void UpdatePosition(in LocalTransform pos) =>
-            UpdatePosition(pos.Position, pos.Rotation, new float3(pos.Scale));
+        public void UpdatePosition(in LocalToWorld pos) =>
+            UpdatePosition(pos.Position, pos.Rotation, new float3(1f));
         
         public void UpdatePosition(Vector3 pos, Quaternion rot, Vector3 scale) {
             if (this.GO is null) this.CreateGameObject();
