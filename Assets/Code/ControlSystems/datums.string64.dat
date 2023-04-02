@@ -1,2 +1,3 @@
 Bridge.JumpTarget.RegisterValue:
-Player.Orbit.Parent: foobar
+Player.Orbit.Parent: Earth
+Planned.Orbit.Target: Mars
