@@ -12,26 +12,29 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 
+using Icarus.Loading;
 
 namespace Icarus.Orbit {
     using BodyName = FixedString64Bytes;
     using OrbitalDatabase = UnsafeParallelHashMap<FixedString64Bytes, OrbitalDatabaseData>;
     using EntityDatabase = UnsafeParallelHashMap<FixedString64Bytes, Entity>;
-    
-    public struct OrbitalDatabaseDataComponent : IBufferElementData {
+
+    public struct OrbitalDatabaseTag : IComponentData {}
+
+    public struct OrbitalDatabasePrefab : IBufferElementData {
         public FixedString64Bytes Name;
-        public Entity Value;
+        public Entity Prefab;
     }
     
     public struct OrbitalDatabaseComponent : IComponentData {
-        private static FixedString64Bytes DEFAULT_PREFAB = "Planet Prefab";
+        private static readonly FixedString64Bytes DEFAULT_PREFAB = "Planet Prefab";
 
         private OrbitalDatabase DataMap;
         private EntityDatabase EntityMap;
         private EntityDatabase PrefabMap;
-
-        public OrbitalDatabaseComponent(OrbitalDatabase dmap) {
-            this.DataMap = dmap;
+        
+        public OrbitalDatabaseComponent(AllocatorManager.AllocatorHandle allocator) {
+            this.DataMap = new UnsafeParallelHashMap<FixedString64Bytes, OrbitalDatabaseData>(0, Allocator.Persistent);
             this.EntityMap = new UnsafeParallelHashMap<FixedString64Bytes, Entity>(0, Allocator.Persistent);
             this.PrefabMap = new UnsafeParallelHashMap<FixedString64Bytes, Entity>(0, Allocator.Persistent);
         }
@@ -48,6 +51,11 @@ namespace Icarus.Orbit {
             get => PrefabMap.Count();
         }
 
+        public int DataCapacity {
+            get => DataMap.Capacity;
+            set => DataMap.Capacity = value;
+        }
+
         public int EntityCapacity {
             get => EntityMap.Capacity;
             set => EntityMap.Capacity = value;
@@ -60,6 +68,10 @@ namespace Icarus.Orbit {
 
         public OrbitalDatabaseData LookupData(BodyName name) {
             return DataMap[name];
+        }
+
+        public void SaveData(OrbitalDatabaseData data) {
+            DataMap[data.Name] = data;
         }
 
         public Entity LookupEntity(BodyName name) {
@@ -118,7 +130,7 @@ namespace Icarus.Orbit {
     }
 
     [System.Serializable]
-    public struct OrbitalDatabaseData {
+    public struct OrbitalDatabaseData : IBufferElementData {
         public FixedString64Bytes Name;
         public FixedString32Bytes Type;
         public FixedString64Bytes Parent;
@@ -173,7 +185,7 @@ namespace Icarus.Orbit {
             RotationElapsedTime = reader.ReadSingle();
         }
     }
-
+    
 #if UNITY_EDITOR
     [AddComponentMenu("Icarus/Orbit/Orbital Database")]
     public class OrbitalDatabaseAuthoring : MonoBehaviour {
@@ -235,36 +247,41 @@ namespace Icarus.Orbit {
             public override void Bake(OrbitalDatabaseAuthoring auth) {
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
                 DependsOn(auth.OrbitalDatabase);
+                var data = AddBuffer<OrbitalDatabaseData>(entity);
 
                 var GuessSize = 100;
 
+                // load data elements
                 var dmap = new OrbitalDatabase(GuessSize, Allocator.Persistent);
-                var emap = new EntityDatabase(GuessSize, Allocator.Persistent);
-                var pmap = new EntityDatabase(GuessSize, Allocator.Persistent);
-
                 auth.LoadDatabase(dmap);
-                SetPrefabs(entity, pmap, auth.PrefabPath);
-                if (auth.LogStatistics) {
-                    ShowStatistics(dmap, pmap);
+                var items = dmap.GetValueArray(Allocator.Temp);
+                for (int i=0; i<items.Length; i++) {
+                    data.Add(items[i]);
                 }
 
-                var comp = new OrbitalDatabaseComponent(dmap);
-                AddComponent<OrbitalDatabaseComponent>(entity, comp);
+                // load prefabs
+                SetPrefabs(entity, auth.PrefabPath);
+
+                // set tag
+                AddComponent<OrbitalDatabaseTag>(entity);
+
+                // clean up
+                items.Dispose();
+                dmap.Dispose();
             }
 
-            private void SetPrefabs(in Entity entity, EntityDatabase pmap, Object dir) {
+            private void SetPrefabs(in Entity entity, Object dir) {
                 string[] root = new string[] { AssetDatabase.GetAssetPath(dir) };
                 string[] assets = AssetDatabase.FindAssets("t:GameObject", root);
-                var prefabs = AddBuffer<OrbitalDatabaseDataComponent>(entity);
+                var prefabs = AddBuffer<OrbitalDatabasePrefab>(entity);
                 for (int i=0; i<assets.Length; i++) {
                     string path = AssetDatabase.GUIDToAssetPath(assets[i]);
                     GameObject prefab = AssetDatabase.LoadMainAssetAtPath(path) as GameObject;
-                    var comp = new OrbitalDatabaseDataComponent {
+                    var comp = new OrbitalDatabasePrefab {
                         Name = prefab.name,
-                        Value = GetEntity(prefab, TransformUsageFlags.Dynamic)
+                        Prefab = GetEntity(prefab, TransformUsageFlags.Dynamic)
                     };
                     prefabs.Add(comp);
-                    pmap[prefab.name] = GetEntity(prefab, TransformUsageFlags.Dynamic);
                 }
             }
         }

@@ -18,21 +18,23 @@ namespace Icarus.Loading {
     [RequireMatchingQueriesForUpdate]
     [UpdateInGroup(typeof(IcarusLoadingSystemGroup))]
     public partial class LoadOrbitalBodySystem : SystemBase {
-        private static FixedString64Bytes DEFAULT_PREFAB = "Planet Prefab";
-        
-        protected override void OnStartRunning() {
-            // Debug.Log("start LoadInitialOrbitalDatabaseSystem");
-            var entity = SystemAPI.GetSingletonEntity<OrbitalDatabaseComponent>();
-            var database = this.EntityManager.GetComponentData<OrbitalDatabaseComponent>(entity);
-            var prefabs = this.EntityManager.GetBuffer<OrbitalDatabaseDataComponent>(entity);
-            var keys = database.GetDataKeyArray(Allocator.TempJob);
-            var entities = new NativeArray<Entity>(keys.Length, Allocator.TempJob);
-            var ecb = new EntityCommandBuffer(Allocator.TempJob);
+        private bool Loaded;
+        protected static void LoadDatabase(in EntityCommandBuffer ecb, in Entity entity,
+                                           in DynamicBuffer<OrbitalDatabaseData> data,
+                                           in DynamicBuffer<OrbitalDatabasePrefab> prefabs) {
+            var entities = new NativeArray<Entity>(data.Length, Allocator.TempJob);
+            var database = new OrbitalDatabaseComponent(Allocator.Persistent);
+
+            // load data
+            database.DataCapacity = data.Length;
+            for (int i=0; i<data.Length; i++) {
+                database.SaveData(data[i]);
+            }
             
             // load prefabs
             database.PrefabCapacity = prefabs.Length;
             for (int i=0; i<prefabs.Length; i++) {
-                database.SavePrefab(prefabs[i].Name, prefabs[i].Value);
+                database.SavePrefab(prefabs[i].Name, prefabs[i].Prefab);
             }
 
             // initialize entity map
@@ -41,28 +43,43 @@ namespace Icarus.Loading {
 
             // instantiate and set orbital data
             for (int i=0; i<entities.Length; i++) {
-                var name = keys[i];
+                var name = data[i].Name;
                 var prefab = database.LookupPrefab(name);
                 entities[i] = ecb.Instantiate(prefab);
-                // ecb.SetName(entities[i], name);
                 // Debug.Log($"instantiated prefab for {name} -> {prefab} : {this.EntityManager.GetName(prefab)}");
                 var comp = new OrbitalBodyToLoadComponent { Name = name };
                 ecb.AddComponent<OrbitalBodyToLoadComponent>(entities[i], comp);
                 ecb.RemoveComponent<Parent>(entities[i]);
             }
 
-            ecb.Playback(this.EntityManager);
-            keys.Dispose();
-            entities.Dispose();
-            ecb.Dispose();
+            ecb.AddComponent<OrbitalDatabaseComponent>(entity, database);
+        }
 
-            this.EntityManager.SetComponentData<OrbitalDatabaseComponent>(entity, database);
-            // Debug.Log("end LoadInitialOrbitalDatabaseSystem");
+        protected override void OnStartRunning() {
+            Loaded = false;
         }
         
         protected override void OnUpdate() {
-            var database = SystemAPI.GetSingletonRW<OrbitalDatabaseComponent>();
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
+            var entity = SystemAPI.GetSingletonEntity<OrbitalDatabaseTag>();
+            
+            if (!Loaded) {
+                var data = SystemAPI.GetBuffer<OrbitalDatabaseData>(entity);
+                var prefabs = SystemAPI.GetBuffer<OrbitalDatabasePrefab>(entity);
+                
+                LoadDatabase(ecb, entity, data, prefabs);
+                ecb.RemoveComponent<OrbitalDatabaseData>(entity);
+                ecb.RemoveComponent<OrbitalDatabasePrefab>(entity);
+                
+                ecb.Playback(this.EntityManager);
+                ecb.Dispose();
+                Loaded = true;
+                
+                // setup ecb for rest of job
+                ecb = new EntityCommandBuffer(Allocator.TempJob);
+            }
+            
+            var database = SystemAPI.GetSingletonRW<OrbitalDatabaseComponent>();
 
             new AddCoreOrbitalParametersJob {
                 database = database.ValueRW,
