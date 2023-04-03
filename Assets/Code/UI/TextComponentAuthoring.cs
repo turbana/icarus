@@ -19,13 +19,11 @@ namespace Icarus.UI {
         public class TextComponentAuthoringBaker : Baker<TextComponentAuthoring> {
             public override void Bake(TextComponentAuthoring auth) {
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
-                var config = TextStylesConfig.Singleton;
-                var style = config.LookupStyle(auth.style);
+                var style = TextStylesConfig.LookupStyle(auth.style);
                 if (style is null) {
                     Debug.LogWarning($"Could not find TextStyle: {auth.style}", auth);
                     return;
                 }
-                DependsOn(config);
                 DependsOn(style);
                 if (auth.datumKey != "") {
                     AddComponent<DatumRef>(entity, new DatumRef {
