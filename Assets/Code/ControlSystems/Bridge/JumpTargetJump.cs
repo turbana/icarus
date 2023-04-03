@@ -63,7 +63,7 @@ namespace Icarus.Controls {
                         var period = dmath.Period(sma, parentData.Mass, 0.0);
                         
                         // perform jump
-                        UnityEngine.Debug.Log($"jumping to {parentName} @{sma}km {period}s i{inc} e{ecc} an{aan} ({pr})");
+                        // UnityEngine.Debug.Log($"jumping to {parentName} @{sma}km {period}s i{inc} e{ecc} an{aan} ({pr})");
 
                         // update parameters
                         ecb.SetComponent(player, new OrbitalParameters {

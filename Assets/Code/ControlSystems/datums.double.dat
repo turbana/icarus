@@ -2,7 +2,7 @@ World.TimeScale: 1
 Debug.SpawnObjects.Count: 10000
 Planned.Orbit.SemiMajorAxis: 1.2
 Planned.Orbit.SMA: 1
-Planned.Orbit.Inclination: 0
+Planned.Orbit.Inclination: 45
 Planned.Orbit.Eccentricity: 0
 Planned.Orbit.AscendingNode: 0
 Player.Orbit.SemiMajorAxis: 7645.2
