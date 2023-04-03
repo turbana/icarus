@@ -8,16 +8,12 @@ namespace Icarus.UI {
     public partial class DatumCleanupSystem : SystemBase {
         [BurstCompile]
         protected override void OnUpdate() {
-            // this.Dependency.Complete();
-            var datums = SystemAPI.GetSingletonRW<DatumCollection>();
-            // // datums.Dirty.Clear();
+            RefRW<DatumCollection> datums;
+            if (!SystemAPI.TryGetSingletonRW<DatumCollection>(out datums)) {
+                // DatumCollection is in a subscene that might not be loaded yet.
+                return;
+            }
             datums.ValueRW.ResetDirty();
-
-            // Entities
-            //     .ForEach((ref DatumCollection datums) => {
-            //         datums.ResetDirty();
-            //     })
-            //     .Run();
         }
     }
 }

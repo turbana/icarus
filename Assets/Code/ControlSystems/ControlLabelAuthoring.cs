@@ -32,7 +32,7 @@ namespace Icarus.UI {
                 DependsOn(style);
                 AddComponentObject<ManagedTextComponent>(entity, new ManagedTextComponent {
                         GO = null,
-                        Style = style,
+                        Style = style.Data,
                         Format = auth.DatumID,
                     });
             }

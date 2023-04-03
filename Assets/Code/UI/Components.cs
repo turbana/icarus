@@ -174,7 +174,7 @@ namespace Icarus.UI {
      * TextMeshPro component. */
     public class ManagedTextComponent : IComponentData, IDisposable, ICloneable {
         public GameObject GO;
-        public TextStyle Style;
+        public TextStyleData Style;
         public string Format;
 
         public TextMeshPro TextMeshPro => this.GO.GetComponent<TextMeshPro>();
@@ -255,12 +255,9 @@ namespace Icarus.UI {
         public static readonly SharedStatic<int> Lock = SharedStatic<int>
             .GetOrCreate<DatumCollectionLock, LockKey>();
         private class LockKey {}
-
-        // static DatumCollectionLock(int start, int end) {
-        //     while (start == Interlocked.Exchange(ref Lock, end));
-        // }
     }
 
+    /* A DatumCollection is a singleton component containing all known datums.  */
     [BurstCompile]
     public unsafe partial struct DatumCollection : IComponentData {
         public UnsafeHashMap<FixedString64Bytes, DatumDouble> DatumDouble;
@@ -427,6 +424,7 @@ namespace Icarus.UI {
 
         [BurstCompile]
         public void SetDouble(FixedString64Bytes name, double value) {
+            // UnityEngine.Debug.Log($"setting DatumDouble: {name}");
             _AquireLock();
             DatumDouble datum;
             if (DatumDouble.ContainsKey(name)) {
@@ -442,6 +440,7 @@ namespace Icarus.UI {
 
         [BurstCompile]
         public void SetString64(FixedString64Bytes name, FixedString64Bytes value) {
+            // UnityEngine.Debug.Log($"setting DatumString64: {name}");
             _AquireLock();
             DatumString64 datum;
             if (DatumString64.ContainsKey(name)) {
@@ -457,6 +456,7 @@ namespace Icarus.UI {
 
         [BurstCompile]
         public void SetString512(FixedString64Bytes name, FixedString512Bytes value) {
+            // UnityEngine.Debug.Log($"setting DatumString512: {name}");
             _AquireLock();
             DatumString512 datum;
             if (DatumString512.ContainsKey(name)) {

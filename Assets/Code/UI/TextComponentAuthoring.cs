@@ -33,7 +33,7 @@ namespace Icarus.UI {
                 }
                 AddComponentObject<ManagedTextComponent>(entity, new ManagedTextComponent {
                         GO = null,
-                        Style = style,
+                        Style = style.Data,
                         Format = auth.format,
                     });
             }

@@ -14,8 +14,8 @@ namespace Icarus.UI {
 
         public static TextStyle LookupStyle(string StyleName) {
             if (StyleName is null || StyleName == "") { return null; }
-            if (Singleton is null) Debug.LogWarning("singleton is null)");
-            if (Singleton.transform is null) Debug.LogWarning("singleton transform is null");
+            // if (Singleton is null) Debug.LogWarning("singleton is null)");
+            // if (Singleton.transform is null) Debug.LogWarning("singleton transform is null");
             var child = Singleton.transform.Find(StyleName);
             if (child is null) { return null; }
             return child.GetComponent<TextStyle>();
