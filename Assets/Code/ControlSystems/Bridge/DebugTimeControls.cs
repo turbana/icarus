@@ -15,6 +15,7 @@ namespace Icarus.Controls {
         [BurstCompile]
         protected override void OnCreate() {
             OrbitalOptionsLookup = GetComponentLookup<OrbitalOptions>(false);
+            RequireForUpdate<OrbitalOptions>();
         }
 
         [BurstCompile]

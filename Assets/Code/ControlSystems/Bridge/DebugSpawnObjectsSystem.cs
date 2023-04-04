@@ -20,6 +20,8 @@ namespace Icarus.Controls {
         [BurstCompile]
         protected override void OnCreate() {
             random = new Random((uint)System.Diagnostics.Stopwatch.GetTimestamp());
+            RequireForUpdate<PlayerOrbitTag>();
+            RequireForUpdate<DebugSatellites>();
         }
 
         [BurstCompile]

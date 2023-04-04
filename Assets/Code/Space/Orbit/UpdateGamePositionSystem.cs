@@ -41,6 +41,9 @@ namespace Icarus.Orbit {
                 .WithAll<OrbitalPosition, OrbitalParameters, OrbitalScale>()
                 .WithAll<RotationalParameters, OrbitalParentPosition>()
                 .Build(this);
+            RequireForUpdate<SunTag>();
+            RequireForUpdate<PlayerOrbitTag>();
+            RequireForUpdate<PlayerTag>();
         }
 
         [BurstCompile]

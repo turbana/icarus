@@ -15,6 +15,11 @@ namespace Icarus.Controls {
         private const byte DECIMAL = (byte)'.';
         readonly private static Unicode.Rune SPACE_RUNE = (Unicode.Rune)' ';
         readonly private static Unicode.Rune DECIMAL_RUNE = (Unicode.Rune)'.';
+
+        [BurstCompile]
+        protected override void OnCreate() {
+            RequireForUpdate<DatumCollection>();
+        }
         
         [BurstCompile]
         protected override void OnUpdate() {

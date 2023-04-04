@@ -18,6 +18,8 @@ namespace Icarus.Controls {
         [BurstCompile]
         protected override void OnCreate() {
             DatabaseLookup = GetComponentLookup<OrbitalDatabaseComponent>(true);
+            RequireForUpdate<OrbitalDatabaseComponent>();
+            RequireForUpdate<PlayerOrbitTag>();
         }
 
         [BurstCompile]

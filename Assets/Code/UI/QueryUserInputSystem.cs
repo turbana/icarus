@@ -11,13 +11,13 @@ namespace Icarus.UI {
     [BurstCompile]
     [UpdateInGroup(typeof(UserInputSystemGroup))]
     public partial class QueryUserInputSystem : SystemBase {
-        private Camera MainCamera;
         ComponentLookup<Crosshair> CrosshairLookup;
 
         [BurstCompile]
         protected override void OnCreate() {
-            MainCamera = Camera.main;
             CrosshairLookup = GetComponentLookup<Crosshair>(false);
+            RequireForUpdate<Crosshair>();
+            RequireForUpdate<PhysicsWorldSingleton>();
         }
         
         [BurstCompile]
@@ -34,8 +34,8 @@ namespace Icarus.UI {
             // setup physics ray caster
             var pworld = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
             var comp = SystemAPI.GetSingletonRW<Crosshair>();
-            float3 rstart = MainCamera.transform.position;
-            float3 rend = rstart + (float3)(MainCamera.transform.forward * Constants.INTERACT_DISTANCE);
+            float3 rstart = Camera.main.transform.position;
+            float3 rend = rstart + (float3)(Camera.main.transform.forward * Constants.INTERACT_DISTANCE);
             
             Entities
                 .ForEach((ref DatumCollection datums) => {

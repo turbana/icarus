@@ -25,12 +25,17 @@ namespace Icarus.Orbit {
         protected GameObject LightObject;
         
         protected override void OnCreate() {
+            RequireForUpdate<SunLightComponent>();
+            LightObject = GetSun();
+        }
+
+        private GameObject GetSun() {
             foreach (Light light in Object.FindObjectsOfType<Light>()) {
                 if (light.type == LightType.Directional) {
-                    LightObject = light.gameObject;
-                    break;
+                    return light.gameObject;
                 }
             }
+            return null;
         }
         
         protected override void OnUpdate() {
@@ -38,6 +43,9 @@ namespace Icarus.Orbit {
             var ltw = SystemAPI.GetComponent<LocalToWorld>(entity);
             var isNaN = ltw.Position.x is float.NaN || ltw.Position.y is float.NaN || ltw.Position.z is float.NaN;
             if (!isNaN) {
+                if (LightObject is null) {
+                    LightObject = GetSun();
+                }
                 LightObject.transform.position = ltw.Position;
                 LightObject.transform.LookAt(Vector3.zero);
             }
