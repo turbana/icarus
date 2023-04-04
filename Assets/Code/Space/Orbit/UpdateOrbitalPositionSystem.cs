@@ -106,7 +106,7 @@ namespace Icarus.Orbit {
         private static double EccentricAnomaly(double M, double e) {
             double E0 = M;
             double E1 = 0;
-            for(int i = 0; i < 6; i++) {
+            for(int i = 0; i < 4; i++) {
                 E1 = E0 + (math.mad(e, math.sin(E0), M) - E0) /
                           (1f - e * math.cos(E0));
                 E0 = E1;
