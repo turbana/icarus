@@ -14,20 +14,31 @@ namespace Icarus.Orbit {
     [RequireMatchingQueriesForUpdate]
     [UpdateInGroup(typeof(UpdateOrbitSystemGroup))]
     public partial class UpdateOrbitalPositionSystem : SystemBase {
+        protected override void OnCreate() {
+            RequireForUpdate<OrbitalOptions>();
+            RequireForUpdate<PlayerOrbitTag>();
+            RequireForUpdate<PlayerParentOrbitTag>();
+            RequireForUpdate<DatumCollection>();
+        }
+        
         protected override void OnUpdate() {
             OrbitalOptions opts = SystemAPI.GetSingleton<OrbitalOptions>();
             float dt = SystemAPI.Time.DeltaTime * opts.TimeScale;
             var OrbitalParentTypeHandle = GetSharedComponentTypeHandle<OrbitalParent>();
             var RotationalParametersLookup = GetComponentLookup<RotationalParameters>(true);
             var player = SystemAPI.GetSingletonEntity<PlayerOrbitTag>();
+            var parent = SystemAPI.GetSingletonEntity<PlayerParentOrbitTag>();
+            var datums = SystemAPI.GetSingleton<DatumCollection>();
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
 
             new UpdateOrbitalPositionJob {
                 ecb = ecb.AsParallelWriter(),
                 Player = player,
+                Parent = parent,
                 DeltaTime = dt,
                 OrbitalParentTypeHandle = OrbitalParentTypeHandle,
                 RotationalParametersLookup = RotationalParametersLookup,
+                Datums = datums,
             }.ScheduleParallel();
 
             this.Dependency.Complete();
@@ -41,11 +52,15 @@ namespace Icarus.Orbit {
             [ReadOnly]
             public Entity Player;
             [ReadOnly]
+            public Entity Parent;
+            [ReadOnly]
             public float DeltaTime;
             [ReadOnly]
             public SharedComponentTypeHandle<OrbitalParent> OrbitalParentTypeHandle;
             [ReadOnly]
             public ComponentLookup<RotationalParameters> RotationalParametersLookup;
+            [ReadOnly]
+            public DatumCollection Datums;
 
             private dquaternion ParentTilt;
             private FixedString64Bytes ParentName;
@@ -97,6 +112,32 @@ namespace Icarus.Orbit {
                         LocalToWorld = ppos.Value + ltp,
                         LocalToParent = ltp
                     });
+
+                FixedString32Bytes prefix = "";
+                if (entity == Player) {
+                    prefix = "Player.Orbit";
+                }
+                else if (entity == Parent) {
+                    prefix = "Parent.Orbit";
+                }
+
+                if (!prefix.IsEmpty) {
+                    // orbital calculations
+                    Datums.SetDouble($"{prefix}.Elapsed", elapsed);
+                    Datums.SetDouble($"{prefix}.MeanMotion", n);
+                    Datums.SetDouble($"{prefix}.MeanAnomaly", M);
+                    Datums.SetDouble($"{prefix}.EccentricAnomaly", E);
+                    Datums.SetDouble($"{prefix}.Beta", beta);
+                    Datums.SetDouble($"{prefix}.Theta", theta);
+                    Datums.SetDouble($"{prefix}.Altitude", altitude);
+                    // orbital parameters
+                    Datums.SetDouble($"{prefix}.Period", parms.Period);
+                    Datums.SetDouble($"{prefix}.Eccentricity", parms.Eccentricity);
+                    Datums.SetDouble($"{prefix}.SemiMajorAxis", parms.SemiMajorAxis);
+                    Datums.SetDouble($"{prefix}.Inclination", parms.Inclination);
+                    Datums.SetDouble($"{prefix}.AscendingNode", parms.AscendingNode);
+                    Datums.SetString64($"{prefix}.BodyName", parms.BodyName);
+                }
             }
         }
         
