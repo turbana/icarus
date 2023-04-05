@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameInit : MonoBehaviour {
+    public Shader IncludeShader;
+    
     void Awake() {
 #if !UNITY_EDITOR
         Debug.Log("===== Icarus init =====");
