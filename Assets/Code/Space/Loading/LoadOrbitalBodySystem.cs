@@ -184,7 +184,8 @@ namespace Icarus.Loading {
                     // XXX shouldn't we have an argument of periapsis?
                     OrbitRotation = dquaternion.EulerYXZ(math.radians(data.Inclination),
                                                          math.radians(data.AscendingNode),
-                                                         0)
+                                                         0),
+                    BodyName = player ? "Ship" : name,
                 });
                     
             // add orbital position

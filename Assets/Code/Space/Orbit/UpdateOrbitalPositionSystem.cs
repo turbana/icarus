@@ -14,7 +14,13 @@ namespace Icarus.Orbit {
     [RequireMatchingQueriesForUpdate]
     [UpdateInGroup(typeof(UpdateOrbitSystemGroup))]
     public partial class UpdateOrbitalPositionSystem : SystemBase {
+        private EntityQuery TotalBodies;
+        
         protected override void OnCreate() {
+            // this is a clone of the job's Execute signature
+            TotalBodies = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<OrbitalPosition, OrbitalParentPosition, OrbitalParameters>()
+                .Build(this);
             RequireForUpdate<OrbitalOptions>();
             RequireForUpdate<PlayerOrbitTag>();
             RequireForUpdate<PlayerParentOrbitTag>();
@@ -40,6 +46,9 @@ namespace Icarus.Orbit {
                 RotationalParametersLookup = RotationalParametersLookup,
                 Datums = datums,
             }.ScheduleParallel();
+
+            // set the total number of orbiting bodies
+            datums.SetDouble("Orbits.TotalBodies", TotalBodies.CalculateEntityCount());
 
             this.Dependency.Complete();
             ecb.Playback(this.EntityManager);
@@ -137,6 +146,16 @@ namespace Icarus.Orbit {
                     Datums.SetDouble($"{prefix}.Inclination", parms.Inclination);
                     Datums.SetDouble($"{prefix}.AscendingNode", parms.AscendingNode);
                     Datums.SetString64($"{prefix}.BodyName", parms.BodyName);
+                    // timings
+                    Datums.SetDouble($"{prefix}.Time.Periapsis", (parms.Period - elapsed));
+                    double time = parms.Period * 0.5 - elapsed;
+                    Datums.SetDouble($"{prefix}.Time.Apoapsis", (time < 0) ? parms.Period + time : time);
+                    // XXX these aren't really right as we'd need to calculate from a
+                    // plane of reference
+                    time = parms.Period * 0.25 - elapsed;
+                    Datums.SetDouble($"{prefix}.Time.RisingNode", (time < 0) ? parms.Period + time : time);
+                    time = parms.Period * 0.75 - elapsed;
+                    Datums.SetDouble($"{prefix}.Time.DescendingNode", (time < 0) ? parms.Period + time : time);
                 }
             }
         }

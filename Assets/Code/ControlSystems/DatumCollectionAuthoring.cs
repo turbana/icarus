@@ -126,7 +126,9 @@ namespace Icarus.UI {
             ref var blobs = ref blob.Blob.Value.DatumBlobs;
             var datums = new DatumCollection(Allocator.Persistent);
 
+#if !UNITY_EDITOR
             UnityEngine.Debug.Log($"loading {blobs.Length} datums");
+#endif
             for (int i=0; i<blobs.Length; i++) {
                 var ID = blobs[i].ID.ToString();
                 switch (blobs[i].Type) {

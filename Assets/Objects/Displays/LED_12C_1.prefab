@@ -1216,10 +1216,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 8967532071183772186}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c4078a25cf3c454691f29e6aefb8d8a, type: 3}
+  m_Script: {fileID: 11500000, guid: 459e602fc6427c24da6fa032857a0cbe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  key: 
-  dynamic: 1
-  style: 0
-  font: {fileID: 11400000, guid: dfff8dd707ad01f4f943d46be68a5b88, type: 2}
+  datumKey: 
+  datumType: 0
+  format: '{0}'
+  style: Display1

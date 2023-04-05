@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Entities;
 using Unity.Transforms;
@@ -14,6 +15,7 @@ namespace Icarus.Orbit {
         public double Inclination;
         public double AscendingNode;
         public dquaternion OrbitRotation;
+        public FixedString64Bytes BodyName;
     }
 
     public struct OrbitalPosition : IComponentData {
@@ -85,7 +87,8 @@ namespace Icarus.Orbit {
                         OrbitRotation = dquaternion.EulerYXZ(
                             math.radians(parms.Inclination),
                             math.radians(parms.AscendingNode),
-                            0f)
+                            0f),
+                        BodyName = (parms.IsPlayer) ? "HSS-423R" : "",
                     });
                 AddComponent(entity, new OrbitalPosition {
                         ElapsedTime = parms.ElapsedTime,

@@ -44,8 +44,10 @@ namespace Icarus.Space {
                 // set size/color/position
                 SetupStar(entities[i], data[i], config.Distance);
             }
-
+            
+#if !UNITY_EDITOR
             UnityEngine.Debug.Log($"loaded {entities.Length} stars");
+#endif
             
             // clean up
             entities.Dispose();    
