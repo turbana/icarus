@@ -69,15 +69,15 @@ namespace Icarus.Controls {
                         ecb.AddComponent<OrbitRenderingEnabled>(entities);
                         ecb.AddComponent<PlayerSiblingOrbitTag>(entities);
                         for (int i=0; i<(int)count; i++) {
-                            double period = parms.Period + rand.NextDouble(0f, 0f);
-                            double elapsed = pos.ElapsedTime + rand.NextDouble(-0.1f, 0.1f);
+                            double period = parms.Period + rand.NextDouble(-0.01, 0.01);
+                            double elapsed = pos.ElapsedTime + rand.NextDouble(0, 0);
                             if (elapsed < 0f) elapsed += period;
                             var nparms = new OrbitalParameters {
                                 Period = period,
-                                Eccentricity = parms.Eccentricity + rand.NextDouble(-0.0000001f, 0.0000001f),
-                                SemiMajorAxis = parms.SemiMajorAxis + rand.NextDouble(-0.1f, 0.1f),
-                                Inclination = parms.Inclination + rand.NextDouble(-0.001f, 0.001f),
-                                AscendingNode = parms.AscendingNode + rand.NextDouble(0f, 0f)
+                                Eccentricity = parms.Eccentricity + rand.NextDouble(-0, 0),
+                                SemiMajorAxis = parms.SemiMajorAxis + rand.NextDouble(-0.01, 0.01),
+                                Inclination = parms.Inclination + rand.NextDouble(-0.0001, 0.0001),
+                                AscendingNode = parms.AscendingNode + rand.NextDouble(-0.0001, 0.0001),
                             };
                             nparms.OrbitRotation = dquaternion
                                 .EulerYXZ(math.radians(nparms.Inclination),
