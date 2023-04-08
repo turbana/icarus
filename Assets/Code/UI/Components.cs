@@ -180,6 +180,13 @@ namespace Icarus.UI {
         public TextMeshPro TextMeshPro => this.GO.GetComponent<TextMeshPro>();
         public RectTransform RectTransform => this.GO.GetComponent<RectTransform>();
 
+        public string Text {
+            get => TextMeshPro.text;
+            set => TextMeshPro.text = value;
+        }
+
+        public bool HasText => Text is not null && Text != "";
+
         public void Dispose() {
             #if UNITY_EDITOR
             UnityEngine.Object.DestroyImmediate(GO);

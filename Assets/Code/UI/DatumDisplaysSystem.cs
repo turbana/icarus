@@ -30,18 +30,31 @@ namespace Icarus.UI {
             Entities
                 .ForEach((in ControlAspect control, in DatumRef dref) => {
                     double value = 0;
-                    if (datums.HasDatum(dref.Name)) {
+                    if (datums.HasDatum(dref.Name) && datums.IsDirty(dref.Name)) {
                         value = datums.GetDouble(dref.Name);
                     }
                     LTL[control.Root] = control.GetLocalTransform((float)value);
                 })
                 .Schedule();
+
+            // update static text
+            Entities
+                .WithNone<DatumRef>()
+                .WithChangeFilter<ManagedTextComponent>()
+                .ForEach((ManagedTextComponent text, in LocalToWorld pos) => {
+                    text.UpdateText(System.Double.MaxValue);
+                    text.UpdatePosition(in pos);
+                })
+                .WithoutBurst()
+                .Run();
             
             // update dynamic text
             Entities
                 .ForEach((ManagedTextComponent text, in DatumRef dref, in LocalToWorld pos) => {
-                    // skip datums that have yet to be set
+                    // skip datums that have yet to be set or that don't need to
+                    // be updated
                     if (!datums.HasDatum(dref.Name)) return;
+                    if (!datums.IsDirty(dref.Name)) return;
                     // UnityEngine.Debug.Log($"looking up {dref.Name}");
                     text.UpdatePosition(in pos);
                     switch (dref.Type) {
@@ -55,18 +68,6 @@ namespace Icarus.UI {
                             text.UpdateText(datums.GetString512(dref.Name));
                             break;
                     }
-                })
-                .WithoutBurst()
-                .Run();
-
-            // update static text
-            Entities
-                .WithNone<DatumRef>()
-                // XXX why can't we use a change filter here?
-                // .WithChangeFilter<ManagedTextComponent>()
-                .ForEach((ManagedTextComponent text, in LocalToWorld pos) => {
-                    text.UpdateText(System.Double.MaxValue);
-                    text.UpdatePosition(in pos);
                 })
                 .WithoutBurst()
                 .Run();
