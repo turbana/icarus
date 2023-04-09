@@ -16,6 +16,22 @@ MonoBehaviour:
   intensity:
     m_OverrideState: 1
     m_Value: 1
+--- !u!114 &-208033436755212625
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c4cd2dc26319704b8a9b61a81b7e97c, type: 3}
+  m_Name: DimStarsShaderProcess
+  m_EditorClassIdentifier: 
+  active: 1
+  intensity:
+    m_OverrideState: 1
+    m_Value: 1
 --- !u!114 &-40467531014874835
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -81,7 +97,7 @@ MonoBehaviour:
   - {fileID: 4934874518606709559}
   - {fileID: 5173465157065642537}
   - {fileID: 327173578806048662}
-  - {fileID: -2089346552326504501}
+  - {fileID: -208033436755212625}
 --- !u!114 &327173578806048662
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -94,7 +110,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f034cba68ab55e046ae1445a42f18c0e, type: 3}
   m_Name: IndirectLightingController
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   indirectDiffuseLightingMultiplier:
     m_OverrideState: 1
     m_Value: 1

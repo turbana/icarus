@@ -3,10 +3,14 @@
 - Left click to interact
 - Scroll wheel up/down can also be used with switches and dials
 
+* Known issues
+- The dials are buggy when using left clicked. Suggest using the mouse wheel instead.
+
 * What can I do?
 - Currently, you can jump to any of the major planets and our Moon. You can try jumping elsewhere, but it's buggy currently. Only the planets/moon have textures currently.
 - You can use "Time controls" to speed up/slow down time.
 - You can spawn new "bodies". These are just test satellites that will spawn around the player's ship. By default it creates 10,000 of them, but you can configure it for more/less at a time.
+- You can look at the prototype map system and zoom in/out.
 
 * What the HELL are all these numbers?
 You can ignore them mostly, but here is what they mean. Eventually there will be an in game help system. Either a spiral binder or a laptop or something with all this in it to refer to.

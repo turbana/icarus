@@ -1,4 +1,5 @@
 World.TimeScale: 1
+OrbitalMap.Scale: 10
 Debug.SpawnObjects.Count: 10000
 Planned.Orbit.SemiMajorAxis: 1.2
 Planned.Orbit.SMA: 1
