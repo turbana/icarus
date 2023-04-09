@@ -32,8 +32,8 @@ namespace Icarus.UI {
                     double value = 0;
                     if (datums.HasDatum(dref.Name) && datums.IsDirty(dref.Name)) {
                         value = datums.GetDouble(dref.Name);
+                        LTL[control.Root] = control.GetLocalTransform((float)value);
                     }
-                    LTL[control.Root] = control.GetLocalTransform((float)value);
                 })
                 .Schedule();
 
